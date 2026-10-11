@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 540" font-family="sans-serif">
+  <rect x="0" y="0" width="900" height="540" fill="white"/>
+  <text x="450" y="28" text-anchor="middle" font-size="18" font-weight="bold">Logistics Management System — Use Case Diagram (draft)</text>
+  <g>
+    <circle cx="100" cy="60" r="20" fill="#dbeafe" stroke="#1d4ed8"/>
+    <line x1="100" y1="80" x2="100" y2="165" stroke="#1d4ed8" stroke-width="2"/>
+    <line x1="60" y1="105" x2="140" y2="105" stroke="#1d4ed8" stroke-width="2"/>
+    <line x1="100" y1="165" x2="70" y2="195" stroke="#1d4ed8" stroke-width="2"/>
+    <line x1="100" y1="165" x2="130" y2="195" stroke="#1d4ed8" stroke-width="2"/>
+    <text x="100" y="218" text-anchor="middle" font-size="15">客户 Customer</text>
+  </g>
+  <g>
+    <circle cx="100" cy="275" r="20" fill="#dbeafe" stroke="#1d4ed8"/>
+    <line x1="100" y1="295" x2="100" y2="380" stroke="#1d4ed8" stroke-width="2"/>
+    <line x1="60" y1="320" x2="140" y2="320" stroke="#1d4ed8" stroke-width="2"/>
+    <line x1="100" y1="380" x2="70" y2="410" stroke="#1d4ed8" stroke-width="2"/>
+    <line x1="100" y1="380" x2="130" y2="410" stroke="#1d4ed8" stroke-width="2"/>
+    <text x="100" y="433" text-anchor="middle" font-size="15">员工 Staff</text>
+  </g>
+  <g>
+    <circle cx="100" cy="490" r="20" fill="#dbeafe" stroke="#1d4ed8"/>
+    <line x1="100" y1="500" x2="100" y2="515" stroke="#1d4ed8" stroke-width="2"/>
+    <text x="100" y="518" text-anchor="middle" font-size="15">管理员 Admin</text>
+  </g>
+  <g font-size="13" text-anchor="middle">
+    <ellipse cx="510" cy="80" rx="100" ry="30" fill="#fef9c3" stroke="#a16207"/>
+    <text x="510" y="76">创建订单</text><text x="510" y="92">FR-01</text>
+    <ellipse cx="720" cy="80" rx="100" ry="30" fill="#fef9c3" stroke="#a16207"/>
+    <text x="720" y="76">查询订单</text><text x="720" y="92">FR-01</text>
+    <ellipse cx="510" cy="180" rx="100" ry="30" fill="#fef9c3" stroke="#a16207"/>
+    <text x="510" y="176">状态流转</text><text x="510" y="192">FR-02</text>
+    <ellipse cx="720" cy="180" rx="100" ry="30" fill="#fef9c3" stroke="#a16207"/>
+    <text x="720" y="176">运单追踪</text><text x="720" y="192">FR-03</text>
+    <ellipse cx="510" cy="280" rx="110" ry="30" fill="#fef9c3" stroke="#a16207"/>
+    <text x="510" y="276">库存入库与预警</text><text x="510" y="292">FR-04</text>
+    <ellipse cx="720" cy="280" rx="100" ry="30" fill="#fef9c3" stroke="#a16207"/>
+    <text x="720" y="276">收到通知</text><text x="720" y="292">FR-05</text>
+    <ellipse cx="610" cy="380" rx="120" ry="30" fill="#fef9c3" stroke="#a16207"/>
+    <text x="610" y="376">查看报表（Should）</text><text x="610" y="392">FR-06</text>
+  </g>
+  <g stroke="#94a3b8" stroke-width="1.2" fill="none">
+    <line x1="140" y1="60" x2="408" y2="70"/>
+    <line x1="140" y1="80" x2="618" y2="75"/>
+    <line x1="140" y1="90" x2="622" y2="172"/>
+    <line x1="140" y1="275" x2="408" y2="180"/>
+    <line x1="140" y1="280" x2="408" y2="280"/>
+    <line x1="140" y1="285" x2="622" y2="286"/>
+    <line x1="140" y1="490" x2="488" y2="388"/>
+  </g>
+</svg>
