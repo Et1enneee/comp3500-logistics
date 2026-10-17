@@ -15,7 +15,7 @@
 
 ## 2026-10-17 卡-05 测试执行记录
 
-记录负责人：Chung Ngon Man（GitHub：Jaden-Gittt）。执行方式：本人浏览器操作及 Codex 协助复测。
+记录负责人：Chung Ngon Man。
 
 ### 环境与判定口径
 
@@ -31,14 +31,14 @@
 
 | 日期 | 用例编号 | 操作及测试数据 | 预期结果 | 实际结果 | 结论 | 测试者 | 证据/关联 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 2026-10-17 | TC-FR01-01 | 客户 customer@demo.com 下 SKU001 × 2；浏览器操作并通过 POST /api/v1/orders 复测 | 201；ORD- 单号；totalCents=300 | 浏览器订单 ORD-20261017-0001；API 复测 201，ORD-20261017-0004，status=CREATED，totalCents=300，quantity=2，unitPriceCents=150 | PASS | Chung Ngon Man（Codex 协助） | 下方 E-01；浏览器标头/回传截图已在测试机留存 |
-| 2026-10-17 | TC-FR01-02 | POST /api/v1/orders；items=[{sku:SKU999,quantity:1}] | 400 SKU_NOT_FOUND | HTTP 400；error.code=SKU_NOT_FOUND_SKU999；未知商品有被拒绝，但完整错误码不一致 | FAIL | Chung Ngon Man（Codex 协助） | E-02；QA-001 |
-| 2026-10-17 | TC-FR01-03 | SKU001 数量设为 0，SKU007 下 10 件（库存 4）；浏览器操作及 API 复测 | 400 INSUFFICIENT_STOCK | HTTP 400；error.code=INSUFFICIENT_STOCK_SKU007；库存不足有被拒绝，但完整错误码不一致 | FAIL | Chung Ngon Man（Codex 协助） | E-03；QA-001 |
-| 2026-10-17 | TC-FR02-01 | 执行 lib/constants.test.ts 中 7 个合法转移断言 | 7 个 canTransition 结果全为 true | 7 项全部 passed；整份单元测试共 9 passed、0 failed | PASS | Chung Ngon Man（Codex 协助） | E-04 |
-| 2026-10-17 | TC-FR02-02 | 单测 CREATED→DELIVERED；另对已创建的真实订单 PATCH /api/v1/orders/{id}/status，to=DELIVERED | 单测 false；接口 409 | 单测确认 false（PASS）；API 实际 404 text/html，未达到预期 409；订单仍为 CREATED | FAIL（API；单测 PASS） | Chung Ngon Man（Codex 协助） | E-04、E-05；QA-002 |
-| 2026-10-17 | TC-FR02-03 | 对同一真实 CREATED 订单 PATCH /api/v1/orders/{id}/status，to=CONFIRMED；检查该订单库存流水 | 200；新增负数库存流水 | HTTP 404 text/html；订单仍为 CREATED，该订单 InventoryLog 为 []，未发生预占 | FAIL | Chung Ngon Man（Codex 协助） | E-05、E-08；QA-002 |
-| 2026-10-17 | TC-FR03-01 | 检查发货前置流程及 POST /api/v1/shipments 端点可用性 | 在符合发货前置条件的订单生成 LG-YYYYMMDD-XXXXXX 运单号 | 状态更新端点缺失，无法通过正常流程准备 PICKING 订单；运单端点探测也回传 404，尚未验证运单号格式 | BLOCKED | Chung Ngon Man（Codex 协助） | E-06；QA-003；端点探测不算格式测试通过 |
-| 2026-10-17 | TC-FR04-01 | 确认 SKU007 stock=4、lowStockThreshold=5；GET /api/v1/alerts | 200；预警包含 SKU007 | 种子条件成立；GET /alerts 实际 404 text/html，没有预警列表可核对 | FAIL | Chung Ngon Man（Codex 协助） | E-07、E-08；QA-004 |
+| 2026-10-17 | TC-FR01-01 | 客户 customer@demo.com 下 SKU001 × 2；浏览器操作并通过 POST /api/v1/orders 复测 | 201；ORD- 单号；totalCents=300 | 浏览器订单 ORD-20261017-0001；API 复测 201，ORD-20261017-0004，status=CREATED，totalCents=300，quantity=2，unitPriceCents=150 | PASS | Chung Ngon Man | 下方 E-01；浏览器标头/回传截图已在测试机留存 |
+| 2026-10-17 | TC-FR01-02 | POST /api/v1/orders；items=[{sku:SKU999,quantity:1}] | 400 SKU_NOT_FOUND | HTTP 400；error.code=SKU_NOT_FOUND_SKU999；未知商品有被拒绝，但完整错误码不一致 | FAIL | Chung Ngon Man | E-02；QA-001 |
+| 2026-10-17 | TC-FR01-03 | SKU001 数量设为 0，SKU007 下 10 件（库存 4）；浏览器操作及 API 复测 | 400 INSUFFICIENT_STOCK | HTTP 400；error.code=INSUFFICIENT_STOCK_SKU007；库存不足有被拒绝，但完整错误码不一致 | FAIL | Chung Ngon Man | E-03；QA-001 |
+| 2026-10-17 | TC-FR02-01 | 执行 lib/constants.test.ts 中 7 个合法转移断言 | 7 个 canTransition 结果全为 true | 7 项全部 passed；整份单元测试共 9 passed、0 failed | PASS | Chung Ngon Man | E-04 |
+| 2026-10-17 | TC-FR02-02 | 单测 CREATED→DELIVERED；另对已创建的真实订单 PATCH /api/v1/orders/{id}/status，to=DELIVERED | 单测 false；接口 409 | 单测确认 false（PASS）；API 实际 404 text/html，未达到预期 409；订单仍为 CREATED | FAIL（API；单测 PASS） | Chung Ngon Man | E-04、E-05；QA-002 |
+| 2026-10-17 | TC-FR02-03 | 对同一真实 CREATED 订单 PATCH /api/v1/orders/{id}/status，to=CONFIRMED；检查该订单库存流水 | 200；新增负数库存流水 | HTTP 404 text/html；订单仍为 CREATED，该订单 InventoryLog 为 []，未发生预占 | FAIL | Chung Ngon Man | E-05、E-08；QA-002 |
+| 2026-10-17 | TC-FR03-01 | 检查发货前置流程及 POST /api/v1/shipments 端点可用性 | 在符合发货前置条件的订单生成 LG-YYYYMMDD-XXXXXX 运单号 | 状态更新端点缺失，无法通过正常流程准备 PICKING 订单；运单端点探测也回传 404，尚未验证运单号格式 | BLOCKED | Chung Ngon Man | E-06；QA-003；端点探测不算格式测试通过 |
+| 2026-10-17 | TC-FR04-01 | 确认 SKU007 stock=4、lowStockThreshold=5；GET /api/v1/alerts | 200；预警包含 SKU007 | 种子条件成立；GET /alerts 实际 404 text/html，没有预警列表可核对 | FAIL | Chung Ngon Man | E-07、E-08；QA-004 |
 
 汇总：八条用例均有结果记录；2 PASS、5 FAIL（其中一条单测 PASS、API FAIL）、1 BLOCKED。BLOCKED 不计为完整执行通过；其余七条包含实际执行记录，达到至少六行实测记录。九个单元断言全部通过不代表八条业务用例全部通过。
 
@@ -59,9 +59,9 @@
 
 | Def-ID | 严重度 | 关联 FR / 用例 | 复现步骤 | 期望 vs 实际 | 状态 | 发现者 | 修复者 | 日期 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| QA-001 | S3 | FR-01 / TC-FR01-02、03 | 分别下 SKU999 × 1 和 SKU007 × 10 | 两项均正确拒绝请求，但错误码增加 SKU 后缀，与卡-05 原表不同；需统一契约或实现后复测 | Open | Chung Ngon Man（Codex 协助） | 待指派 | 2026-10-17 |
-| QA-002 | S2 | FR-02 / TC-FR02-02、03 | 对真实订单调用状态更新端点 | 预期非法转移 409、合法确认 200 并记负数流水；实际均 404，流程无法执行 | Open | Chung Ngon Man（Codex 协助） | 待指派 | 2026-10-17 |
-| QA-003 | S2 | FR-03 / TC-FR03-01 | 准备 PICKING 订单并生成运单 | 前置状态流程无法完成，运单端点 404；运单号格式测试被阻塞 | Open | Chung Ngon Man（Codex 协助） | 待指派 | 2026-10-17 |
-| QA-004 | S2 | FR-04 / TC-FR04-01 | 使用 stock=4、阈值=5 的 SKU007 查预警 | 预期列表包含 SKU007；实际端点 404 | Open | Chung Ngon Man（Codex 协助） | 待指派 | 2026-10-17 |
-| QA-005 | S4 | FR-01 / 本机界面走查 | 在本机深色主题下提交成功或失败订单 | 提示应清晰可读；实际浅色文字配浅色背景，难以辨认；需在团队最终页面样式下复核 | Open | Chung Ngon Man（Codex 协助） | 待指派 | 2026-10-17 |
-| QA-006 | S2 | FR-01、FR-04 / 启动环境 | 用仓库 schema 初始化 Prisma | Product 缺少 OrderItem、InventoryLog 反向关联；本机补齐后 validate/migrate 成功，仓库原文件仍待开发者修复 | Open（本机已临时补齐） | Chung Ngon Man（Codex 协助） | 待指派 | 2026-10-17 |
+| QA-001 | S3 | FR-01 / TC-FR01-02、03 | 分别下 SKU999 × 1 和 SKU007 × 10 | 两项均正确拒绝请求，但错误码增加 SKU 后缀，与卡-05 原表不同；需统一契约或实现后复测 | Open | Chung Ngon Man | 待指派 | 2026-10-17 |
+| QA-002 | S2 | FR-02 / TC-FR02-02、03 | 对真实订单调用状态更新端点 | 预期非法转移 409、合法确认 200 并记负数流水；实际均 404，流程无法执行 | Open | Chung Ngon Man | 待指派 | 2026-10-17 |
+| QA-003 | S2 | FR-03 / TC-FR03-01 | 准备 PICKING 订单并生成运单 | 前置状态流程无法完成，运单端点 404；运单号格式测试被阻塞 | Open | Chung Ngon Man | 待指派 | 2026-10-17 |
+| QA-004 | S2 | FR-04 / TC-FR04-01 | 使用 stock=4、阈值=5 的 SKU007 查预警 | 预期列表包含 SKU007；实际端点 404 | Open | Chung Ngon Man | 待指派 | 2026-10-17 |
+| QA-005 | S4 | FR-01 / 本机界面走查 | 在本机深色主题下提交成功或失败订单 | 提示应清晰可读；实际浅色文字配浅色背景，难以辨认；需在团队最终页面样式下复核 | Open | Chung Ngon Man | 待指派 | 2026-10-17 |
+| QA-006 | S2 | FR-01、FR-04 / 启动环境 | 用仓库 schema 初始化 Prisma | Product 缺少 OrderItem、InventoryLog 反向关联；本机补齐后 validate/migrate 成功，仓库原文件仍待开发者修复 | Open（本机已临时补齐） | Chung Ngon Man | 待指派 | 2026-10-17 |
