@@ -1,0 +1,29 @@
+{
+  "order": {
+    "id": "cmvp56lid0001kb7c4ifcap1a",
+    "orderNumber": "ORD-20261026-0001",
+    "customerId": "cmv6m4u960000kbbgjsaxx29x",
+    "status": "CONFIRMED",
+    "totalCents": 300,
+    "createdAt": "2026-10-26T10:57:02.821Z",
+    "updatedAt": "2026-10-26T11:03:46.940Z",
+    "items": [
+      {
+        "id": "cmvp56lid0003kb7cj2rzabil",
+        "orderId": "cmvp56lid0001kb7c4ifcap1a",
+        "productId": "cmv6m4u9a0003kbbg3exm9v4w",
+        "quantity": 2,
+        "unitPriceCents": 150,
+        "product": {
+          "sku": "SKU001",
+          "name": "矿泉水 500ml"
+        }
+      }
+    ],
+    "customer": {
+      "id": "cmv6m4u960000kbbgjsaxx29x",
+      "email": "customer@demo.com",
+      "name": "演示客户"
+    }
+  }
+}

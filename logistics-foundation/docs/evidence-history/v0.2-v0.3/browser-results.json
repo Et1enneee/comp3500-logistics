@@ -1,0 +1,22 @@
+{
+  "passed": [
+    "home renders database catalog, initial total ¥3.00",
+    "staff empty / blank input / not-found error",
+    "browser creates order and inventory stays unchanged",
+    "created order link prefills lookup and resolves internal ID",
+    "customer role forbidden; order and inventory unchanged",
+    "staff confirms real order; DB stock 100→98 / one ORDER_CONFIRM log",
+    "actual HTTP repeat returns 409 without another stock/log change",
+    "customer page reload displays current database stock 98",
+    "mobile insufficient-stock error; no order written; no page overflow",
+    "mobile confirmation layout / no horizontal document overflow",
+    "v0.3 chain: confirm → pick → ship one LG waybill; stock unchanged by shipping",
+    "v0.3 chain: duplicate shipment returns 409 with single waybill",
+    "v0.3 chain: transit → delivered with 3 ordered tracking events",
+    "network-unknown state removes stale confirmation action",
+    "mobile dark scheme is usable / no page exceptions"
+  ],
+  "consoleErrors": [],
+  "orderNumber": "ORD-20261028-0001",
+  "internalId": "cmvrw3n89000lvo0ina7t5cfl"
+}

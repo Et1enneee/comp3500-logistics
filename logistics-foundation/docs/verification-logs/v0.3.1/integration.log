@@ -1,0 +1,55 @@
+
+> group42-logistics-foundation@0.3.1 test:integration
+> tsx --test tests/orders.integration.ts tests/foundation.integration.ts tests/logistics-chain.integration.ts
+
+▶ Foundation creation / real isolated SQLite
+  ✔ create stores snapshot / leaves inventory and logs unchanged (32.88025ms)
+  ✔ duplicate SKUs aggregate before stock precheck (3.288209ms)
+  ✔ valid duplicate SKUs become one order line (3.589334ms)
+  ✔ reject empty / negative / fractional / malformed lines without writing (1.925417ms)
+  ✔ malformed JSON / null request return structured 400 (0.496ms)
+  ✔ unknown SKU / customer are rejected (2.620042ms)
+  ✔ non-customer demo role cannot create orders (1.001917ms)
+  ✔ end-to-end create / lookup / confirm / repeat preserves snapshot (7.541584ms)
+  ✔ stock changed after creation: confirmation fails without side effects (7.719583ms)
+✔ Foundation creation / real isolated SQLite (836.100458ms)
+▶ v0.3 logistics chain / real isolated SQLite
+  ✔ CONFIRMED -> PICKING: legal, stock and inventory logs unchanged (42.959542ms)
+  ✔ PICKING from CREATED is rejected 409 with no change (4.436083ms)
+  ✔ shipment from PICKING: LG waybill + initial event, stock unchanged (4.44ms)
+  ✔ shipment from CONFIRMED is rejected; no waybill or event residue (7.542625ms)
+  ✔ sequential duplicate shipment: 409 and still one waybill (1.641125ms)
+  ✔ concurrent duplicate shipment: exactly one waybill (13.721333ms)
+  ✔ missing identity / non-STAFF cannot update status or ship (7.19025ms)
+  ✔ IN_TRANSIT -> DELIVERED: shipment + ordered events, stock unchanged (4.657125ms)
+  ✔ tracking: correct association and order; wrong id leaks nothing (3.514667ms)
+  ✔ PATCH to SHIPPED / CANCELLED is rejected without mutation (4.39775ms)
+✔ v0.3 logistics chain / real isolated SQLite (882.298459ms)
+▶ REAL Prisma 6 / isolated SQLite integration
+  ✔ GET: missing/empty/blank orderNumber => 400 (28.207958ms)
+  ✔ GET: nonexistent order => 404 (1.398333ms)
+  ✔ GET: detail includes SKU/name and no passwordHash (2.08525ms)
+  ✔ PATCH: invalid/empty/malformed body => 400, no mutation (4.646667ms)
+  ✔ PATCH: missing/unknown identity => 401; role spoof ignored (4.071042ms)
+  ✔ PATCH: unknown internal ID and ORD-number-as-ID => 404 (3.535667ms)
+  ✔ PATCH: successful confirmation + repeated call has no effects (6.141458ms)
+  ✔ PATCH: every other non-CREATED status is rejected (18.703541ms)
+  ✔ PATCH: multi-product success writes one log per product (13.579958ms)
+  ✔ PATCH: later stock shortage rolls back earlier decrement/log/status (4.691417ms)
+Order API unexpected failure Error
+  ✔ PATCH: unexpected ledger failure rolls back entire transaction (4.933625ms)
+  ✔ PATCH: duplicate lines aggregate to one reservation/log (3.479167ms)
+  ✔ PATCH: individually sufficient duplicate lines can fail aggregate check (3.083875ms)
+  ✔ PATCH: stock exactly equal to demand reaches zero, not negative (3.049709ms)
+  ✔ PATCH: concurrent requests for same order reserve only once (6.758917ms)
+  ✔ PATCH: two orders compete for limited stock, no overselling (4.777708ms)
+  ✔ PATCH: invalid historical quantity or empty lines => no mutation (8.195208ms)
+✔ REAL Prisma 6 / isolated SQLite integration (897.794917ms)
+ℹ tests 39
+ℹ suites 0
+ℹ pass 39
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1123.656291

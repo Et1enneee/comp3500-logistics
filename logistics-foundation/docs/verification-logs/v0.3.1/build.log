@@ -1,0 +1,35 @@
+
+> group42-logistics-foundation@0.3.1 build
+> next build
+
+▲ Next.js 16.4.3 (Turbopack)
+⚠ Warning: Next.js ignored package-lock.json in /Users/etinne because it would include your home directory (/Users/etinne).
+ To use this directory, set `turbopack.root` in your Next.js config.
+
+✓ Running next.config.ts took 63ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 1180ms
+  Running TypeScript ...
+  Finished TypeScript in 1302ms ...
+  Collecting page data using 9 workers ...
+  Generating static pages using 9 workers (0/6) ...
+  Generating static pages using 9 workers (1/6) 
+  Generating static pages using 9 workers (2/6) 
+  Generating static pages using 9 workers (4/6) 
+✓ Generating static pages using 9 workers (6/6) in 107ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ○ /_not-found
+├ ƒ /api/v1/orders
+├ ƒ /api/v1/orders/[id]/status
+├ ƒ /api/v1/orders/[id]/tracking
+├ ƒ /api/v1/shipments
+└ ƒ /staff
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

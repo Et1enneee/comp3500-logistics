@@ -1,0 +1,151 @@
+npm warn deprecated eslint@9.39.5: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+
+added 426 packages in 10s
+
+> group42-logistics-foundation@0.2.0 db:setup
+> prisma generate && prisma migrate deploy
+
+warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+For more information, see: https://pris.ly/prisma-config
+
+Prisma schema loaded from prisma/schema.prisma
+┌─────────────────────────────────────────────────────────┐
+│  Update available 6.19.3 -> 8.0.0-rc.27                 │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+
+✔ Generated Prisma Client (v6.19.3) to ./node_modules/@prisma/client in 61ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+
+warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+For more information, see: https://pris.ly/prisma-config
+
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "dev.db" at "file:./dev.db"
+
+SQLite database dev.db created at file:./dev.db
+
+1 migration found in prisma/migrations
+
+Applying migration `20261013114356_init`
+
+The following migration(s) have been applied:
+
+migrations/
+  └─ 20261013114356_init/
+    └─ migration.sql
+      
+All migrations have been successfully applied.
+
+> group42-logistics-foundation@0.2.0 db:seed:demo
+> tsx prisma/seed.ts
+
+
+> group42-logistics-foundation@0.2.0 typecheck
+> tsc --noEmit
+
+
+> group42-logistics-foundation@0.2.0 test
+> vitest run
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv5.0.4 [39m[90m/data/foundation-cleancheck[39m
+
+ [32m✓[39m lib/constants.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m9 passed[39m[22m[90m (9)[39m
+[2m   Start at [22m 16:20:26
+[2m   Duration [22m 160ms[2m (transform 54%, import 23%, tests 14%, worker 8%)[22m
+
+
+> group42-logistics-foundation@0.2.0 test:integration
+> tsx --test tests/orders.integration.ts tests/foundation.integration.ts
+
+▶ Foundation creation / real isolated SQLite
+  ✔ create stores snapshot / leaves inventory and logs unchanged (85.282391ms)
+  ✔ duplicate SKUs aggregate before stock precheck (11.754982ms)
+  ✔ valid duplicate SKUs become one order line (6.683739ms)
+  ✔ reject empty / negative / fractional / malformed lines without writing (3.784705ms)
+  ✔ malformed JSON / null request return structured 400 (1.308675ms)
+  ✔ unknown SKU / customer are rejected (4.670124ms)
+  ✔ non-customer demo role cannot create orders (2.097693ms)
+  ✔ end-to-end create / lookup / confirm / repeat preserves snapshot (17.155641ms)
+  ✔ stock changed after creation: confirmation fails without side effects (17.629085ms)
+✔ Foundation creation / real isolated SQLite (1353.367914ms)
+▶ REAL Prisma 6 / isolated SQLite integration
+  ✔ GET: missing/empty/blank orderNumber => 400 (22.825825ms)
+  ✔ GET: nonexistent order => 404 (5.585511ms)
+  ✔ GET: detail includes SKU/name and no passwordHash (9.574334ms)
+  ✔ PATCH: invalid/empty/malformed body => 400, no mutation (16.211988ms)
+  ✔ PATCH: missing/unknown identity => 401; role spoof ignored (6.096809ms)
+  ✔ PATCH: unknown internal ID and ORD-number-as-ID => 404 (5.103033ms)
+  ✔ PATCH: successful confirmation + repeated call has no effects (9.872859ms)
+  ✔ PATCH: every other non-CREATED status is rejected (26.71405ms)
+  ✔ PATCH: multi-product success writes one log per product (21.314612ms)
+  ✔ PATCH: later stock shortage rolls back earlier decrement/log/status (9.484678ms)
+Order API unexpected failure Error
+  ✔ PATCH: unexpected ledger failure rolls back entire transaction (8.122377ms)
+  ✔ PATCH: duplicate lines aggregate to one reservation/log (7.296462ms)
+  ✔ PATCH: individually sufficient duplicate lines can fail aggregate check (6.424118ms)
+  ✔ PATCH: stock exactly equal to demand reaches zero, not negative (9.83093ms)
+  ✔ PATCH: concurrent requests for same order reserve only once (15.837733ms)
+  ✔ PATCH: two orders compete for limited stock, no overselling (12.091043ms)
+  ✔ PATCH: invalid historical quantity or empty lines => no mutation (16.429897ms)
+✔ REAL Prisma 6 / isolated SQLite integration (1380.489854ms)
+ℹ tests 28
+ℹ suites 0
+ℹ pass 28
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3375.495598
+
+> group42-logistics-foundation@0.2.0 lint
+> eslint
+
+
+> group42-logistics-foundation@0.2.0 build
+> next build
+
+▲ Next.js 16.4.3 (Turbopack)
+✓ Running next.config.ts took 34ms
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 4.7s
+  Running TypeScript ...
+  Finished TypeScript in 3.2s ...
+  Collecting page data using 1 worker ...
+  Generating static pages using 1 worker (0/5) ...
+  Generating static pages using 1 worker (1/5) 
+  Generating static pages using 1 worker (2/5) 
+  Generating static pages using 1 worker (3/5) 
+✓ Generating static pages using 1 worker (5/5) in 137ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ○ /_not-found
+├ ƒ /api/v1/orders
+├ ƒ /api/v1/orders/[id]/status
+└ ƒ /staff
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

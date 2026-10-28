@@ -1,0 +1,43 @@
+
+> group42-logistics-foundation@0.2.0 test:integration
+> tsx --test tests/orders.integration.ts tests/foundation.integration.ts
+
+▶ Foundation creation / real isolated SQLite
+  ✔ create stores snapshot / leaves inventory and logs unchanged (42.780608ms)
+  ✔ duplicate SKUs aggregate before stock precheck (7.420122ms)
+  ✔ valid duplicate SKUs become one order line (10.423193ms)
+  ✔ reject empty / negative / fractional / malformed lines without writing (5.035101ms)
+  ✔ malformed JSON / null request return structured 400 (1.268504ms)
+  ✔ unknown SKU / customer are rejected (4.116574ms)
+  ✔ non-customer demo role cannot create orders (3.886221ms)
+  ✔ end-to-end create / lookup / confirm / repeat preserves snapshot (20.350855ms)
+  ✔ stock changed after creation: confirmation fails without side effects (9.781071ms)
+✔ Foundation creation / real isolated SQLite (1111.462218ms)
+▶ REAL Prisma 6 / isolated SQLite integration
+  ✔ GET: missing/empty/blank orderNumber => 400 (22.489335ms)
+  ✔ GET: nonexistent order => 404 (14.439353ms)
+  ✔ GET: detail includes SKU/name and no passwordHash (13.893576ms)
+  ✔ PATCH: invalid/empty/malformed body => 400, no mutation (14.270091ms)
+  ✔ PATCH: missing/unknown identity => 401; role spoof ignored (5.15466ms)
+  ✔ PATCH: unknown internal ID and ORD-number-as-ID => 404 (4.21958ms)
+  ✔ PATCH: successful confirmation + repeated call has no effects (8.325277ms)
+  ✔ PATCH: every other non-CREATED status is rejected (34.682016ms)
+  ✔ PATCH: multi-product success writes one log per product (23.075475ms)
+  ✔ PATCH: later stock shortage rolls back earlier decrement/log/status (10.885567ms)
+Order API unexpected failure Error
+  ✔ PATCH: unexpected ledger failure rolls back entire transaction (9.890906ms)
+  ✔ PATCH: duplicate lines aggregate to one reservation/log (8.999079ms)
+  ✔ PATCH: individually sufficient duplicate lines can fail aggregate check (6.488151ms)
+  ✔ PATCH: stock exactly equal to demand reaches zero, not negative (10.817965ms)
+  ✔ PATCH: concurrent requests for same order reserve only once (10.130494ms)
+  ✔ PATCH: two orders compete for limited stock, no overselling (11.239976ms)
+  ✔ PATCH: invalid historical quantity or empty lines => no mutation (16.087923ms)
+✔ REAL Prisma 6 / isolated SQLite integration (1146.143062ms)
+ℹ tests 28
+ℹ suites 0
+ℹ pass 28
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2653.020722

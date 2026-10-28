@@ -1,0 +1,20 @@
+
+> group42-logistics-foundation@0.3.1 test:browser
+> node scripts/browser-smoke.mjs
+
+PASS home renders database catalog, initial total ¥3.00
+PASS staff empty / blank input / not-found error
+PASS browser creates order and inventory stays unchanged
+PASS created order link prefills lookup and resolves internal ID
+PASS customer role forbidden; order and inventory unchanged
+PASS staff confirms real order; DB stock 100→98 / one ORDER_CONFIRM log
+PASS actual HTTP repeat returns 409 without another stock/log change
+PASS customer page reload displays current database stock 98
+PASS mobile insufficient-stock error; no order written; no page overflow
+PASS mobile confirmation layout / no horizontal document overflow
+PASS v0.3 chain: confirm → pick → ship one LG waybill; stock unchanged by shipping
+PASS v0.3 chain: duplicate shipment returns 409 with single waybill
+PASS v0.3.1 chain: tracking 500 after successful transit warns without false failure
+PASS v0.3.1 chain: deliver shows 3 ordered events; tracking network error warns on lookup
+PASS network-unknown state removes stale confirmation action
+PASS mobile dark scheme is usable / no page exceptions
