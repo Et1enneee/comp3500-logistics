@@ -1,0 +1,69 @@
+name: Logistics checks
+on:
+  push:
+    branches: [main, 'chore/**', 'feat/**']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: logistics-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: logistics-foundation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: logistics-foundation/package-lock.json
+      - name: Verify current source manifest
+        run: sha256sum -c SHA256SUMS.txt
+      - run: npm ci
+      - name: Create disposable runner database
+        run: npm run db:setup
+      - name: Seed disposable runner database only
+        run: RESET_DEMO_DATA=YES npm run db:seed:demo
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run test:integration
+      - run: npm run lint
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - name: Browser acceptance
+        shell: bash
+        run: |
+          mkdir -p artifacts docs/evidence
+          npm run start -- --hostname 127.0.0.1 --port 3100 > artifacts/server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          ready=0
+          for i in {1..60}; do
+            if curl --fail --silent http://127.0.0.1:3100/ > /dev/null; then ready=1; break; fi
+            sleep 1
+          done
+          if [ "$ready" != 1 ]; then cat artifacts/server.log; exit 1; fi
+          FOUNDATION_BROWSER_TEST=YES FOUNDATION_BASE_URL=http://127.0.0.1:3100 npm run test:browser | tee artifacts/browser.log
+      - name: Export lean source from actual commit
+        working-directory: .
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          git archive --format=zip -o artifacts/Group42-logistics-source.zip HEAD
+          sha256sum artifacts/Group42-logistics-source.zip > artifacts/SHA256SUMS.txt
+          printf '%s\n' "$GITHUB_SHA" > artifacts/COMMIT.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: logistics-source-and-evidence
+          path: |
+            artifacts/
+            logistics-foundation/artifacts/
+            logistics-foundation/docs/evidence/
+          if-no-files-found: ignore

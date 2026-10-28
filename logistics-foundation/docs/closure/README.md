@@ -6,7 +6,7 @@
 - 唯一代码底座：组长冻结的 foundation-v0.3.1-candidate.zip，原始 ZIP SHA-256：`7ab1d4eee9d3195dafcdf0144ca97de450c8f8a7258965c34b591287691f8455`。
 - 本次收口包在该底座上只改文档及摘要；没有移植 repo-init，没有改业务源码、测试、依赖或 schema。
 - 运行事实按代码与对应版本证据说明；完整需求编号仍沿用团队原 docs/traceability.md 的 FR-01～FR-07、NFR-01～NFR-05，不新增编号。
-- 本源码包未提供完整 requirement register、glossary、acceptance、test-plan 或原 SRS 正文；这些团队资产不能假称已经逐项核对。现有 FR-01/FR-02 的映射可确认，其余编号待取得原 register 后对齐，本文按能力名称列出，不擅自分配。
+- 远端收口已核对原requirement register并补齐当前项目docs/traceability.md、glossary、acceptance及test-plan；原SRS完整正文仍未取得，不能冒称完整SRS已完成。FR-01～07与NFR-01～05映射见当前traceability.md。
 - 原设计的客户取消分支保留为未实现需求，不因为本轮未做而从设计中消失；也不把枚举支持等同于接口支持。
 - 原 BASELINE.json 是 v0.2 历史来源；当前来源摘要看 BASELINE-v0.3.1.json。历史修订表中的摘要仅针对当时文件，当前完整性以根目录 SHA256SUMS.txt 为准。
 

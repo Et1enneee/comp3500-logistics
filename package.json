@@ -1,0 +1,19 @@
+{
+  "name": "group42-logistics-repository",
+  "version": "0.3.1",
+  "private": true,
+  "description": "Command entry only; application and dependency lock are in logistics-foundation/",
+  "scripts": {
+    "setup": "npm --prefix logistics-foundation ci",
+    "dev:local": "npm --prefix logistics-foundation run dev:local",
+    "build": "npm --prefix logistics-foundation run build",
+    "start": "npm --prefix logistics-foundation run start",
+    "typecheck": "npm --prefix logistics-foundation run typecheck",
+    "test:integration": "npm --prefix logistics-foundation run test:integration",
+    "lint": "npm --prefix logistics-foundation run lint",
+    "db:setup": "npm --prefix logistics-foundation run db:setup",
+    "db:seed:demo": "npm --prefix logistics-foundation run db:seed:demo",
+    "test:browser": "npm --prefix logistics-foundation run test:browser",
+    "test": "npm --prefix logistics-foundation test"
+  }
+}
