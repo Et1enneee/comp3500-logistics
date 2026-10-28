@@ -1,0 +1,42 @@
+@startuml
+left to right direction
+actor "Customer demo" as C
+actor "Staff demo" as S
+actor "Unauthenticated reader
+(local demo only)" as R
+rectangle "v0.3.1 implemented" {
+ usecase "Create order
+FR-01" as CREATE
+ usecase "Lookup order by ORD
+FR-01" as QUERY
+ usecase "Confirm order
+FR-02 implemented part" as CONFIRM
+ usecase "Start picking" as PICK
+ usecase "Ship and generate waybill" as SHIP
+ usecase "Read tracking" as TRACK
+ usecase "Simulate carrier pickup/delivery" as SIM
+}
+C -- CREATE
+R -- QUERY
+R -- TRACK
+S -- CONFIRM
+S -- PICK
+S -- SHIP
+S -- SIM
+rectangle "Design retained / NOT implemented" {
+ usecase "Cancel order
+FR-02 pending part" as CANCEL
+}
+C -- CANCEL
+S -- CANCEL
+note bottom of CANCEL
+CREATED: Customer cancellation
+CONFIRMED: Staff/Customer cancellation
+No endpoint in this release.
+Future customer ownership must be enforced.
+end note
+note bottom of R
+Actual GET endpoints have no ownership check.
+Navigation is not authentication.
+end note
+@enduml
