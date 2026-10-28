@@ -1,0 +1,3 @@
+# Current project stays in logistics-foundation; exclude historical assets only.
+/repo-init export-ignore
+/logistics-foundation/docs/evidence-history export-ignore

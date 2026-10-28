@@ -116,3 +116,7 @@ Remove-Item Env:FOUNDATION_BROWSER_TEST
 ## 文档收口入口（docs-closure-1）
 
 范围、角色、用例、证据归属与接续清单统一见 `docs/closure/README.md`。此次仅文档修订，软件版本仍为0.3.1，未扩功能。
+
+## 仓库收口入口
+
+此目录是唯一当前运行项目；仓库根README提供统一命令。完整编号及覆盖见docs/traceability.md；旧分支处理见docs/handoff/LEGACY-ASSETS.md。repo-init不是合并前置条件。
