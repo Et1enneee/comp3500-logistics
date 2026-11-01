@@ -1,0 +1,113 @@
+name: Logistics checks
+
+on:
+  push:
+    branches: [main, 'chore/**', 'feat/**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: logistics-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    defaults:
+      run:
+        working-directory: logistics-foundation
+    env:
+      # 测试用固定非生产演示口令；CI 不使用真实 secret。
+      DEMO_PASSWORD: Demo1234!
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: logistics-foundation/package-lock.json
+
+      - name: Verify current source manifest
+        run: sha256sum -c SHA256SUMS.txt
+
+      - run: npm ci
+
+      - name: Create disposable runner database (migrations only)
+        run: npm run db:setup
+
+      - name: Seed disposable runner database only
+        run: RESET_DEMO_DATA=YES npm run db:seed:demo
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Integration tests (real isolated SQLite)
+        run: npm run test:integration
+
+      - name: Delivery isolation and source digest regressions
+        run: npm run test:delivery
+
+      - name: Migration preserves existing data
+        run: npm run verify:migration
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Production build
+        run: npm run build
+
+      - name: Dependency audit (raw JSON)
+        continue-on-error: true
+        run: |
+          mkdir -p artifacts
+          npm audit --json > artifacts/audit.json || true
+          npm audit --omit=dev --json > artifacts/audit-omit-dev.json || true
+          npm audit || true
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Performance probe + browser acceptance (one server lifecycle)
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          node node_modules/next/dist/bin/next start --hostname 127.0.0.1 --port 3100 > artifacts/server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          ready=0
+          for i in {1..60}; do
+            if curl --fail --silent http://127.0.0.1:3100/login > /dev/null; then ready=1; break; fi
+            sleep 1
+          done
+          if [ "$ready" != 1 ]; then cat artifacts/server.log; exit 1; fi
+          PERF_BASE_URL=http://127.0.0.1:3100 PERF_OUTPUT=artifacts/performance.json node scripts/perf-probe.mjs
+          FOUNDATION_BROWSER_TEST=YES \
+          FOUNDATION_BASE_URL=http://127.0.0.1:3100 \
+          EVIDENCE_DIR=artifacts/screenshots \
+          npm run test:browser | tee artifacts/browser.log
+
+      - name: Export lean source from actual commit
+        working-directory: .
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          git archive --format=zip -o artifacts/Group42-logistics-source.zip HEAD
+          sha256sum artifacts/Group42-logistics-source.zip > artifacts/SHA256SUMS.txt
+          printf '%s\n' "$GITHUB_SHA" > artifacts/COMMIT.txt
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: logistics-source-and-evidence
+          path: |
+            artifacts/
+            logistics-foundation/artifacts/
+          if-no-files-found: ignore

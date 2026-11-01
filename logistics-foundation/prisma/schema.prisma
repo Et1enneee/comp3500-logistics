@@ -32,6 +32,21 @@ model User {
   createdAt     DateTime       @default(now())
   orders        Order[]
   notifications Notification[]
+  sessions      Session[]
+  inventoryLogs InventoryLog[]
+}
+
+// 真实登录会话：数据库只保存 token 的 SHA-256，原始 token 仅在浏览器 HttpOnly Cookie 中。
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  csrfToken String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([userId])
 }
 
 model Product {
@@ -43,9 +58,10 @@ model Product {
   lowStockThreshold Int      @default(5)
   updatedAt         DateTime @updatedAt
 
-  orderItems        OrderItem[]
-  inventoryLogs     InventoryLog[]
+  orderItems    OrderItem[]
+  inventoryLogs InventoryLog[]
 }
+
 model Order {
   id          String      @id @default(cuid())
   orderNumber String      @unique
@@ -57,6 +73,11 @@ model Order {
   updatedAt   DateTime    @updatedAt
   items       OrderItem[]
   shipment    Shipment?
+  notifications Notification[]
+
+  @@index([customerId, createdAt])
+  @@index([status, createdAt])
+  @@index([createdAt])
 }
 
 model OrderItem {
@@ -67,6 +88,9 @@ model OrderItem {
   product        Product @relation(fields: [productId], references: [id])
   quantity       Int
   unitPriceCents Int
+
+  @@index([orderId])
+  @@index([productId])
 }
 
 model Shipment {
@@ -88,16 +112,25 @@ model TrackingEvent {
   at          DateTime @default(now())
   location    String
   description String
+
+  @@index([shipmentId, at])
 }
 
 model Notification {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id])
+  orderId   String?
+  order     Order?   @relation(fields: [orderId], references: [id])
   type      String
   content   String
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
+
+  // 同一订单同一事件只允许一条通知：重复/并发请求不会多发。
+  @@unique([orderId, type])
+  @@index([userId, read])
+  @@index([userId, createdAt])
 }
 
 model InventoryLog {
@@ -107,5 +140,10 @@ model InventoryLog {
   delta     Int
   reason    String
   orderId   String?
+  actorId   String?
+  actor     User?    @relation(fields: [actorId], references: [id])
   createdAt DateTime @default(now())
+
+  @@index([productId, createdAt])
+  @@index([orderId])
 }

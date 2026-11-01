@@ -1,36 +1,30 @@
-# Group 42 · 物流管理地基候选 v0.3.1
+# Group 42 · 物流管理应用 v0.4.2
 
-这是在尹培旭已交付后端上完成页面与集成的**本地教学演示基线**（本地模拟、非真实认证），不是完整物流系统，也不是已获全组签收的最终版本。尚未上传或合并到团队 GitHub；应先审差异，不得覆盖仓库中的其他新工作。
+`logistics-foundation/` 是本仓库唯一应用：在已验收 v0.3.1 底座上补齐真实登录与授权、客户订单中心、员工履约工作台、取消与库存释放、库存/预警/流水、站内通知、ADMIN 只读报表与 CSV 导出。
 
-**v0.3.1 封版修订**：仅同步范围文案、修正追踪读取失败反馈（不误报操作失败、不诱导重复提交），并把本轮测试/构建/浏览器日志收入包内；未新增功能、未改 schema、未升级依赖。
+本地教学演示，**不用于生产环境**：物流是本地模拟（页面已标注），未接入真实承运商或支付。
 
 ## 本包能做什么
 
-- `/`：数据库商品目录、整数数量、实时预估合计、真实下单、ORD 单号、可读错误。
-- `/staff`：按 ORD 单号查询；自动使用内部 order.id 确认；成功后重新查询；角色错误、重复操作与网络结果未知提示。
-- 服务端：创建校验与价格快照；确认时事务更新状态、条件扣可用库存、记录 ORDER_CONFIRM 流水；失败回滚。
-- v0.3 增量：STAFF 拣货（CONFIRMED→PICKING）、发货（POST `/api/v1/shipments`，事务内生成唯一 LG- 运单＋初始追踪事件）、追踪查询与模拟揽收/签收（SHIPPED→IN_TRANSIT→DELIVERED）。发货不再扣库存。
-- v0.3.1：追踪读取仅把明确的“无运单”视为空；500/网络错误会提示，且不会把已成功的状态操作误报为失败。实际日志见 `docs/verification-logs/v0.3.1/`。
-- 未实现：取消接口、独立库存预警页、通知、报表、真实登录与对象级访问控制。schema 或状态枚举出现这些实体不代表功能已经完成。
+- `/login`：真实会话登录（scrypt 密码哈希、HttpOnly Cookie、CSRF、登录限流）。旧 `X-Demo-User-Email` 不再有任何认证或授权效力。
+- `/`（客户）：数据库商品目录、整数数量、实时预估合计、下单；`/orders` 我的订单（状态筛选、分页、按 ORD 查询）；`/orders/{id}` 明细、运单时间线、取消；`/notifications` 通知中心（未读数、标记已读）。
+- `/staff`（员工）：订单队列（状态筛选、分页、按 ORD 精确查询）；`/staff/orders/{id}` 确认 / 拣货 / 发货（唯一 LG 运单）/ 模拟揽收 / 模拟签收 / 取消 CONFIRMED；`/inventory` 库存、低库存预警、补货、库存流水。
+- `/admin`（管理员，只读）：订单数、状态分布、已签收金额、非取消金额、当前低库存 SKU、GMT+8 日期范围、CSV 导出；库存页只读。
+- API：`/api/v1/auth/*`、`/api/v1/orders`（创建/列表/按 ORD 查询）、`/api/v1/orders/{id}`、`/api/v1/orders/{id}/status`、`/api/v1/orders/{id}/tracking`、`/api/v1/shipments`、`/api/v1/inventory*`、`/api/v1/notifications*`、`/api/v1/reports/overview`、`/api/v1/reports/export.csv`。
 
-## 1. 全新目录安装（已用 Node 24 测试；v0.3.1 复跑于 Node 25.4.0）
-
-> Node 25 下 vitest 会给出 EBADENGINE 警告；本轮实测全部检查通过。
-
-本 ZIP 不含 node_modules、构建缓存或数据库；不要在旧库上照抄清库命令。
+## 1. 全新目录安装（Node 24，本轮验证 24.22.2）
 
 ```bash
 npm ci
-npm run db:setup
+npm run db:setup      # prisma generate + migrate deploy（迁移保留既有数据）
 ```
 
-**仅全新或可丢弃的演示库**初始化商品和账号。seed 会清空演示数据库，现已加入明确确认闸口：
+**仅全新或可丢弃的演示库**重建演示数据（seed 有明确确认闸口，会清空该库）：
 
 macOS / Linux：
 ```bash
 RESET_DEMO_DATA=YES npm run db:seed:demo
 ```
-
 Windows PowerShell：
 ```powershell
 $env:RESET_DEMO_DATA="YES"
@@ -38,81 +32,68 @@ npm run db:seed:demo
 Remove-Item Env:RESET_DEMO_DATA
 ```
 
-之后运行：
+seed 生成：2 客户 + 1 员工 + 1 管理员、10 个 SKU（SKU007 库存 4 / 阈值 5）、56 张覆盖各状态与两种取消路径的订单、真实运单/追踪事件/库存流水/站内通知，并打印演示账号。密码由 `DEMO_PASSWORD` 配置，默认 `Demo1234!`，以 scrypt 哈希入库。
+
+启动：
+
 ```bash
-npm run dev:local
+npm run dev:local     # http://127.0.0.1:3000
+# 或生产构建
+npm run build && npm run start -- --hostname 127.0.0.1 --port 3100
 ```
 
-打开 `http://127.0.0.1:3000`。若用生产模式：
-```bash
-npm run build
-npm run start -- --hostname 127.0.0.1
-```
+> 若本机 shell 设置了 `RUST_LOG`，Prisma CLI 在数据库文件尚不存在时会报空的 `Schema engine error`（其日志解析把首行当 banner）。执行 Prisma 命令前 `unset RUST_LOG`，或先 `touch prisma/dev.db`。CI 默认不设置该变量。
 
-请始终在本机回环地址运行。演示邮箱可被冒用，不能对公网部署此身份机制。
+## 2. 已实现的业务规则（便于代码追踪）
 
-## 2. 三分钟演示
+- 下单只校验可用库存，创建 `CREATED`；不扣库存、不写流水（`lib/create-order.ts`）。
+- 确认是权威校验：同一事务内条件更新状态、按 SKU 汇总条件扣减、每 SKU 一条 `ORDER_CONFIRM` 负流水、写通知；失败整体回滚（`lib/order-api.ts`）。
+- 取消：`CREATED → CANCELLED` 不动库存；`CONFIRMED → CANCELLED` 回补并写 `ORDER_CANCEL_RELEASE` 正流水，只释放一次；`PICKING` 及之后拒绝（409）。
+- 发货：`PICKING → SHIPPED` 条件抢占，同一事务生成唯一 `LG-YYYYMMDD-XXXXXX` 运单、初始事件与通知；重复/并发只有一张运单（`lib/shipment-api.ts`）。
+- 库存：`stock` 固定表示可用库存；补货只增量并写 `STOCK_REPLENISH` 流水与操作人；预警严格 `stock < threshold`（`lib/inventory-api.ts`）。
+- 报表：按 `createdAt` 归属 GMT+8 自然日（起始含、结束日次日 00:00 不含），金额称“订单金额”；CSV 防公式注入（`lib/reports-api.ts`）。
+- 查询参数：页面与 API 共用校验；非法状态、小数或重复页码返回可恢复提示/API 400。下单保留 `SKU_NOT_FOUND_<sku>` 和 `INSUFFICIENT_STOCK_<sku>` 错误码；畸形会话 Cookie 视为失效。
+- 身份：`401` 未登录、`403` 角色不符/CSRF 失败、跨客户对象统一 `404`（`lib/http.ts`、`lib/order-api.ts`）。
 
-1. 客户页默认 SKU001 × 2，合计 ¥3.00，提交取得新 ORD 单号。
-2. 点击“带入员工工作台”，再点“查询订单”。状态应为 CREATED。
-3. 演示账号选员工，点击“确认订单”。刷新后的状态为 CONFIRMED；确认按钮禁用。
-4. 点击“开始拣货”→ PICKING（库存不变）；填写承运商后点“发货”→ SHIPPED，页面出现 LG- 运单号与追踪事件；库存仍不变。
-5. 点“模拟揽收”→ IN_TRANSIT，再点“模拟签收”→ DELIVERED；追踪事件依次为 仓库 / 揽收网点 / 收件地址。
-6. 返回客户页，可用库存由初始 100 变 98（仅确认预占；创建与发货都不减库存）。
-7. 新订单选择客户演示账号进行确认/拣货/发货，应显示 403，数据不变。
-8. SKU001 改 0，SKU007 填 10；提交应显示可读库存不足，不能新增订单。
-
-库存流水由数据库/自动测试核查；页面没有伪造“实时流水”界面。演示数据随操作变化，截图中的历史单号不能直接用于全新数据库。
-
-## 3. 检查命令
+## 3. 检查与证据
 
 ```bash
 npm run typecheck
 npm test
 npm run test:integration
+npm run test:delivery
 npm run lint
 npm run build
+# 浏览器验收（先 build + start + 全新 seed）：
+FOUNDATION_BROWSER_TEST=YES FOUNDATION_BASE_URL=http://127.0.0.1:3100 npm run test:browser
 ```
 
-集成测试使用临时 SQLite，不连接或清空项目 dev.db。包含原后端确认场景、新增创建端验证及物流主链。v0.3.1 实际结果见 `docs/verification-v0.3.1.md`，本轮日志在 `docs/verification-logs/v0.3.1/`；历史证据归档在 `docs/evidence-history/`，本轮截图在 `docs/evidence/`。
+完整隔离证据（可从仓库根或应用目录运行）：
 
-## 4. 交接入口
-
-- `docs/handoff/FOUNDATION.md`：范围、规则、第三方接续边界。
-- `docs/contracts/api.md`：实际接口及本候选版变更。
-- `docs/contracts/data-model.md`：当前可用库存语义。
-- `docs/contracts/state-machine.md`：设计范围与已实现转换的区别。
-- `docs/handoff/messages.md`：给尹培旭、杨庭彰的复核任务。
-- `docs/verification-original-1026.md`：尹培旭原交付记录（历史，不是本轮结果）。
-
-已知依赖风险：npm audit 报 3 项 high，关联 Prisma 工具链的 deepmerge-ts 递归合并问题；尚未修复，也没有因此认定公网安全。不要运行 `npm audit fix --force` 直接跨主版本升级 Prisma。
-
-本候选版没有改变 Prisma schema；基线已有 migration。现有项目合并本包**不要求删除数据库或重新 seed**。
-
-## 5. 可选浏览器验收（会创建测试订单）
-
-仅在**新建且刚 seed 的可丢弃副本**运行，不要对原有数据库执行此测试。先在一个终端运行生产服务：
 ```bash
-npm run build
-npm run start -- --hostname 127.0.0.1 --port 3100
+npm run baseline
+RESET_DEMO_DATA=YES npm run evidence
 ```
 
-另一个终端安装测试浏览器并确认执行（macOS/Linux）：
-```bash
-npx playwright install chromium
-FOUNDATION_BROWSER_TEST=YES npm run test:browser
+调用者必须显式确认；脚本会复制源码到独立临时目录，安装锁定依赖、迁移并 seed 临时库、执行测试/构建/性能/浏览器/重启检查，结束后删除副本。**原项目数据库不参与此流程。** 默认输出 `../evidence/`，可用 `EVIDENCE_ROOT` 指定；未确认时在任何副作用之前退出。源码摘要与打包共用 `scripts/source-files.mjs`，排除数据库、真实环境变量、依赖、构建/编译缓存和运行证据；打包时重新核对摘要，不匹配即拒绝交付。
+
+浏览器脚本输出 PNG 与 `browser-results.json`（默认 `docs/evidence/`，可用 `EVIDENCE_DIR` 指定）；不会在测试中伪造界面截图。
+
+## 4. 目录
+
+```
+app/                页面与 App Router 路由（api/v1/* 为后端接口）
+components/ui.tsx   状态徽章、分页、空状态等共享展示组件
+lib/                业务函数（下单、状态、发货、库存、通知、报表、认证、HTTP、时间）
+prisma/             schema、两份迁移、seed
+tests/              真实 SQLite 集成测试（每个文件独立临时库）
+scripts/            浏览器验收
+docs/               合同、追溯、已知限制与历史证据
 ```
 
-Windows PowerShell：
-```powershell
-npx playwright install chromium
-$env:FOUNDATION_BROWSER_TEST="YES"
-npm run test:browser
-Remove-Item Env:FOUNDATION_BROWSER_TEST
-```
+## 5. 已知限制
 
-已安装系统 Chromium 时可用 CHROMIUM_PATH 指定路径。默认测试端口 3100，可用 FOUNDATION_BASE_URL 修改，仅允许 localhost/127.0.0.1。该测试预期初始 SKU001=100、SKU007=4，会写入订单并改变 SKU001 库存；不得把反复失败当成需要清空原库的理由。
-
-## 文档收口入口（docs-closure-1）
-
-范围、角色、用例、证据归属与接续清单统一见 `docs/closure/README.md`。此次仅文档修订，软件版本仍为0.3.1，未扩功能。
+- SQLite 单写者模型：并发写冲突会返回 503，不承诺企业级吞吐。
+- 报表库存指标是“当前快照”，不随订单日期过滤（界面已标明）。
+- 2026-11-01 完整 audit 为 3 high + 16 moderate；`npm audit --omit=dev` 仍为 3 high。Prisma/deepmerge-ts 链仍在非 dev 安装范围，不能视为运行环境无风险；moderate 来自 ESLint/minimatch 链。原始 JSON、扫描口径及限制见 `docs/known-issues.md`；本次不强制破坏性升级。
+- 未实现：公开注册、找回密码、OAuth/MFA、真实支付、真实承运商 API、邮件/短信/推送、多仓、退货退款。
