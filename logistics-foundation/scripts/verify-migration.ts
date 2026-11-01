@@ -1,0 +1,153 @@
+import { execFileSync } from "node:child_process";
+import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
+import { createRequire } from "node:module";
+import { PrismaClient } from "@prisma/client";
+import { createAuthHandlers } from "../lib/auth-api";
+
+/**
+ * 迁移保留数据校验（P0-F）：
+ * 1) 只应用 v0.3.1 第一版迁移，写入“旧库”用户/订单/库存/流水/通知；
+ * 2) 追加 v0.4.0 迁移并再次 deploy；
+ * 3) 断言旧数据一条不少、新表/新列就位、历史行不被编造操作人；
+ * 4) 旧 demo 哈希在真实登录下失效；用 reset-demo-passwords 工具升级后可用，且订单仍在。
+ */
+
+const require = createRequire(resolve("package.json"));
+const prismaCli = require.resolve("prisma/build/index.js");
+const tsxCli = require.resolve("tsx/cli");
+const legacyMigration = "20261013114356_init";
+const newMigration = "20261030120000_auth_inventory_notifications";
+const checks: { name: string; detail: unknown }[] = [];
+
+function record(name: string, detail: unknown) {
+  checks.push({ name, detail });
+  console.log(`PASS ${name}`);
+}
+
+async function main() {
+  const directory = await mkdtemp(join(tmpdir(), "g42-migration-"));
+  const dbUrl = "file:" + join(directory, "legacy.db").replaceAll("\\", "/");
+  try {
+    const prismaDir = join(directory, "prisma");
+    await mkdir(join(prismaDir, "migrations"), { recursive: true });
+    const schemaSource = await readFile(resolve("prisma/schema.prisma"), "utf8");
+    const schema = schemaSource.replace(/url\s*=\s*"file:\.\/dev\.db"/, 'url = env("ORDER_TEST_DATABASE_URL")');
+    if (schema === schemaSource) throw new Error("未能替换 schema 数据源，拒绝继续");
+    await writeFile(join(prismaDir, "schema.prisma"), schema);
+    await cp(resolve("prisma/migrations", legacyMigration), join(prismaDir, "migrations", legacyMigration), { recursive: true });
+    await writeFile(
+      join(prismaDir, "migrations", "migration_lock.toml"),
+      await readFile(resolve("prisma/migrations", "migration_lock.toml")),
+    );
+
+    const deploy = () => execFileSync(
+      process.execPath,
+      [prismaCli, "migrate", "deploy", "--schema", join(prismaDir, "schema.prisma")],
+      { env: { ...process.env, ORDER_TEST_DATABASE_URL: dbUrl, RUST_LOG: "info" }, stdio: "pipe", timeout: 60000 },
+    );
+    deploy();
+    record("legacy database created with v0.3.1 schema only", { migration: legacyMigration });
+
+    const legacy = new PrismaClient({ datasources: { db: { url: dbUrl } } });
+    await legacy.$connect();
+    const customer = await legacy.user.create({
+      data: { email: "customer.a@demo.com", name: "旧客户", passwordHash: "demo", role: "CUSTOMER" },
+    });
+    await legacy.user.create({ data: { email: "staff@demo.com", name: "旧员工", passwordHash: "demo", role: "STAFF" } });
+    const product = await legacy.product.create({
+      data: { sku: "SKU001", name: "矿泉水 500ml", priceCents: 150, stock: 97, lowStockThreshold: 20 },
+    });
+    const order = await legacy.order.create({
+      data: {
+        orderNumber: "ORD-20261001-0001", customerId: customer.id, status: "CONFIRMED", totalCents: 450,
+        items: { create: [{ productId: product.id, quantity: 3, unitPriceCents: 150 }] },
+      },
+    });
+    // 旧库没有新增列：用 createMany 写入，避免 Prisma 回读 v0.4 才有的列。
+    await legacy.inventoryLog.createMany({
+      data: [{ productId: product.id, orderId: order.id, delta: -3, reason: "ORDER_CONFIRM" }],
+    });
+    await legacy.notification.createMany({
+      data: [{ userId: customer.id, type: "LEGACY_NOTE", content: "历史通知" }],
+    });
+    await legacy.$disconnect();
+
+    await cp(resolve("prisma/migrations", newMigration), join(prismaDir, "migrations", newMigration), { recursive: true });
+    deploy();
+    record("v0.4.0 migration applied on top of existing data", { migration: newMigration });
+
+    const migrated = new PrismaClient({ datasources: { db: { url: dbUrl } } });
+    await migrated.$connect();
+    const ordersAfter = await migrated.order.count();
+    const itemsAfter = await migrated.orderItem.count();
+    const logsAfter = await migrated.inventoryLog.count();
+    const productsAfter = await migrated.product.count();
+    const notificationsAfter = await migrated.notification.count();
+    const legacyLog = await migrated.inventoryLog.findFirstOrThrow({ where: { reason: "ORDER_CONFIRM" } });
+    const legacyNote = await migrated.notification.findFirstOrThrow({ where: { type: "LEGACY_NOTE" } });
+    const legacyOrder = await migrated.order.findUniqueOrThrow({ where: { orderNumber: "ORD-20261001-0001" } });
+    if (ordersAfter !== 1 || itemsAfter !== 1 || logsAfter !== 1 || productsAfter !== 1 || notificationsAfter !== 1) {
+      throw new Error(`旧数据数量不符: orders=${ordersAfter} items=${itemsAfter} logs=${logsAfter} products=${productsAfter} notifications=${notificationsAfter}`);
+    }
+    if (legacyOrder.status !== "CONFIRMED" || legacyOrder.totalCents !== 450) throw new Error("旧订单字段被改变");
+    if (legacyLog.actorId !== null) throw new Error("新列 actorId 应为 null，而不是凭空编造操作人");
+    if (legacyNote.orderId !== null) throw new Error("历史通知不应被绑定到订单");
+    record("existing orders, stock, ledger and notifications preserved", {
+      orders: ordersAfter, items: itemsAfter, logs: logsAfter, products: productsAfter, notifications: notificationsAfter,
+    });
+
+    const tables = await migrated.$queryRaw<{ name: string }[]>`
+      SELECT name FROM sqlite_master WHERE type='table' ORDER BY name`;
+    const tableNames = tables.map(row => row.name);
+    for (const table of ["Session", "Notification", "InventoryLog"]) {
+      if (!tableNames.includes(table)) throw new Error(`缺少表 ${table}`);
+    }
+    const sessionColumns = await migrated.$queryRaw<{ name: string }[]>`PRAGMA table_info("Session")`;
+    const columnNames = sessionColumns.map(row => row.name);
+    for (const column of ["tokenHash", "csrfToken", "expiresAt"]) {
+      if (!columnNames.includes(column)) throw new Error(`Session 缺少列 ${column}`);
+    }
+    record("new tables and columns exist after migration", { tables: tableNames.filter(name => ["Session", "Notification", "InventoryLog"].includes(name)) });
+
+    const auth = createAuthHandlers(migrated);
+    const loginRequest = () => new Request("http://localhost/api/v1/auth/login", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ email: "customer.a@demo.com", password: "Demo1234!" }),
+    });
+    const beforeReset = await auth.login(loginRequest());
+    if (beforeReset.status !== 401) throw new Error(`旧 demo 哈希不应能登录，实际 ${beforeReset.status}`);
+    record("legacy demo password hash is rejected by real login", { status: beforeReset.status });
+
+    execFileSync(process.execPath, [tsxCli, resolve("scripts/reset-demo-passwords.ts")], {
+      env: { ...process.env, RESET_PASSWORDS: "YES", DEMO_PASSWORD: "Demo1234!", DATABASE_URL_OVERRIDE: dbUrl, RUST_LOG: "info" },
+      stdio: "pipe",
+      timeout: 120000,
+    });
+    const afterReset = await auth.login(loginRequest());
+    if (afterReset.status !== 200) throw new Error(`重设密码后登录应成功，实际 ${afterReset.status}`);
+    const ordersStillThere = await migrated.order.count();
+    if (ordersStillThere !== 1) throw new Error("重设密码不应删除订单");
+    record("reset-passwords tool upgrades hash without deleting data", {
+      loginStatus: afterReset.status, ordersAfterReset: ordersStillThere,
+    });
+    await migrated.$disconnect();
+
+    const reportPath = process.env.MIGRATION_REPORT || "docs/evidence/migration-check.json";
+    await mkdir(resolve(reportPath, ".."), { recursive: true });
+    await writeFile(
+      resolve(reportPath),
+      JSON.stringify({ ok: true, checkedAt: new Date().toISOString(), checks }, null, 2),
+    );
+    console.log("迁移保留数据校验通过");
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+}
+
+main().catch(error => {
+  console.error(error);
+  process.exitCode = 1;
+});

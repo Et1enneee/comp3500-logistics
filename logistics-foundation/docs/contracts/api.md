@@ -103,3 +103,64 @@ if (!confirmation.ok) throw new Error(result.error.message);
 ## 页面与数据
 
 `/` 服务端实时读取数据库商品目录，不再把价格或库存硬编码在浏览器中。`/staff` 查询后用 order.id 确认，成功再次查询；v0.3 起同一页面可继续拣货、发货并查看运单追踪。页面不展示库存流水原始表；库存/流水检查由测试或数据库审查执行。GET /orders 仍不含 shipment；追踪走独立端点 GET /orders/{id}/tracking。
+
+---
+
+# v0.4.0 接口增量（真实会话 / 订单中心 / 库存 / 通知 / 报表）
+
+## 认证与会话
+
+所有接口以服务端会话为准，`X-Demo-User-Email` 已无任何效力。
+
+| 方法 | 路径 | 角色 | 说明 |
+| --- | --- | --- | --- |
+| POST | `/api/v1/auth/login` | 公开 | `{email,password}`；成功 200 `{user,csrfToken,expiresAt}` 并 Set-Cookie（HttpOnly/SameSite=Lax/8h）；失败 401 同一文案；同源校验；限流 429 `RATE_LIMITED` |
+| POST | `/api/v1/auth/logout` | 已登录 | 需 `X-CSRF-Token`；删除服务端会话并清 Cookie；无令牌 403 `CSRF_INVALID` |
+| GET | `/api/v1/auth/me` | 已登录 | 返回 `{user,csrfToken,expiresAt}`；未登录 401 |
+
+写请求（POST/PATCH/DELETE）统一要求 `X-CSRF-Token` 等于会话令牌；带 `Origin` 时还须与 `Host` 同源。错误仍为 `{error:{code,message}}`。
+
+## 订单
+
+| 方法 | 路径 | 角色 | 说明 |
+| --- | --- | --- | --- |
+| POST | `/api/v1/orders` | CUSTOMER | 身份取自会话；body 若含 `email/customerId` 必须与会话一致，否则 403。201 `{order}` |
+| GET | `/api/v1/orders?orderNumber=ORD-…` | CUSTOMER/STAFF | 按 ORD 精确查询；客户查他人订单 404 |
+| GET | `/api/v1/orders?page=&pageSize=&status=` | CUSTOMER/STAFF | 分页列表 `{orders,page,pageSize,total,totalPages}`；客户仅本人；ADMIN 403 |
+| GET | `/api/v1/orders/{内部id}` | CUSTOMER/STAFF | 详情（含 shipment 摘要）；客户越权 404 |
+| PATCH | `/api/v1/orders/{内部id}/status` | STAFF；CUSTOMER 仅取消本人 | `to` ∈ CONFIRMED/PICKING/IN_TRANSIT/DELIVERED/CANCELLED；`to=SHIPPED` 仍 400，必须走发货接口 |
+| GET | `/api/v1/orders/{内部id}/tracking` | CUSTOMER/STAFF | 运单与事件（时间正序）；未发货 404 `SHIPMENT_NOT_FOUND`；客户越权 404 |
+
+取消语义：`CREATED→CANCELLED` 不动库存与流水；`CONFIRMED→CANCELLED` 同一事务回补并每 SKU 一条 `ORDER_CANCEL_RELEASE` 正流水；`PICKING` 及之后 409；重复/并发最多成功一次，员工只能取消 CONFIRMED，ADMIN 403。
+
+## 发货
+
+`POST /api/v1/shipments`（STAFF）`{orderNumber,carrier}`：仅 `PICKING` 可发货；同一事务写入状态、唯一 `LG-` 运单、初始追踪事件与通知；重复 409 `SHIPMENT_EXISTS` 或 `INVALID_STATE_TRANSITION`；库存不再扣减。
+
+## 库存
+
+| 方法 | 路径 | 角色 | 说明 |
+| --- | --- | --- | --- |
+| GET | `/api/v1/inventory?page=&pageSize=&sku=&lowStock=1` | STAFF/ADMIN | 分页；`isLowStock = stock < lowStockThreshold`；含 `lowStockCount` |
+| GET | `/api/v1/inventory/low-stock` | STAFF/ADMIN | `{products,count}` |
+| POST | `/api/v1/inventory/{productId}/replenish` | STAFF | `{quantity}` 正整数（≤1,000,000），仅增量；写 `STOCK_REPLENISH` + 操作人；201 `{product,log}` |
+| GET | `/api/v1/inventory/logs?sku=&orderNumber=&page=&pageSize=` | STAFF/ADMIN | delta/reason/时间/关联订单/操作人；无删除接口 |
+
+## 通知
+
+| 方法 | 路径 | 角色 | 说明 |
+| --- | --- | --- | --- |
+| GET | `/api/v1/notifications?page=&pageSize=&unread=1` | CUSTOMER | 仅本人；返回 `unreadCount` |
+| GET | `/api/v1/notifications/unread-count` | CUSTOMER | `{unreadCount}` |
+| POST | `/api/v1/notifications/{id}/read` | CUSTOMER | 仅本人；他人/不存在 404 `NOTIFICATION_NOT_FOUND` |
+
+通知在确认/取消/发货/揽收/签收的同一事务内生成，`(orderId,type)` 唯一，重复请求不重发。
+
+## 报表
+
+| 方法 | 路径 | 角色 | 说明 |
+| --- | --- | --- | --- |
+| GET | `/api/v1/reports/overview?from=YYYY-MM-DD&to=YYYY-MM-DD` | ADMIN | 默认最近 7 个 GMT+8 自然日；`{range,orders:{count,byStatus,nonCancelledAmountCents,deliveredAmountCents},inventory:{lowStockSkuCount,note},daily[]}` |
+| GET | `/api/v1/reports/export.csv?from=&to=` | ADMIN | UTF-8 BOM；列 `orderNumber,createdAtGmt8,timezone,status,statusLabel,totalCents,totalYuan`；公式注入前缀 `'`；无个人信息 |
+
+客户与员工访问报表 403；未登录 401。金额均为“订单金额”（无支付，不称收入）。

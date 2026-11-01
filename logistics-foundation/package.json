@@ -1,6 +1,6 @@
 {
   "name": "group42-logistics-foundation",
-  "version": "0.3.1",
+  "version": "0.4.2",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,11 +9,16 @@
     "lint": "eslint",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "test:integration": "tsx --test tests/orders.integration.ts tests/foundation.integration.ts tests/logistics-chain.integration.ts",
+    "test:integration": "tsx --test tests/*.integration.ts",
     "db:setup": "prisma generate && prisma migrate deploy",
     "db:seed:demo": "tsx prisma/seed.ts",
     "dev:local": "next dev --hostname 127.0.0.1",
-    "test:browser": "node scripts/browser-smoke.mjs"
+    "test:browser": "node scripts/browser-smoke.mjs",
+    "db:reset-passwords": "tsx scripts/reset-demo-passwords.ts",
+    "verify:migration": "tsx scripts/verify-migration.ts",
+    "evidence": "node scripts/run-verification.mjs",
+    "baseline": "node scripts/write-baseline.mjs",
+    "test:delivery": "node --test tests/delivery.check.mjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

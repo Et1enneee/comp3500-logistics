@@ -24,3 +24,26 @@ describe("订单状态机", () => {
     expect(canTransition("CANCELLED", "CONFIRMED")).toBe(false);
   });
 });
+
+describe("取消规则（升级补充）", () => {
+  it.each([
+    ["CREATED", "CANCELLED"],
+    ["CONFIRMED", "CANCELLED"],
+  ] as const)("%s -> CANCELLED 合法", (from, to) => {
+    expect(canTransition(from, to)).toBe(true);
+  });
+
+  it.each([
+    ["PICKING", "CANCELLED"],
+    ["SHIPPED", "CANCELLED"],
+    ["IN_TRANSIT", "CANCELLED"],
+    ["DELIVERED", "CANCELLED"],
+  ] as const)("%s -> CANCELLED 非法（拣货后不支持取消）", (from, to) => {
+    expect(canTransition(from, to)).toBe(false);
+  });
+
+  it("DELIVERED 与 CANCELLED 是终态", () => {
+    expect(canTransition("DELIVERED", "CANCELLED")).toBe(false);
+    expect(canTransition("CANCELLED", "CREATED")).toBe(false);
+  });
+});
