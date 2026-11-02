@@ -77,7 +77,7 @@ export async function queryOrderList(
     db.order.count({ where }),
   ]);
   return {
-    orders: rows.map(mapListRow),
+    orders: rows.map(row => mapListRow(row, actor)),
     page: query.page,
     pageSize: query.pageSize,
     total,
@@ -85,16 +85,37 @@ export async function queryOrderList(
   };
 }
 
-function mapListRow(row: OrderListRow) {
+function mapListRow(row: OrderListRow, actor: Actor) {
   return {
     id: row.id,
     orderNumber: row.orderNumber,
     status: row.status,
     totalCents: row.totalCents,
     createdAt: row.createdAt,
-    customer: row.customer,
+    ...(actor.role === "CUSTOMER" ? { customer: row.customer } : {}),
     itemCount: row._count.items,
     trackingNumber: row.shipment?.trackingNumber ?? null,
+  };
+}
+
+/** Staff receive only the operational order fields; do not serialize the customer relation or customerId. */
+function staffOrderDetail(order: OrderDetailRow) {
+  return {
+    id: order.id,
+    orderNumber: order.orderNumber,
+    status: order.status,
+    totalCents: order.totalCents,
+    createdAt: order.createdAt,
+    updatedAt: order.updatedAt,
+    items: order.items.map(item => ({
+      id: item.id,
+      orderId: item.orderId,
+      productId: item.productId,
+      quantity: item.quantity,
+      unitPriceCents: item.unitPriceCents,
+      product: { sku: item.product.sku, name: item.product.name },
+    })),
+    shipment: order.shipment,
   };
 }
 
@@ -103,7 +124,7 @@ export async function queryOrderDetail(
   db: PrismaClient,
   actor: Actor,
   id: string,
-): Promise<OrderDetailRow> {
+) {
   if (actor.role === "ADMIN") throw new HttpError(403, "FORBIDDEN", "Administrators do not view customer order details; they use aggregated reports only");
   if (!id?.trim()) throw new HttpError(400, "INVALID_ARGUMENT", "Please provide the order's internal ID");
   const order = await db.order.findUnique({ where: { id }, include: DETAIL_INCLUDE });
@@ -111,14 +132,14 @@ export async function queryOrderDetail(
   if (actor.role === "CUSTOMER" && order.customerId !== actor.id) {
     throw new HttpError(404, "ORDER_NOT_FOUND", "Order not found");
   }
-  return order;
+  return actor.role === "STAFF" ? staffOrderDetail(order) : order;
 }
 
 export async function queryOrderByNumber(
   db: PrismaClient,
   actor: Actor,
   orderNumber: string,
-): Promise<OrderDetailRow> {
+) {
   if (actor.role === "ADMIN") throw new HttpError(403, "FORBIDDEN", "Administrators do not view customer order details; they use aggregated reports only");
   if (!orderNumber.trim()) throw new HttpError(400, "INVALID_ARGUMENT", "Please provide the order number");
   const order = await db.order.findUnique({ where: { orderNumber }, include: DETAIL_INCLUDE });
@@ -126,7 +147,7 @@ export async function queryOrderByNumber(
   if (actor.role === "CUSTOMER" && order.customerId !== actor.id) {
     throw new HttpError(404, "ORDER_NOT_FOUND", "Order not found");
   }
-  return order;
+  return actor.role === "STAFF" ? staffOrderDetail(order) : order;
 }
 
 export async function queryTracking(db: PrismaClient, actor: Actor, id: string) {
