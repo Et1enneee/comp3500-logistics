@@ -7,7 +7,7 @@ const SCRYPT_r = 8;
 const SCRYPT_p = 1;
 const KEY_LENGTH = 64;
 
-export type Role = "CUSTOMER" | "STAFF" | "ADMIN";
+export type Role = "CUSTOMER" | "STAFF" | "DRIVER" | "ADMIN";
 
 export interface SessionUser {
   id: string;

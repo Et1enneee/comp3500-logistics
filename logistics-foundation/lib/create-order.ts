@@ -1,5 +1,6 @@
 import type { PrismaClient } from "@prisma/client";
 import { failure, HttpError, readJsonBody, requireSession } from "@/lib/http";
+import { normalizeDeliveryAddress } from "@/lib/delivery-address";
 
 /**
  * POST /api/v1/orders
@@ -24,6 +25,11 @@ export function createOrderPost(db: PrismaClient) {
       }
       if ("customerId" in body && body.customerId !== user.id) {
         throw new HttpError(403, "FORBIDDEN", "The customer ID in the request does not match the session identity");
+      }
+
+      const deliveryAddress = normalizeDeliveryAddress(body.deliveryAddress);
+      if (!deliveryAddress) {
+        throw new HttpError(400, "INVALID_ARGUMENT", "Please enter a delivery address of 1–200 characters without control characters");
       }
 
       const quantities = new Map<string, number>();
@@ -84,6 +90,7 @@ export function createOrderPost(db: PrismaClient) {
               data: {
                 orderNumber: prefix + String(sequence).padStart(4, "0"),
                 customerId: user.id,
+                deliveryAddress,
                 status: "CREATED",
                 totalCents,
                 items: { create: lines },
