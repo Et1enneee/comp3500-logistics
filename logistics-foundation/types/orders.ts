@@ -20,9 +20,9 @@ export interface ShipmentSummaryDto {
   shippedAt: string | null; deliveredAt: string | null;
 }
 export interface OrderDetail extends OrderSummary {
-  customerId: string; createdAt: string; updatedAt: string;
+  customerId?: string; deliveryAddress?: string | null; createdAt: string; updatedAt: string;
   items: OrderItemDto[];
-  customer: { id: string; email: string; name: string };
+  customer?: { id: string; email: string; name: string };
   shipment?: ShipmentSummaryDto | null;
 }
 export interface GetOrderResponse { order: OrderDetail }
@@ -32,7 +32,7 @@ export interface ConfirmOrderResponse { order: OrderSummary }
 
 export interface OrderListItem {
   id: string; orderNumber: string; status: OrderStatus; totalCents: number;
-  createdAt: string; customer: { name: string; email: string };
+  createdAt: string; customer?: { name: string; email: string };
   itemCount: number; trackingNumber: string | null;
 }
 export interface OrderListResponse {
@@ -49,7 +49,7 @@ export interface TrackingResponse {
   trackingNumber: string; carrier: string; status: string; events: TrackingEventDto[];
 }
 
-export interface SessionUserDto { id: string; email: string; name: string; role: "CUSTOMER" | "STAFF" | "ADMIN" }
+export interface SessionUserDto { id: string; email: string; name: string; role: "CUSTOMER" | "STAFF" | "DRIVER" | "ADMIN" }
 export interface MeResponse { user: SessionUserDto; csrfToken: string; expiresAt: string }
 
 export interface InventoryItem {
@@ -64,7 +64,7 @@ export interface InventoryLogItem {
   id: string; delta: number; reason: string; createdAt: string;
   product: { sku: string; name: string };
   orderNumber: string | null;
-  actor: { name: string; email: string } | null;
+  actor: { name: string; email: string | null } | null;
 }
 export interface InventoryLogsResponse {
   logs: InventoryLogItem[];

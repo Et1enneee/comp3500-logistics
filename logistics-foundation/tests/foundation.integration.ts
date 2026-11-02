@@ -16,7 +16,7 @@ test("Foundation creation / real isolated SQLite", { timeout: 180000 }, async t 
     const post = createOrderPost(db);
     const handlers = createOrderHandlers(db);
     const create = (body: unknown, session: typeof users.customerA.session | null = users.customerA.session) =>
-      post(apiRequest("http://localhost/api/v1/orders", { method: "POST", body, session }));
+      post(apiRequest("http://localhost/api/v1/orders", { method: "POST", body: body && typeof body === "object" && !Array.isArray(body) ? { deliveryAddress: "Demo Address, Example Street", ...body } : body, session }));
 
     let createdId = "";
     let createdNumber = "";

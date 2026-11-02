@@ -16,7 +16,7 @@ test("Logistics chain / real isolated SQLite", { timeout: 180000 }, async t => {
     const shipments = createShipmentHandlers(db);
 
     const create = (session = users.customerA.session) => post(apiRequest("http://localhost/api/v1/orders", {
-      method: "POST", body: { items: [{ sku: "SKU001", quantity: 2 }] }, session,
+      method: "POST", body: { deliveryAddress: "Demo Address, Example Street", items: [{ sku: "SKU001", quantity: 2 }] }, session,
     }));
     const patch = (id: string, to: string, session = users.staff.session) => handlers.updateStatus(
       apiRequest("http://localhost/api/v1/orders/id/status", { method: "PATCH", body: { to }, session }),
