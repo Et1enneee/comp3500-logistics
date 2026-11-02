@@ -50,6 +50,9 @@ async function main() {
   const staff = await prisma.user.create({
     data: { email: "staff@demo.com", name: "Demo Staff", passwordHash, role: "STAFF" },
   });
+  await prisma.user.create({
+    data: { email: "driver@demo.com", name: "Demo Driver", passwordHash, role: "DRIVER" },
+  });
   const admin = await prisma.user.create({
     data: { email: "admin@demo.com", name: "Demo Administrator", passwordHash, role: "ADMIN" },
   });
@@ -122,6 +125,7 @@ async function main() {
       data: {
         orderNumber,
         customerId: customer.id,
+        deliveryAddress: index % 2 === 0 ? "Demo Address A, Example Street" : "Demo Address B, Example Street",
         status: "CREATED",
         totalCents,
         createdAt: base,
@@ -219,7 +223,7 @@ async function main() {
       const transitAt = new Date(base.getTime() + 8 * 3600 * 1000);
       const shipment = await prisma.shipment.findUniqueOrThrow({ where: { orderId: order.id } });
       await prisma.trackingEvent.create({
-        data: { shipmentId: shipment.id, at: transitAt, location: "Pickup station", description: `Picked up by carrier ${shipment.carrier}` },
+        data: { shipmentId: shipment.id, at: transitAt, location: "Pickup station", description: `Simulated pickup by carrier ${shipment.carrier}` },
       });
       await prisma.shipment.update({ where: { orderId: order.id }, data: { status: "IN_TRANSIT" } });
       await prisma.order.update({ where: { id: order.id }, data: { status: "IN_TRANSIT", updatedAt: transitAt } });
@@ -236,7 +240,7 @@ async function main() {
       const deliveredAt = new Date(base.getTime() + 28 * 3600 * 1000);
       const shipment = await prisma.shipment.findUniqueOrThrow({ where: { orderId: order.id } });
       await prisma.trackingEvent.create({
-        data: { shipmentId: shipment.id, at: deliveredAt, location: "Delivery address", description: "Signed for by the recipient" },
+        data: { shipmentId: shipment.id, at: deliveredAt, location: "Delivery address", description: "Simulated delivery completed" },
       });
       await prisma.shipment.update({ where: { orderId: order.id }, data: { status: "DELIVERED", deliveredAt } });
       await prisma.order.update({ where: { id: order.id }, data: { status: "DELIVERED", updatedAt: deliveredAt } });
@@ -262,7 +266,7 @@ async function main() {
   console.log("  Low stock: " + (lowStock.length ? lowStock.map(p => `${p.sku}(${p.stock}/${p.lowStockThreshold})`).join(", ") : "none"));
   console.log("  Demo accounts (password from DEMO_PASSWORD, or Demo1234! when unset):");
   console.log("    customer.a@demo.com / customer.b@demo.com (customers)");
-  console.log("    staff@demo.com (staff)  admin@demo.com (administrator, read-only reports)");
+  console.log("    staff@demo.com (staff)  driver@demo.com (driver)  admin@demo.com (administrator, read-only reports)");
   void staff; void admin;
 }
 
