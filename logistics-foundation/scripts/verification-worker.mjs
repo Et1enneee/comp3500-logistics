@@ -152,7 +152,7 @@ async function restartCheck() {
   const createResponse = await fetch(baseUrl + "/api/v1/orders", {
     method: "POST",
     headers: { "content-type": "application/json", cookie: customer.cookie, "x-csrf-token": customer.csrf },
-    body: JSON.stringify({ items: [{ sku: "SKU001", quantity: 1 }] }),
+    body: JSON.stringify({ deliveryAddress: "Demo Address, Example Street", items: [{ sku: "SKU001", quantity: 1 }] }),
   });
   if (createResponse.status !== 201) throw new Error(`create -> ${createResponse.status}`);
   const before = await createResponse.json();
