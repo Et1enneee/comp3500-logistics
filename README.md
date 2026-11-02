@@ -2,9 +2,13 @@
 
 The sole application lives in `logistics-foundation/`; the root directory forwards all run, test, and evidence commands. It keeps the v0.3.1 foundation, Next.js / React / TypeScript / Prisma 6 / SQLite, and the existing lockfile.
 
-## Startup (Node 24; verified this round on 24.22.2)
+## Startup (Node 24; tested on 24.14.1)
+
+From a fresh clone, with network access to install dependencies:
 
 ```bash
+git clone https://github.com/Et1enneee/comp3500-logistics.git
+cd comp3500-logistics
 npm run setup
 npm run db:setup
 # Only for a brand-new or disposable demo database; this command deletes existing data in that database:
@@ -14,9 +18,22 @@ npm run dev:local
 
 Open http://127.0.0.1:3000. Existing databases only run migrations; to upgrade legacy demo passwords use `RESET_PASSWORDS=YES npm run db:reset-passwords`, which preserves orders and inventory. For Windows environment-variable syntax see the application README.
 
+### Demo accounts
+
+After seeding, sign in with one of these accounts:
+
+| Role | Email |
+| --- | --- |
+| Customer A | `customer.a@demo.com` |
+| Customer B | `customer.b@demo.com` |
+| Staff | `staff@demo.com` |
+| Admin | `admin@demo.com` |
+
+The default password is `Demo1234!`; setting `DEMO_PASSWORD` before seeding overrides it. These are demo credentials for local use only.
+
 ## Current Capabilities
 
-Real login/logout with persistent sessions and per-customer object isolation; customer catalog, order placement, my orders, shipment tracking, and cancellation; staff confirmation, picking, shipping, and simulated pickup/delivery; a single cancellation after confirmation releases reserved stock; inventory alerts, replenishment, and stock ledger; in-app notifications; ADMIN read-only reports with CSV export. Default demo accounts and password configuration are documented in the application README. Logistics is simulated locally; there is no real payment or carrier integration.
+Real login/logout with persistent sessions and per-customer object isolation; customer catalog, order placement, my orders, shipment tracking, and cancellation; staff confirmation, picking, shipping, and simulated pickup/delivery; a single cancellation after confirmation releases reserved stock; inventory alerts, replenishment, and stock ledger; in-app notifications; ADMIN read-only reports with CSV export. Logistics is simulated locally; there is no real payment or carrier integration.
 
 ## Checks and Isolated Evidence
 
@@ -36,13 +53,13 @@ RESET_DEMO_DATA=YES npm run evidence
 
 `evidence` does not touch the original project database. Output defaults to `evidence/` one level above the application and can be redirected with `EVIDENCE_ROOT`. The lower-level `test:browser` mutates the demo database it connects to; prefer the fully isolated evidence entry point. Service startup, readiness checks, performance and browser checks, restart verification, and service teardown are managed by the evidence pipeline.
 
-The current CI lives in `.github/workflows/ci.yml`; performance and browser checks share the same service lifecycle. Running it remotely still requires uploading and checking the actual Actions run; the delivery package only claims locally verified results.
+The CI workflow is in `.github/workflows/ci.yml`; performance and browser checks share the same service lifecycle. The [main-branch run for commit `671c1a1`](https://github.com/Et1enneee/comp3500-logistics/actions/runs/41419103400) passed. Check GitHub Actions for results on later commits.
 
 ## Reading Entry Points
 
-- `logistics-foundation/README.md`: accounts, business rules, and run steps.
+- `logistics-foundation/README.md`: business rules and detailed run steps.
 - `logistics-foundation/docs/known-issues.md`: dependency audit, SQLite, availability, and testing boundaries.
 - `logistics-foundation/docs/contracts/` and `docs/traceability.md`: interfaces and requirements traceability.
 - `logistics-foundation/docs/reference/legacy/`: historical material, not a statement of current capabilities.
 
-The delivered source excludes dependencies, build caches, databases, real environment variables, and past evidence; `evidence/results.json`, `delivery.json`, and `SHA256SUMS.txt` in the delivery package are used to verify this round's source and evidence. The course report, demo materials, and official submission records remain managed separately by the team.
+The source excludes dependencies, build caches, databases, and real environment variables. `logistics-foundation/SHA256SUMS.txt` lists application files for checksum verification. Historical evidence is kept as historical material; current test evidence is supplied separately. The course report, demo materials, and official submission records remain managed separately by the team.
