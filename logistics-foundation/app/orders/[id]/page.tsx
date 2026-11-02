@@ -58,7 +58,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
               <div><dt>Order Number (ORD for lookup)</dt><dd className="mono">{order.orderNumber}</dd></div>
               <div><dt>Created At ({TIMEZONE_LABEL})</dt><dd>{formatGmt8(order.createdAt)}</dd></div>
               <div><dt>Last Updated ({TIMEZONE_LABEL})</dt><dd>{formatGmt8(order.updatedAt)}</dd></div>
-              <div><dt>Customer</dt><dd>{order.customer.name} · <span className="small">{order.customer.email}</span></dd></div>
+              <div><dt>Customer</dt><dd>{session.user.name} · <span className="small">{session.user.email}</span></dd></div>
             </dl>
           </div>
           <div className="table-wrap">

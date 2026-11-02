@@ -135,6 +135,8 @@ Write requests (POST/PATCH/DELETE) uniformly require `X-CSRF-Token` equal to the
 | PATCH | `/api/v1/orders/{internal id}/status` | STAFF; CUSTOMER only cancels own | `to` ∈ CONFIRMED/PICKING/IN_TRANSIT/DELIVERED/CANCELLED; `to=SHIPPED` still 400, must go through the shipping endpoint |
 | GET | `/api/v1/orders/{internal id}/tracking` | CUSTOMER/STAFF | shipment and events (chronological); 404 `SHIPMENT_NOT_FOUND` before shipping; cross-customer access 404 |
 
+STAFF order list and detail responses omit the customer identity and customer ID; the interface retains operational order fields. Customer-owned order responses are unchanged. Order numbers are lookup identifiers, not authentication credentials.
+
 Cancellation semantics: `CREATED→CANCELLED` leaves stock and ledger untouched; `CONFIRMED→CANCELLED` restores stock in the same transaction with one positive `ORDER_CANCEL_RELEASE` ledger entry per SKU; `PICKING` and later 409; repeated/concurrent attempts succeed at most once; staff can cancel only CONFIRMED; ADMIN 403.
 
 ## Shipping
@@ -148,7 +150,7 @@ Cancellation semantics: `CREATED→CANCELLED` leaves stock and ledger untouched;
 | GET | `/api/v1/inventory?page=&pageSize=&sku=&lowStock=1` | STAFF/ADMIN | paginated; `isLowStock = stock < lowStockThreshold`; includes `lowStockCount` |
 | GET | `/api/v1/inventory/low-stock` | STAFF/ADMIN | `{products,count}` |
 | POST | `/api/v1/inventory/{productId}/replenish` | STAFF | `{quantity}` positive integer (≤1,000,000), increments only; writes `STOCK_REPLENISH` + operator; 201 `{product,log}` |
-| GET | `/api/v1/inventory/logs?sku=&orderNumber=&page=&pageSize=` | STAFF/ADMIN | delta/reason/time/related order/operator; no delete endpoint |
+| GET | `/api/v1/inventory/logs?sku=&orderNumber=&page=&pageSize=` | STAFF/ADMIN | delta/reason/time/related order/operator; customer actors are displayed without their identity; no delete endpoint |
 
 ## Notifications
 

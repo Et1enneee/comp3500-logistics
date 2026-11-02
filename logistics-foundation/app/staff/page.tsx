@@ -105,7 +105,6 @@ export default async function StaffPage({
               <thead>
                 <tr>
                   <th scope="col">Order Number</th>
-                  <th scope="col">Customer</th>
                   <th scope="col">Created At (GMT+8)</th>
                   <th scope="col">Status</th>
                   <th scope="col" className="num">Items</th>
@@ -118,7 +117,6 @@ export default async function StaffPage({
                 {result.orders.map(order => (
                   <tr key={order.id}>
                     <td className="mono">{order.orderNumber}</td>
-                    <td>{order.customer.name}<div className="sku">{order.customer.email}</div></td>
                     <td>{formatGmt8(order.createdAt)}</td>
                     <td><StatusBadge status={order.status} /></td>
                     <td className="num">{order.itemCount}</td>
