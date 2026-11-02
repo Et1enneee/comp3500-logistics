@@ -144,7 +144,7 @@ export default async function InventoryPage({
                       <td className="mono small">{log.reason}</td>
                       <td className={`num mono ${log.delta < 0 ? "low" : ""}`}>{log.delta > 0 ? `+${log.delta}` : log.delta}</td>
                       <td className="mono small">{log.orderNumber ?? "—"}</td>
-                      <td className="small">{log.actor ? `${log.actor.name} · ${log.actor.email}` : "System / legacy data"}</td>
+                      <td className="small">{log.actor ? (log.actor.email ? `${log.actor.name} · ${log.actor.email}` : log.actor.name) : "System / legacy data"}</td>
                     </tr>
                   ))}
                 </tbody>

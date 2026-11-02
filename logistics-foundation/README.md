@@ -53,7 +53,7 @@ npm run build && npm run start -- --hostname 127.0.0.1 --port 3100
 - Inventory: `stock` always means available stock; replenishment only increments and writes a `STOCK_REPLENISH` ledger entry with the operator; alerts require strictly `stock < threshold` (`lib/inventory-api.ts`).
 - Reports: orders are attributed to GMT+8 calendar days by `createdAt` (start day inclusive, the day after the end date at 00:00 exclusive); amounts are called "order amounts"; CSV is protected against formula injection (`lib/reports-api.ts`).
 - Query parameters: pages and API share validation; illegal status values, decimal quantities, or duplicate page parameters return recoverable UI messages / API 400. Order placement keeps the `SKU_NOT_FOUND_<sku>` and `INSUFFICIENT_STOCK_<sku>` error codes; malformed session cookies are treated as invalid.
-- Identity: `401` when not logged in, `403` on role mismatch/CSRF failure, and a uniform `404` for cross-customer objects (`lib/http.ts`, `lib/order-api.ts`).
+- Identity: `401` when not logged in, `403` on role mismatch/CSRF failure, and a uniform `404` for cross-customer objects (`lib/http.ts`, `lib/order-api.ts`). Staff order lists/details omit customer identity and customer ID; customer actors in inventory logs are shown without identifying details. Order numbers identify orders but do not replace login.
 
 ## 3. Checks and Evidence
 

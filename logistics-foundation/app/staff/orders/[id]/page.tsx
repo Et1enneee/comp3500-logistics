@@ -39,7 +39,6 @@ export default async function StaffOrderPage({ params }: { params: Promise<{ id:
           <div className="card-body">
             <dl className="order-meta">
               <div><dt>Order Number</dt><dd className="mono">{order.orderNumber}</dd></div>
-              <div><dt>Customer</dt><dd>{order.customer.name} · <span className="small">{order.customer.email}</span></dd></div>
               <div><dt>Created At ({TIMEZONE_LABEL})</dt><dd>{formatGmt8(order.createdAt)}</dd></div>
               <div><dt>Internal ID (used automatically by the API)</dt><dd className="mono">{order.id}</dd></div>
             </dl>
