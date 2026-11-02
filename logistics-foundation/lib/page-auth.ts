@@ -33,5 +33,6 @@ export async function requirePageRole(roles: SessionUser["role"][]): Promise<Pag
 export function homePathForRole(role: SessionUser["role"]): string {
   if (role === "STAFF") return "/staff";
   if (role === "ADMIN") return "/admin";
+  if (role === "DRIVER") return "/driver";
   return "/";
 }
