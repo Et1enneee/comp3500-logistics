@@ -31,11 +31,11 @@ export default function LoginForm({ nextPath }: { nextPath: string }) {
         setError(data?.error?.message || `Sign-in failed (HTTP ${response.status}). Please try again.`);
         return;
       }
-      const role = data?.user?.role as "CUSTOMER" | "STAFF" | "ADMIN" | undefined;
+      const role = data?.user?.role as "CUSTOMER" | "STAFF" | "DRIVER" | "ADMIN" | undefined;
       if (nextPath && nextPath.startsWith("/")) {
         router.replace(nextPath);
       } else {
-        router.replace(role === "STAFF" ? "/staff" : role === "ADMIN" ? "/admin" : "/");
+        router.replace(role === "STAFF" ? "/staff" : role === "ADMIN" ? "/admin" : role === "DRIVER" ? "/driver" : "/");
       }
       router.refresh();
     } catch {

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description: "Group 42 · Ordering, confirmation, picking, shipping, tracking, cancellation, inventory and operations reports",
 };
 
-const ROLE_LABEL: Record<string, string> = { CUSTOMER: "Customer", STAFF: "Staff", ADMIN: "Administrator" };
+const ROLE_LABEL: Record<string, string> = { CUSTOMER: "Customer", STAFF: "Staff", DRIVER: "Driver", ADMIN: "Administrator" };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const session = await getPageSession();
@@ -24,7 +24,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <header className="site-header">
           <div className="header-inner">
-            <Link href={session ? (session.user.role === "STAFF" ? "/staff" : session.user.role === "ADMIN" ? "/admin" : "/") : "/login"} className="brand">
+            <Link href={session ? (session.user.role === "STAFF" ? "/staff" : session.user.role === "ADMIN" ? "/admin" : session.user.role === "DRIVER" ? "/driver" : "/") : "/login"} className="brand">
               <span className="brand-mark" aria-hidden="true">L</span>
               <span>Logistics Management<span className="brand-sub">GROUP 42 / v{version}</span></span>
             </Link>
@@ -45,6 +45,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   <Link href="/inventory">Inventory & Ledger</Link>
                 </>
               )}
+              {session?.user.role === "DRIVER" && <Link href="/driver">My Deliveries</Link>}
               {session?.user.role === "ADMIN" && (
                 <>
                   <Link href="/admin">Operations Reports</Link>

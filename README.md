@@ -27,13 +27,16 @@ After seeding, sign in with one of these accounts:
 | Customer A | `customer.a@demo.com` |
 | Customer B | `customer.b@demo.com` |
 | Staff | `staff@demo.com` |
+| Driver | `driver@demo.com` |
 | Admin | `admin@demo.com` |
 
 The default password is `Demo1234!`; setting `DEMO_PASSWORD` before seeding overrides it. These are demo credentials for local use only.
 
+For an existing local demo database, run `npm run db:setup` to apply the migration, then `CREATE_DEMO_DRIVER=YES npm run db:driver-demo` (macOS/Linux) to create only the driver demo account without wiping data. Existing driver accounts are not changed. On PowerShell set `$env:CREATE_DEMO_DRIVER="YES"` before the command and remove it afterward.
+
 ## Current Capabilities
 
-Real login/logout with persistent sessions and per-customer object isolation; customer catalog, order placement, my orders, shipment tracking, and cancellation; staff confirmation, picking, shipping, and simulated pickup/delivery; a single cancellation after confirmation releases reserved stock; inventory alerts, replenishment, and stock ledger; in-app notifications; ADMIN read-only reports with CSV export. Logistics is simulated locally; there is no real payment or carrier integration.
+Real login/logout with persistent sessions and per-customer object isolation; customer catalog, order placement, my orders, shipment tracking, and cancellation; staff confirmation, picking, shipping and driver assignment; drivers update assigned simulated deliveries; a single cancellation after confirmation releases reserved stock; inventory alerts, replenishment, and stock ledger; in-app notifications; ADMIN read-only reports with CSV export. Logistics is simulated locally; there is no real GPS, scanner, payment or carrier integration; the delivery-address field is stored in the local database and is for fictional demo data only. See `logistics-foundation/docs/driver-module.md`.
 
 ## Checks and Isolated Evidence
 

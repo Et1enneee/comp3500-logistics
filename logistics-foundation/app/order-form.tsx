@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { money, type CatalogProduct } from "@/lib/catalog";
+import { normalizeDeliveryAddress } from "@/lib/delivery-address";
 
 type SubmitState =
   | { kind: "idle" }
@@ -13,6 +14,7 @@ type SubmitState =
 
 export default function OrderForm({ products, csrfToken }: { products: CatalogProduct[]; csrfToken: string }) {
   const router = useRouter();
+  const [deliveryAddress, setDeliveryAddress] = useState("");
   const [quantities, setQuantities] = useState<Record<string, string>>({});
   const [state, setState] = useState<SubmitState>({ kind: "idle" });
   const lock = useRef(false);
@@ -33,13 +35,17 @@ export default function OrderForm({ products, csrfToken }: { products: CatalogPr
       setState({ kind: "error", message: "Please select at least one product; quantities must be valid non-negative integers." });
       return;
     }
+    if (!normalizeDeliveryAddress(deliveryAddress)) {
+      setState({ kind: "error", message: "Please enter a delivery address of 1–200 characters without control characters." });
+      return;
+    }
     lock.current = true;
     setState({ kind: "busy" });
     try {
       const response = await fetch("/api/v1/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
-        body: JSON.stringify({ items: lines.map(({ product, quantity }) => ({ sku: product.sku, quantity })) }),
+        body: JSON.stringify({ deliveryAddress: deliveryAddress.trim(), items: lines.map(({ product, quantity }) => ({ sku: product.sku, quantity })) }),
       });
       const data = await response.json().catch(() => null);
       if (!response.ok) {
@@ -135,6 +141,11 @@ export default function OrderForm({ products, csrfToken }: { products: CatalogPr
             <div className="card-body">
               <p className="small muted">Current identity</p>
               <p className="mono">Determined automatically from your sign-in session; no email input needed</p>
+              <div className="field">
+                <label htmlFor="delivery-address">Delivery address</label>
+                <input id="delivery-address" name="deliveryAddress" type="text" autoComplete="street-address" maxLength={200} value={deliveryAddress} disabled={busy} onChange={event => setDeliveryAddress(event.target.value)} placeholder="Street, building, area" required />
+                <p className="hint">Visible to you and the assigned driver, not the staff order view.</p>
+              </div>
               <h2>Order Summary</h2>
               <ul className="summary-lines">
                 {lines.map(({ product, quantity }) => (
