@@ -32,7 +32,18 @@ After seeding, sign in with one of these accounts:
 
 The default password is `Demo1234!`; setting `DEMO_PASSWORD` before seeding overrides it. These are demo credentials for local use only.
 
-For an existing local demo database, run `npm run db:setup` to apply the migration, then `CREATE_DEMO_DRIVER=YES npm run db:driver-demo` (macOS/Linux) to create only the driver demo account without wiping data. Existing driver accounts are not changed. On PowerShell set `$env:CREATE_DEMO_DRIVER="YES"` before the command and remove it afterward.
+For an existing local demo database, run `npm run db:setup` to apply the migrations, then `CREATE_DEMO_DRIVER=YES npm run db:driver-demo` (macOS/Linux) to create only the driver demo account without wiping data. Existing driver accounts are not changed. On PowerShell set `$env:CREATE_DEMO_DRIVER="YES"` before the command and remove it afterward.
+
+### Try the simulated delivery workflow
+
+Use fictional addresses only; the local SQLite database stores addresses as plain text. Switch accounts by signing out and signing in again.
+
+1. **Customer A:** place a new order with a fictional delivery address. Note the order number. Creating the order does not deduct stock.
+2. **Staff:** find that order in the workbench, confirm and pick it, then create the shipment and assign the demo driver. Staff order views do not show the customer's address.
+3. **Driver:** open My Deliveries to see the assigned order and its address; simulate pickup and delivery in order.
+4. **Customer A:** open the order to review its delivery status and tracking events.
+
+Orders created before the address migration keep an empty address and are marked as not provided; they can still be processed for simulation, but do not represent a real delivery. Staff can also simulate pickup and delivery without a driver assignment for backward compatibility. No GPS, recipient phone or real carrier service is connected. For details and limitations see `logistics-foundation/docs/driver-module.md`.
 
 ## Current Capabilities
 
