@@ -128,7 +128,7 @@ Write requests (POST/PATCH/DELETE) uniformly require `X-CSRF-Token` equal to the
 
 | Method | Path | Role | Notes |
 | --- | --- | --- | --- |
-| POST | `/api/v1/orders` | CUSTOMER | identity from the session; if the body contains `email/customerId` it must match the session, otherwise 403. 201 `{order}` |
+| POST | `/api/v1/orders` | CUSTOMER | requires `deliveryAddress` (1–200 characters); identity from the session; if `email/customerId` is supplied it must match, otherwise 403. 201 `{order}` |
 | GET | `/api/v1/orders?orderNumber=ORD-…` | CUSTOMER/STAFF | exact lookup by ORD; a customer reading another's order gets 404 |
 | GET | `/api/v1/orders?page=&pageSize=&status=` | CUSTOMER/STAFF | paginated list `{orders,page,pageSize,total,totalPages}`; customers see only their own; ADMIN 403 |
 | GET | `/api/v1/orders/{internal id}` | CUSTOMER/STAFF | details (with shipment summary); cross-customer access 404 |
@@ -138,6 +138,16 @@ Write requests (POST/PATCH/DELETE) uniformly require `X-CSRF-Token` equal to the
 STAFF order list and detail responses omit the customer identity and customer ID; the interface retains operational order fields. Customer-owned order responses are unchanged. Order numbers are lookup identifiers, not authentication credentials.
 
 Cancellation semantics: `CREATED→CANCELLED` leaves stock and ledger untouched; `CONFIRMED→CANCELLED` restores stock in the same transaction with one positive `ORDER_CANCEL_RELEASE` ledger entry per SKU; `PICKING` and later 409; repeated/concurrent attempts succeed at most once; staff can cancel only CONFIRMED; ADMIN 403.
+
+## Driver assignment (simulated increment)
+
+| Method | Path | Role | Notes |
+| --- | --- | --- | --- |
+| POST | `/api/v1/orders/{id}/driver` | STAFF | `{driverId}` must identify a DRIVER; assignment/reassignment only while SHIPPED; session and CSRF required |
+| GET | `/api/v1/driver/tasks` | DRIVER | only assigned shipments, including their delivery addresses; no customer name, email or phone |
+| PATCH | `/api/v1/orders/{id}/status` | DRIVER | `IN_TRANSIT` or `DELIVERED` only, assigned shipment required; non-assigned 404, invalid state 409 |
+
+STAFF retains existing simulated transit/delivery actions for compatibility. A customer-supplied address is visible to the order owner and assigned driver, not staff order views or APIs. Old orders may have no address. No real GPS, scanner or customer phone is implemented. See `../driver-module.md`.
 
 ## Shipping
 

@@ -8,6 +8,7 @@ import { Forbidden, Money, StatusBadge } from "@/components/ui";
 import { formatGmt8, TIMEZONE_LABEL } from "@/lib/time";
 import StaffActions from "./staff-actions";
 import TrackingPanel from "./tracking-panel";
+import AssignDriver from "./assign-driver";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +24,9 @@ export default async function StaffOrderPage({ params }: { params: Promise<{ id:
     if (error instanceof HttpError && error.status === 404) notFound();
     throw error;
   }
+
+  const assignment = order.status === "SHIPPED" ? await prisma.shipment.findUnique({ where: { orderId: id }, select: { driverId: true } }) : null;
+  const drivers = order.status === "SHIPPED" ? await prisma.user.findMany({ where: { role: "DRIVER" }, select: { id: true, name: true, email: true }, orderBy: { name: "asc" } }) : [];
 
   return (
     <main className="page">
@@ -67,6 +71,11 @@ export default async function StaffOrderPage({ params }: { params: Promise<{ id:
             <StaffActions orderId={order.id} orderNumber={order.orderNumber} status={order.status} csrfToken={session.csrfToken} />
           </div>
         </section>
+
+        {order.status === "SHIPPED" && <section className="card">
+          <div className="card-head"><h2>Assign Driver</h2></div>
+          <div className="card-body"><AssignDriver orderId={order.id} csrfToken={session.csrfToken} drivers={drivers} selected={assignment?.driverId ?? null} /></div>
+        </section>}
 
         <section className="card">
           <div className="card-head"><h2>Shipment Tracking</h2>{order.shipment && <span className="small muted">Shipment status {order.shipment.status}</span>}</div>

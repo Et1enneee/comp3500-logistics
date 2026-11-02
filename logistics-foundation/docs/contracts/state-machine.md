@@ -1,4 +1,6 @@
-# Order Status: Design Scope vs Current Implementation
+# Order Status: Historical v0.3 Design Scope
+
+> Historical snapshot: the status and authentication claims below do not describe the current implementation. For the current simulated driver increment, see `../driver-module.md`; for cancellation and API rules, see `api.md`.
 
 The design model of seven states / seven transitions is authoritative in lib/constants.ts and the Prisma enum; the original 9 state-machine unit tests are kept. The state model allowing a transition does not mean the HTTP API has implemented it.
 
