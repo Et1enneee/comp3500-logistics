@@ -2,11 +2,11 @@ import { PrismaClient } from "@prisma/client";
 import { hashPassword } from "../lib/auth";
 
 /**
- * 旧库安全升级工具：把已有的演示账号密码哈希改为真实 scrypt 哈希。
- * - 只改 passwordHash，不删除用户、订单、库存或流水。
- * - 必须显式 RESET_PASSWORDS=YES。
- * - 默认只处理 @demo.com 演示账号，可用 --emails=a@x,b@x 指定。
- * - 可使用 DATABASE_URL_OVERRIDE 指向临时/备份库（迁移验证脚本会用）。
+ * Legacy-database safety upgrade tool: rewrites existing demo account password hashes into real scrypt hashes.
+ * - Only passwordHash is changed; no users, orders, inventory or ledger rows are deleted.
+ * - Requires an explicit RESET_PASSWORDS=YES.
+ * - By default only @demo.com demo accounts are processed; use --emails=a@x,b@x to specify others.
+ * - DATABASE_URL_OVERRIDE can point at a temporary/backup database (used by the migration verification script).
  */
 const password = process.env.DEMO_PASSWORD || process.env.RESET_PASSWORD || "Demo1234!";
 const overrideUrl = process.env.DATABASE_URL_OVERRIDE;
@@ -22,9 +22,9 @@ function targetEmails(): string[] | null {
 
 async function main() {
   if (process.env.RESET_PASSWORDS !== "YES") {
-    throw new Error("拒绝修改密码。请显式设置 RESET_PASSWORDS=YES 后重试（该操作只改哈希，不删数据）。");
+    throw new Error("Refusing to modify passwords. Set RESET_PASSWORDS=YES explicitly and retry (this operation only rewrites hashes; it deletes no data).");
   }
-  if (password.length < 8) throw new Error("密码至少 8 位；请通过 DEMO_PASSWORD 提供。");
+  if (password.length < 8) throw new Error("The password must be at least 8 characters; provide it via DEMO_PASSWORD.");
 
   const emails = targetEmails();
   const targets = await prisma.user.findMany({
@@ -33,17 +33,17 @@ async function main() {
     orderBy: { email: "asc" },
   });
   if (targets.length === 0) {
-    console.log("没有匹配的账号；未修改任何数据。");
+    console.log("No matching accounts; nothing was modified.");
     return;
   }
   const passwordHash = hashPassword(password);
   for (const user of targets) {
     await prisma.user.update({ where: { id: user.id }, data: { passwordHash } });
-    console.log(`已重设 ${user.email}（${user.role}）的密码哈希；订单与库存未改动。`);
+    console.log(`Reset the password hash for ${user.email} (${user.role}); orders and inventory untouched.`);
   }
-  // 同时清空该批账号的旧会话，避免旧 Cookie 继续可用。
+  // Also clear the old sessions of these accounts so stale cookies stop working.
   const cleared = await prisma.session.deleteMany({ where: { userId: { in: targets.map(user => user.id) } } });
-  console.log(`共重设 ${targets.length} 个账号，清理 ${cleared.count} 个旧会话。密码来源：${process.env.DEMO_PASSWORD ? "DEMO_PASSWORD" : process.env.RESET_PASSWORD ? "RESET_PASSWORD" : "默认演示值"}`);
+  console.log(`Reset ${targets.length} account(s) in total and cleared ${cleared.count} old session(s). Password source: ${process.env.DEMO_PASSWORD ? "DEMO_PASSWORD" : process.env.RESET_PASSWORD ? "RESET_PASSWORD" : "default demo value"}`);
 }
 
 main()

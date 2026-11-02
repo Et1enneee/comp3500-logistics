@@ -4,10 +4,10 @@ import path from "node:path";
 import { sourceFiles } from "./source-files.mjs";
 
 /**
- * 生成当前源码清单：
- *   BASELINE-v0.4.2.json  —— 每个源文件的 SHA-256 + 来源信息
- *   SHA256SUMS.txt        —— `sha256sum -c` 可直接校验（路径相对本目录）
- * 不包含 node_modules、构建产物、数据库、运行证据、清单自身。
+ * Generate the current source manifest:
+ *   BASELINE-v0.4.2.json  —— SHA-256 of every source file + provenance info
+ *   SHA256SUMS.txt        —— directly verifiable with `sha256sum -c` (paths relative to this directory)
+ * Excludes node_modules, build output, databases, run evidence, and the manifests themselves.
  */
 const root = process.cwd();
 const files = (await sourceFiles(root))
@@ -28,14 +28,14 @@ const baseline = {
   derived_from: {
     upstream_commit: "eddab17be9a29b7fb11769b60ac6afce1b3288c0",
     upstream_source_zip_sha256: "92b1a918b99e99245079ef70e1761df55c83598f857f4760fd94c0190c545d24",
-    note: "在已验收 v0.3.1 底座上增量开发；未重写业务主链，未升级框架或 Prisma 大版本。",
+    note: "Incremental development on the accepted v0.3.1 foundation; the core business chain was not rewritten, and neither the framework nor Prisma major versions were upgraded.",
   },
   file_count: Object.keys(hashes).length,
   source_files: hashes,
   verification_summary: {
-    counts_source: "以本轮 evidence/results.json 的 summary 实测统计为准；基线不预填测试数量。",
+    counts_source: "Test counts are taken from the measured summary in this round's evidence/results.json; the baseline does not pre-fill test counts.",
     migrations: ["20261013114356_init", "20261030120000_auth_inventory_notifications"],
-    evidence: "证据包 evidence/results.json 记录每步命令、退出码、耗时与源码摘要。",
+    evidence: "The evidence package evidence/results.json records each step's command, exit code, duration, and source digest.",
   },
 };
 

@@ -15,7 +15,7 @@ export default function LoginForm({ nextPath }: { nextPath: string }) {
     if (lock.current) return;
     setError("");
     if (!email.trim() || !password) {
-      setError("请输入邮箱和密码。");
+      setError("Please enter both email and password.");
       return;
     }
     lock.current = true;
@@ -28,7 +28,7 @@ export default function LoginForm({ nextPath }: { nextPath: string }) {
       });
       const data = await response.json().catch(() => null);
       if (!response.ok) {
-        setError(data?.error?.message || `登录失败（HTTP ${response.status}），请重试。`);
+        setError(data?.error?.message || `Sign-in failed (HTTP ${response.status}). Please try again.`);
         return;
       }
       const role = data?.user?.role as "CUSTOMER" | "STAFF" | "ADMIN" | undefined;
@@ -39,7 +39,7 @@ export default function LoginForm({ nextPath }: { nextPath: string }) {
       }
       router.refresh();
     } catch {
-      setError("无法连接服务器，登录结果未知。请刷新页面后重试。");
+      setError("Could not reach the server; the sign-in result is unknown. Please refresh the page and try again.");
     } finally {
       lock.current = false;
       setBusy(false);
@@ -48,9 +48,9 @@ export default function LoginForm({ nextPath }: { nextPath: string }) {
 
   return (
     <form onSubmit={submit} noValidate className="stack">
-      {error && <div className="feedback error" role="alert" style={{ margin: 0 }}><strong>登录未成功</strong><p>{error}</p></div>}
+      {error && <div className="feedback error" role="alert" style={{ margin: 0 }}><strong>Sign-in failed</strong><p>{error}</p></div>}
       <div>
-        <label htmlFor="login-email">邮箱</label>
+        <label htmlFor="login-email">Email</label>
         <input
           id="login-email"
           name="email"
@@ -63,7 +63,7 @@ export default function LoginForm({ nextPath }: { nextPath: string }) {
         />
       </div>
       <div>
-        <label htmlFor="login-password">密码</label>
+        <label htmlFor="login-password">Password</label>
         <input
           id="login-password"
           name="password"
@@ -76,9 +76,9 @@ export default function LoginForm({ nextPath }: { nextPath: string }) {
         />
       </div>
       <button className="primary full" type="submit" disabled={busy}>
-        {busy ? "正在登录…" : "登录"}
+        {busy ? "Signing in…" : "Sign In"}
       </button>
-      <p className="hint">会话保存在 HttpOnly Cookie 中，8 小时过期；退出后立即失效。</p>
+      <p className="hint">The session is stored in an HttpOnly cookie and expires after 8 hours; it becomes invalid immediately after sign-out.</p>
     </form>
   );
 }

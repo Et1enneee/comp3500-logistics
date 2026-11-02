@@ -7,7 +7,7 @@ export default function MarkReadButton({ id, csrfToken, read }: { id: string; cs
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const lock = useRef(false);
-  if (read) return <span className="tag">已读</span>;
+  if (read) return <span className="tag">Read</span>;
 
   async function mark() {
     if (lock.current) return;
@@ -21,12 +21,12 @@ export default function MarkReadButton({ id, csrfToken, read }: { id: string; cs
       });
       if (!response.ok) {
         const data = await response.json().catch(() => null);
-        setError(data?.error?.message || `标记失败（HTTP ${response.status}）`);
+        setError(data?.error?.message || `Failed to mark as read (HTTP ${response.status})`);
         return;
       }
       router.refresh();
     } catch {
-      setError("网络中断，标记结果未知。请刷新后重试。");
+      setError("The network dropped; the mark-as-read result is unknown. Please refresh and try again.");
     } finally {
       lock.current = false;
       setBusy(false);
@@ -35,7 +35,7 @@ export default function MarkReadButton({ id, csrfToken, read }: { id: string; cs
 
   return (
     <span className="inline-actions">
-      <button className="small" onClick={mark} disabled={busy}>{busy ? "处理中…" : "标记已读"}</button>
+      <button className="small" onClick={mark} disabled={busy}>{busy ? "Working…" : "Mark as Read"}</button>
       {error && <span className="small low" role="alert">{error}</span>}
     </span>
   );

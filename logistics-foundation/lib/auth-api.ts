@@ -14,8 +14,9 @@ import {
 import { errorResponse, failure, HttpError, readJsonBody } from "@/lib/http";
 
 /**
- * 认证 HTTP 处理器（可注入 db，便于真实 SQLite 集成测试）。
- * 安全要点：scrypt 校验、统一错误提示防枚举、登录限流、HttpOnly Cookie、CSRF。
+ * Auth HTTP handlers (db is injectable for real-SQLite integration tests).
+ * Security essentials: scrypt verification, a uniform error message to prevent enumeration,
+ * login rate limiting, HttpOnly cookies, and CSRF protection.
  */
 export function createAuthHandlers(db: PrismaClient) {
   async function login(req: Request): Promise<Response> {
@@ -24,30 +25,30 @@ export function createAuthHandlers(db: PrismaClient) {
       const host = req.headers.get("host");
       try {
         if (host && new URL(origin).host !== host) {
-          return errorResponse(403, "CSRF_INVALID", "跨站登录请求已被拒绝");
+          return errorResponse(403, "CSRF_INVALID", "The cross-site sign-in request was rejected");
         }
       } catch {
-        return errorResponse(403, "CSRF_INVALID", "请求来源无法识别");
+        return errorResponse(403, "CSRF_INVALID", "The request origin could not be identified");
       }
     }
     try {
       const body = await readJsonBody(req);
       const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
       const password = typeof body.password === "string" ? body.password : "";
-      if (!email || !password) throw new HttpError(400, "INVALID_ARGUMENT", "请输入邮箱和密码");
+      if (!email || !password) throw new HttpError(400, "INVALID_ARGUMENT", "Please enter both email and password");
 
       const key = loginAttemptKey(email);
-      if (isLoginBlocked(key)) throw new HttpError(429, "RATE_LIMITED", "登录尝试过于频繁，请 10 分钟后再试");
+      if (isLoginBlocked(key)) throw new HttpError(429, "RATE_LIMITED", "Too many sign-in attempts. Please try again in 10 minutes");
 
       const user = await db.user.findUnique({
         where: { email },
         select: { id: true, name: true, email: true, role: true, passwordHash: true },
       });
-      // 用户不存在与密码错误返回同一提示，避免邮箱枚举。
+      // A missing user and a wrong password return the same message to prevent email enumeration.
       const valid = user ? verifyPassword(password, user.passwordHash) : false;
       if (!user || !valid) {
         recordLoginFailure(key);
-        throw new HttpError(401, "UNAUTHENTICATED", "邮箱或密码不正确");
+        throw new HttpError(401, "UNAUTHENTICATED", "Incorrect email or password");
       }
       clearLoginFailures(key);
       const session = await createSession(db, user.id);
@@ -76,7 +77,7 @@ export function createAuthHandlers(db: PrismaClient) {
       if (authenticated) {
         const token = req.headers.get("x-csrf-token");
         if (token !== authenticated.session.csrfToken) {
-          throw new HttpError(403, "CSRF_INVALID", "写请求缺少有效的防跨站令牌，请刷新页面后重试");
+          throw new HttpError(403, "CSRF_INVALID", "The write request lacks a valid anti-CSRF token. Please refresh the page and try again");
         }
         await destroySession(db, authenticated.session.id);
       }
@@ -92,7 +93,7 @@ export function createAuthHandlers(db: PrismaClient) {
   async function me(req: Request): Promise<Response> {
     try {
       const authenticated = await readSession(db, req);
-      if (!authenticated) throw new HttpError(401, "UNAUTHENTICATED", "请先登录");
+      if (!authenticated) throw new HttpError(401, "UNAUTHENTICATED", "Please sign in first");
       return Response.json(
         {
           user: authenticated.user,

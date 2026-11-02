@@ -1,20 +1,28 @@
-# 当前验收场景
+# Current Acceptance Scenarios
 
-本表对应现行实现；旧分支和旧main记录保留在reference/legacy及Git历史，不冒称本轮执行。
+This table reflects the current implementation (v0.4.2); old-branch and old-main records remain in reference/legacy and Git history and are not claimed as this round's execution.
 
-| 关联 | Given | When | Then | 验证入口 |
+| Linked | Given | When | Then | Verification Entry |
 |---|---|---|---|---|
-| FR-01 | 有客户演示账号、SKU及足够库存 | 提交正整数数量 | 201/CREATED、ORD、服务端合计/快照；库存与日志不变 | foundation.integration |
-| FR-01/04 | SKU007库存4 | 创建10件 | 400可读库存不足、不建单 | foundation+browser |
-| FR-02/04 | CREATED，库存足够 | STAFF确认 | 原子扣可用库存、每SKU一条ORDER_CONFIRM、CONFIRMED | orders.integration |
-| FR-02 | CONFIRMED | 再确认 | 409；库存/流水不变 | orders+browser |
-| FR-02/04 | A创建时库存10，后B确认7件占用，剩3 | 确认A的10件 | 409；A仍CREATED，库存3，无A确认日志 | foundation.integration |
-| FR-02 | CREATED | 请求DELIVERED | 409非法转换，数据不变 | orders.integration |
-| FR-02 | CONFIRMED | 拣货 | PICKING；库存/流水不变 | logistics-chain.integration |
-| FR-03/04 | PICKING | 发货 | 201、唯一LG、SHIPPED及初始事件同事务；不再扣库存 | logistics-chain+browser |
-| FR-03 | 已发货 | 顺序/并发重复发货 | 409；仅一张运单 | logistics-chain.integration |
-| FR-02/03 | SHIPPED且有运单 | STAFF模拟揽收再签收 | IN_TRANSIT→DELIVERED，三条正序事件，库存不变 | logistics-chain+browser |
-| FR-07 | CUSTOMER或ADMIN演示身份 | 修改履约状态/发货 | 403，无业务变更；缺身份401 | logistics-chain.integration |
-| FR-03 | 状态修改成功但追踪读取500/网络错 | 页面刷新 | 保留订单/成功结果，单独提示追踪故障，不诱导重复提交 | browser-smoke |
+| FR-01 | Customer demo account, SKUs, and sufficient stock | Submit a positive integer quantity | 201/CREATED, ORD, server-side total/snapshot; stock and logs unchanged | foundation.integration |
+| FR-01/04 | SKU007 stock 4 | Create 10 units | 400 readable insufficient-stock error; no order created | foundation+browser |
+| FR-02/04 | CREATED with sufficient stock | Staff confirms | Atomically deducts available stock, one ORDER_CONFIRM per SKU, CONFIRMED | orders.integration |
+| FR-02 | CONFIRMED | Confirm again | 409; stock/ledger unchanged | orders+browser |
+| FR-02/04 | A creates when stock is 10; B later confirms 7, leaving 3 | Confirm A's 10 units | 409; A stays CREATED, stock 3, no confirmation log for A | foundation.integration |
+| FR-02 | CREATED | Request DELIVERED | 409 illegal transition; data unchanged | orders.integration |
+| FR-02 | CONFIRMED | Pick | PICKING; stock/ledger unchanged | logistics-chain.integration |
+| FR-03/04 | PICKING | Ship | 201, unique LG, SHIPPED and initial event in the same transaction; no further stock deduction | logistics-chain+browser |
+| FR-03 | Already shipped | Sequential/concurrent duplicate ship | 409; only one shipment | logistics-chain.integration |
+| FR-02/03 | SHIPPED with a shipment | Staff simulates pickup then delivery | IN_TRANSIT→DELIVERED, three events in order, stock unchanged | logistics-chain+browser |
+| FR-07 | Logged-in CUSTOMER or ADMIN | Change fulfillment status / ship | 403, no business change; missing session 401 | logistics-chain.integration |
+| FR-03 | Status change succeeds but tracking read fails with 500/network error | Page refresh | Order/success result preserved, tracking failure reported separately, no prompt to resubmit | browser-smoke |
+| FR-02 | CREATED, own order | Customer cancels | CANCELLED; stock and ledger untouched | cancel.integration |
+| FR-02/04 | CONFIRMED with reserved stock | Cancel (customer own order / staff) | Stock restored exactly once; one ORDER_CANCEL_RELEASE per SKU; repeated/concurrent cancel succeeds at most once; multi-product failure rolls back all | cancel.integration + browser 14–15 |
+| FR-02 | PICKING or later | Cancel | 409 with no stock change; cross-customer cancel 404; staff can cancel only CONFIRMED; ADMIN cannot cancel | cancel.integration |
+| FR-04 | SKU below threshold (4 < 5) | View inventory / replenish 1 | Alert listed while stock < threshold, gone at exactly 5; replenish increments only, writes STOCK_REPLENISH + operator; no delete/overwrite endpoint; invalid quantities and missing CSRF rejected without changes | inventory.integration + browser 16–18 |
+| FR-04 | CUSTOMER / ADMIN session | Read inventory / replenish | CUSTOMER 403 for both; ADMIN read-only list, replenish 403 | inventory.integration |
+| FR-05 | Customer with confirm/cancel/ship/pickup/deliver events | Open notifications / mark read | Exactly one notification per event (orderId,type unique, duplicates/concurrency do not multiply); own-only list with unread count; others' mark-read 404; STAFF/ADMIN 403 | notifications.integration + browser 10 |
+| FR-06 | ADMIN session, orders across GMT+8 days | Open reports / export CSV | Aggregates match the DB (cancelled counted in status, excluded from amounts); snapshot amounts and current inventory snapshot; range validation 400; CUSTOMER/STAFF 403; CSV fixed columns, formula injection neutralised, no personal data | reports.integration + browser 11 |
+| FR-07 | Valid seeded account + correct password | Login / logout | scrypt hash with per-user salt; HttpOnly SameSite session cookie, no secrets in response; wrong password/unknown user same 401 wording; 5 failures in 10 minutes → 429 (rotating forwarded headers cannot evade); logout deletes the session, reused cookie 401 | auth.integration |
 
-取消、独立预警/补货、通知、报表和真实鉴权尚未实现；不能执行相应场景，也不能将它们从完整需求中删除。
+Cancellation, standalone alerts/replenishment, notifications, reports, and real authentication are implemented in v0.4.2; the rows above list their current scenarios and verification entries. Out-of-scope items (public registration, password recovery, OAuth/MFA, real payments/carriers, etc.) remain recorded as not implemented in `known-issues.md` (item 16) and are not claimed as done.

@@ -16,9 +16,9 @@ async function databaseSnapshot(projectDir) {
   return snapshot;
 }
 
-// 没有调用者显式确认时，在安装、创建输出目录或任何数据库操作之前退出。
+// Unless the caller explicitly confirms, exit before installing, creating output directories, or touching any database.
 if (process.env.RESET_DEMO_DATA !== "YES") {
-  console.error("拒绝运行：请显式设置 RESET_DEMO_DATA=YES。证据流程仅在独立临时源码副本中初始化可丢弃库，不连接当前项目数据库。");
+  console.error("Refusing to run: set RESET_DEMO_DATA=YES explicitly. The evidence flow only initializes a disposable database inside an isolated temporary source copy and never connects to the current project database.");
   process.exitCode = 1;
 } else {
   const originalCwd = process.cwd();
@@ -31,8 +31,8 @@ if (process.env.RESET_DEMO_DATA !== "YES") {
     const databasesBefore = await databaseSnapshot(projectDir);
     await copySourceTree(projectDir, isolated);
     const copied = await sourceDigest(isolated);
-    if (JSON.stringify(copied) !== JSON.stringify(before)) throw new Error("临时副本源码摘要不匹配");
-    console.log("证据流程：临时副本 + 全新可丢弃数据库；原项目数据库不参与运行。");
+    if (JSON.stringify(copied) !== JSON.stringify(before)) throw new Error("source digest mismatch in the temporary copy");
+    console.log("Evidence flow: temporary copy + fresh disposable database; the original project database is not involved in the run.");
     process.chdir(isolated);
     await runVerification({ evidenceRoot });
     const databasesAfter = await databaseSnapshot(projectDir);
@@ -41,9 +41,9 @@ if (process.env.RESET_DEMO_DATA !== "YES") {
       mode: "disposable-source-copy", explicitResetConfirmation: true,
       originalDatabaseUnchanged, before: databasesBefore, after: databasesAfter,
     }, null, 2) + "\n");
-    if (!originalDatabaseUnchanged) throw new Error("原数据库在验证期间发生变化，请检查并发写入后重试");
+    if (!originalDatabaseUnchanged) throw new Error("The original database changed during verification; check for concurrent writes and retry");
     const after = await sourceDigest(projectDir);
-    if (JSON.stringify(after) !== JSON.stringify(before)) throw new Error("运行期间原源码发生变化，请重新生成证据");
+    if (JSON.stringify(after) !== JSON.stringify(before)) throw new Error("The original source changed during the run; regenerate the evidence");
   } catch (error) {
     console.error(error);
     process.exitCode = 1;

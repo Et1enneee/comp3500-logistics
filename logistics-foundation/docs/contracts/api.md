@@ -1,74 +1,76 @@
-# v0.3.1 订单与物流接口（当前实现）
+# v0.3.1 Order and Logistics API (historical record)
 
-当前实现下单、按单号查询、员工确认/拣货、发货、追踪与模拟揽收/签收。沿用原订单确认语义，不支持取消。范围与验证入口见 ../closure/README.md；真实认证、客户所有权及未实现设计不得由本接口表推定为已完成。
+> This section documents the v0.3.1 contract as originally shipped, and is retained for historical context. It is superseded where it differs by the **"v0.4.0 API Additions"** section below, which documents the current capabilities (real sessions, order center, cancellation, inventory, notifications, and reports).
+
+This v0.3.1 contract covers order placement, lookup by order number, staff confirm/pick, shipping, tracking, and simulated pickup/delivery via the demo-email header, and does not support cancellation. It keeps the original order-confirmation semantics. Scope and verification entries are in ../closure/README.md.
 
 ## GET /api/v1/orders?orderNumber=ORD-…
 
-按页面 ORD 单号精确查询，不提供列表。空白参数视为空。
-200 返回 `{ "order": ... }`。原 Order/OrderItem 字段不改名；在 items 中新增 product.sku / product.name。
-客户仅保留 id/email/name，移除密码哈希等无关字段。金额均为整数分。
-响应样例见 `get-order.example.json`。该文件保存了2026-10-26本地HTTP查询的真实演示响应：订单ORD-20261026-0001，状态CONFIRMED，商品SKU001 × 2，总额300分。它是当时的响应快照，前端不能硬编码其中的ID、订单号、金额或状态。确认接口路径中的{id}必须使用本次查询返回的order.id。
+Exact lookup by the page's ORD order number; no listing. A blank parameter is treated as empty.
+200 returns `{ "order": ... }`. Original Order/OrderItem field names are unchanged; product.sku / product.name are added in items.
+The customer keeps only id/email/name; unrelated fields such as password hashes are removed. All amounts are integer cents.
+A sample response is in `get-order.example.json`. That file preserves a real demo response from a local HTTP query on 2026-10-26: order ORD-20261026-0001, status CONFIRMED, product SKU001 × 2, total 300 cents. It is a snapshot of that moment's response; the frontend must not hardcode its IDs, order number, amounts, or status. The {id} in the confirmation path must use the order.id returned by this query.
 
 ## PATCH /api/v1/orders/{id}/status
 
-{id} 只解释为数据库内部 order.id，不猜测、不回退为 ORD 单号。
-请求头：Content-Type: application/json；X-Demo-User-Email: User 表中的演示邮箱（必填）。
-请求体：`{ "to": "CONFIRMED" | "PICKING" | "IN_TRANSIT" | "DELIVERED" }`（v0.3 起）。
-200：`{ "order": { "id": "…", "orderNumber": "ORD-…", "status": "<目标状态>", "totalCents": 300 } }`
+{id} is interpreted only as the internal database order.id; it is never guessed or fallen back to the ORD order number.
+Headers: Content-Type: application/json; X-Demo-User-Email: a demo email from the User table (required).
+Body: `{ "to": "CONFIRMED" | "PICKING" | "IN_TRANSIT" | "DELIVERED" }` (since v0.3).
+200: `{ "order": { "id": "…", "orderNumber": "ORD-…", "status": "<target status>", "totalCents": 300 } }`
 
-| to | 允许的当前状态 | 副作用（同一事务） |
+| to | Allowed current status | Side effects (same transaction) |
 | --- | --- | --- |
-| CONFIRMED | CREATED | 可用库存 -= 数量；每种商品一条 delta=-quantity / reason=ORDER_CONFIRM 流水 |
-| PICKING | CONFIRMED | 仅状态变更；不扣库存、不写库存流水 |
-| IN_TRANSIT | SHIPPED | 运单状态→IN_TRANSIT；新增一条揽收 TrackingEvent（揽收网点） |
-| DELIVERED | IN_TRANSIT | 运单状态→DELIVERED、写 deliveredAt；新增一条签收 TrackingEvent（收件地址） |
+| CONFIRMED | CREATED | available stock -= quantity; one delta=-quantity / reason=ORDER_CONFIRM ledger entry per product |
+| PICKING | CONFIRMED | status change only; no stock deduction, no inventory ledger entry |
+| IN_TRANSIT | SHIPPED | shipment status→IN_TRANSIT; adds a pickup TrackingEvent (pickup station) |
+| DELIVERED | IN_TRANSIT | shipment status→DELIVERED, writes deliveredAt; adds a delivery TrackingEvent (delivery address) |
 
-- 发货（→SHIPPED）不接受 PATCH：返回 400 INVALID_ARGUMENT，message 指引使用 POST /api/v1/shipments。
-- 其他目标（如 CANCELLED）本版未实现：400 INVALID_ARGUMENT。
-- 同一目标重复提交：409 INVALID_STATE_TRANSITION，且不产生任何副作用。
-- IN_TRANSIT/DELIVERED 若订单没有运单：409 SHIPMENT_NOT_FOUND，订单状态回滚。
-- 成功后前端再次 GET 同一个 ORD 单号刷新明细；v0.3 前端同时读取追踪。
-- 错误码：400 INVALID_ARGUMENT；401 UNAUTHENTICATED；403 FORBIDDEN（非 STAFF）；404 ORDER_NOT_FOUND；409 INSUFFICIENT_STOCK / INVALID_STATE_TRANSITION / SHIPMENT_NOT_FOUND；500/503。
+- Shipping (→SHIPPED) is not accepted via PATCH: returns 400 INVALID_ARGUMENT with a message pointing to POST /api/v1/shipments.
+- Other targets (e.g. CANCELLED) are not implemented in v0.3.1: 400 INVALID_ARGUMENT. Cancellation was added in v0.4.0; see the additions below.
+- Repeated submission to the same target: 409 INVALID_STATE_TRANSITION with no side effects.
+- IN_TRANSIT/DELIVERED when the order has no shipment: 409 SHIPMENT_NOT_FOUND and the order status rolls back.
+- On success the frontend GETs the same ORD order number again to refresh details; since v0.3 the frontend also reads tracking.
+- Error codes: 400 INVALID_ARGUMENT; 401 UNAUTHENTICATED; 403 FORBIDDEN (not STAFF); 404 ORDER_NOT_FOUND; 409 INSUFFICIENT_STOCK / INVALID_STATE_TRANSITION / SHIPMENT_NOT_FOUND; 500/503.
 
 ## POST /api/v1/shipments
 
-发货（PICKING → SHIPPED）。仅 STAFF 演示账号。
-请求头：Content-Type: application/json；X-Demo-User-Email（必填）。
-请求体：`{ "orderNumber": "ORD-YYYYMMDD-XXXX", "carrier": "顺丰速运" }`（carrier 1–40 字）。
-201：`{ "shipment": { "id": "…", "trackingNumber": "LG-YYYYMMDD-XXXXXX", "carrier": "…", "status": "SHIPPED", "shippedAt": "…" }, "order": { "id": "…", "orderNumber": "…", "status": "SHIPPED", "totalCents": 300 } }`
-同一事务内完成：订单 PICKING→SHIPPED（条件更新）、生成当日唯一运单号、写一条初始 TrackingEvent（仓库）。
-库存：不扣减、不写 InventoryLog（库存在确认时已预占）。
-错误：400 INVALID_ARGUMENT（非法 JSON / 缺单号 / 缺承运商 / 非 JSON Content-Type）；401 UNAUTHENTICATED；403 FORBIDDEN（非 STAFF）；404 ORDER_NOT_FOUND；409 SHIPMENT_EXISTS（已有运单/已发货，重复请求不会生成第二张）；409 INVALID_STATE_TRANSITION（非 PICKING）；500/503。
-顺序或并发重复发货：只产生一张运单；失败不残留运单或追踪事件。
+Shipping (PICKING → SHIPPED). STAFF demo accounts only.
+Headers: Content-Type: application/json; X-Demo-User-Email (required).
+Body: `{ "orderNumber": "ORD-YYYYMMDD-XXXX", "carrier": "SF Express" }` (carrier 1–40 characters).
+201: `{ "shipment": { "id": "…", "trackingNumber": "LG-YYYYMMDD-XXXXXX", "carrier": "…", "status": "SHIPPED", "shippedAt": "…" }, "order": { "id": "…", "orderNumber": "…", "status": "SHIPPED", "totalCents": 300 } }`
+Completed within one transaction: order PICKING→SHIPPED (conditional update), generates the unique shipment number for the day, writes one initial TrackingEvent (warehouse).
+Stock: no deduction, no InventoryLog (stock was already reserved at confirmation).
+Errors: 400 INVALID_ARGUMENT (invalid JSON / missing order number / missing carrier / non-JSON Content-Type); 401 UNAUTHENTICATED; 403 FORBIDDEN (not STAFF); 404 ORDER_NOT_FOUND; 409 SHIPMENT_EXISTS (shipment already exists / already shipped; repeated requests do not create a second one); 409 INVALID_STATE_TRANSITION (not PICKING); 500/503.
+Sequential or concurrent duplicate shipping: only one shipment is produced; failures leave no shipment or tracking events behind.
 
 ## GET /api/v1/orders/{id}/tracking
 
-{id} 为内部 order.id。只读；与 GET /orders 相同的演示姿态，不要求 X-Demo-User-Email，也无对象级所有权校验（已知限制）。
-200：`{ "trackingNumber": "LG-…", "carrier": "…", "status": "SHIPPED|IN_TRANSIT|DELIVERED", "events": [ { "at": "…", "location": "…", "description": "…" } ] }`，events 按时间正序。
-错误：400 INVALID_ARGUMENT（空 id）；404 ORDER_NOT_FOUND；404 SHIPMENT_NOT_FOUND（尚未发货）；500。
-错误 id 只返回 404，不返回其他订单任何字段。
+{id} is the internal order.id. Read-only; the same demo posture as GET /orders — no X-Demo-User-Email required and no object-level ownership check (known limitation).
+200: `{ "trackingNumber": "LG-…", "carrier": "…", "status": "SHIPPED|IN_TRANSIT|DELIVERED", "events": [ { "at": "…", "location": "…", "description": "…" } ] }`, events in chronological order.
+Errors: 400 INVALID_ARGUMENT (empty id); 404 ORDER_NOT_FOUND; 404 SHIPMENT_NOT_FOUND (not yet shipped); 500.
+A wrong id returns only 404 and never any field of another order.
 
-## 错误
+## Errors
 
-所有本次接口错误使用 `{ "error": { "code": "…", "message": "供用户阅读的说明" } }`。
+All API errors in this round use `{ "error": { "code": "…", "message": "human-readable explanation" } }`.
 
-* 400 INVALID\_ARGUMENT：空单号、非JSON Content-Type、缺失/非法JSON、to缺失或不支持（含 to=SHIPPED，需改走 POST /shipments）。
-* 401 UNAUTHENTICATED：演示邮箱缺失或User表查无此人。
-* 403 FORBIDDEN：角色不等于STAFF，包括CUSTOMER和ADMIN（发货同样要求 STAFF）。
-* 404 ORDER\_NOT\_FOUND：订单不存在（使用有效STAFF进行确认时）。
-* 404 SHIPMENT\_NOT\_FOUND：追踪或物流状态更新时订单尚无运单。
-* 409 INSUFFICIENT\_STOCK：CREATED订单中任一商品可用库存不足。
-* 409 INVALID\_STATE\_TRANSITION：非法流转（已确认/已拣货/已发货等），业务数据不变。
-* 409 SHIPMENT\_EXISTS：重复发货，已存在运单；不会生成第二张。
-* 额外兜底：500 INTERNAL\_ERROR；可识别的数据库忙/冲突重试耗尽返回503 TEMPORARILY\_UNAVAILABLE。前端应能显示未知code的message。
-校验顺序：参数/JSON → 演示身份 → 事务内状态与库存。多种错误同时存在时，按此顺序返回。
-空明细或非法历史数量返回400，不产生库存变动。确认处理仍会防御性检查历史订单数量；本候选版 POST 已验证正整数数量。
+* 400 INVALID\_ARGUMENT: empty order number, non-JSON Content-Type, missing/invalid JSON, missing or unsupported to (including to=SHIPPED, which must go through POST /shipments).
+* 401 UNAUTHENTICATED: demo email missing or not found in the User table.
+* 403 FORBIDDEN: role is not STAFF, including CUSTOMER and ADMIN (shipping likewise requires STAFF).
+* 404 ORDER\_NOT\_FOUND: order does not exist (when confirming with a valid STAFF).
+* 404 SHIPMENT\_NOT\_FOUND: the order has no shipment yet when tracking or updating logistics status.
+* 409 INSUFFICIENT\_STOCK: any product in the CREATED order has insufficient available stock.
+* 409 INVALID\_STATE\_TRANSITION: illegal transition (already confirmed/picked/shipped etc.), business data unchanged.
+* 409 SHIPMENT\_EXISTS: duplicate shipping; a shipment already exists and a second one will not be created.
+* Additional fallbacks: 500 INTERNAL\_ERROR; recognizable database busy/conflict retries exhausted return 503 TEMPORARILY\_UNAVAILABLE. The frontend should be able to display the message of an unknown code.
+Validation order: parameters/JSON → demo identity → in-transaction status and stock. When multiple errors coexist, they are returned in this order.
+Empty items or illegal legacy quantities return 400 with no stock changes. Confirmation still defensively checks legacy order quantities; this candidate POST has verified positive integer quantities.
 
-## 身份限制
+## Identity Limitations (v0.3.1 only)
 
-邮箱只是演示标识，可被冒用；不是登录认证，不构成安全验收。必须仅在隔离的演示环境使用，不可直接部署为公网生产确认接口。查询身份权限不在此次约定内。
+In v0.3.1 the email header is only a demo identifier and can be impersonated; it is not login authentication and constitutes no security acceptance. It must be used only in an isolated demo environment. This limitation is superseded by the real server-side session authentication added in v0.4.0 (see below); the demo-email header no longer has any effect.
 
-## 前端调用示例（示意，演示邮箱从选择框取得）
+## Frontend Call Example (illustrative; demo email taken from the selection box)
 
 ```ts
 const r = await fetch(`/api/v1/orders?orderNumber=${encodeURIComponent(orderNumber)}`);
@@ -82,85 +84,87 @@ const confirmation = await fetch(`/api/v1/orders/${encodeURIComponent(id)}/statu
 });
 const result = await confirmation.json();
 if (!confirmation.ok) throw new Error(result.error.message);
-// 成功后再GET orderNumber，刷新页面状态与明细。
+// On success, GET the orderNumber again to refresh page status and details.
 ```
 
 
-## POST /api/v1/orders（地基候选新增校验）
+## POST /api/v1/orders (new validations in the foundation candidate)
 
-请求 JSON：`{"email":"customer@demo.com","items":[{"sku":"SKU001","quantity":2}]}`。
+Request JSON: `{"email":"customer@demo.com","items":[{"sku":"SKU001","quantity":2}]}`.
 
-- 至少 1 条、最多 100 条明细；数量为正整数，重复 SKU 先汇总再预检库存。
-- 客户须存在且角色为 CUSTOMER；演示邮箱仍非真实认证。
-- 201 返回 `{order}`；商品行记录下单单价快照，服务端计算整数分合计。
-- 创建不改变 Product.stock，不产生 InventoryLog；预检不承诺锁定库存。
-- 400 INVALID_ARGUMENT：非法 JSON、空订单、非法数量、金额或数量超限。
-- 400 CUSTOMER_NOT_FOUND / SKU_NOT_FOUND_<sku> / INSUFFICIENT_STOCK_<sku>：保留相应创建错误类别，message 改为可读说明。
-- 403 FORBIDDEN：非 CUSTOMER 演示账号。
-- 500 INTERNAL_ERROR / 503 TEMPORARILY_UNAVAILABLE：异常或重试耗尽。
-- 编号按 UTC 日历日使用 ORD-YYYYMMDD-XXXX；页面时间显示 GMT+8，因此夜间可能跨不同日期，非错单。每日最多 9999 号；唯一冲突/瞬态争用最多重试三次。未实现客户端创建请求幂等键；结果未知时不得盲目重复提交。
+- At least 1 and at most 100 items; quantities are positive integers; duplicate SKUs are aggregated before the stock pre-check.
+- The customer must exist with the CUSTOMER role; the demo email is still not real authentication.
+- 201 returns `{order}`; product lines record a unit-price snapshot at placement, and the server computes the integer-cent total.
+- Creation does not change Product.stock or produce an InventoryLog; the pre-check does not promise to lock stock.
+- 400 INVALID_ARGUMENT: invalid JSON, empty order, illegal quantity, or amount/quantity over the limit.
+- 400 CUSTOMER_NOT_FOUND / SKU_NOT_FOUND_<sku> / INSUFFICIENT_STOCK_<sku>: the corresponding creation error categories are kept, with readable messages.
+- 403 FORBIDDEN: not a CUSTOMER demo account.
+- 500 INTERNAL_ERROR / 503 TEMPORARILY_UNAVAILABLE: exception or retries exhausted.
+- Numbering uses ORD-YYYYMMDD-XXXX by UTC calendar day; page times display GMT+8, so numbers may cross dates at night — not a wrong order. At most 9999 numbers per day; unique conflicts/transient contention retry at most three times. No client-side create idempotency key is implemented; do not blindly resubmit when the result is unknown.
 
-## 页面与数据
+## Pages and Data
 
-`/` 服务端实时读取数据库商品目录，不再把价格或库存硬编码在浏览器中。`/staff` 查询后用 order.id 确认，成功再次查询；v0.3 起同一页面可继续拣货、发货并查看运单追踪。页面不展示库存流水原始表；库存/流水检查由测试或数据库审查执行。GET /orders 仍不含 shipment；追踪走独立端点 GET /orders/{id}/tracking。
+`/` reads the product catalog live from the database on the server; prices and stock are no longer hardcoded in the browser. `/staff` confirms with order.id after lookup and queries again on success; since v0.3 the same page can continue picking, shipping, and viewing shipment tracking. Pages do not show the raw inventory ledger table; inventory/ledger checks are done by tests or database review. GET /orders still excludes shipment; tracking goes through the separate endpoint GET /orders/{id}/tracking.
 
 ---
 
-# v0.4.0 接口增量（真实会话 / 订单中心 / 库存 / 通知 / 报表）
+# v0.4.0 API Additions (real sessions / order center / inventory / notifications / reports)
 
-## 认证与会话
+> Current as of v0.4.2. This section documents the implemented, test-covered API surface and supersedes the v0.3.1 contract above wherever they differ.
 
-所有接口以服务端会话为准，`X-Demo-User-Email` 已无任何效力。
+## Authentication and Sessions
 
-| 方法 | 路径 | 角色 | 说明 |
+All endpoints rely on the server-side session; `X-Demo-User-Email` no longer has any effect.
+
+| Method | Path | Role | Notes |
 | --- | --- | --- | --- |
-| POST | `/api/v1/auth/login` | 公开 | `{email,password}`；成功 200 `{user,csrfToken,expiresAt}` 并 Set-Cookie（HttpOnly/SameSite=Lax/8h）；失败 401 同一文案；同源校验；限流 429 `RATE_LIMITED` |
-| POST | `/api/v1/auth/logout` | 已登录 | 需 `X-CSRF-Token`；删除服务端会话并清 Cookie；无令牌 403 `CSRF_INVALID` |
-| GET | `/api/v1/auth/me` | 已登录 | 返回 `{user,csrfToken,expiresAt}`；未登录 401 |
+| POST | `/api/v1/auth/login` | public | `{email,password}`; success 200 `{user,csrfToken,expiresAt}` with Set-Cookie (HttpOnly/SameSite=Lax/8h); failure 401 with identical wording; same-origin check; rate limit 429 `RATE_LIMITED` |
+| POST | `/api/v1/auth/logout` | logged in | requires `X-CSRF-Token`; deletes the server-side session and clears the cookie; without the token 403 `CSRF_INVALID` |
+| GET | `/api/v1/auth/me` | logged in | returns `{user,csrfToken,expiresAt}`; 401 when not logged in |
 
-写请求（POST/PATCH/DELETE）统一要求 `X-CSRF-Token` 等于会话令牌；带 `Origin` 时还须与 `Host` 同源。错误仍为 `{error:{code,message}}`。
+Write requests (POST/PATCH/DELETE) uniformly require `X-CSRF-Token` equal to the session token; when `Origin` is present it must also be same-origin with `Host`. Errors remain `{error:{code,message}}`.
 
-## 订单
+## Orders
 
-| 方法 | 路径 | 角色 | 说明 |
+| Method | Path | Role | Notes |
 | --- | --- | --- | --- |
-| POST | `/api/v1/orders` | CUSTOMER | 身份取自会话；body 若含 `email/customerId` 必须与会话一致，否则 403。201 `{order}` |
-| GET | `/api/v1/orders?orderNumber=ORD-…` | CUSTOMER/STAFF | 按 ORD 精确查询；客户查他人订单 404 |
-| GET | `/api/v1/orders?page=&pageSize=&status=` | CUSTOMER/STAFF | 分页列表 `{orders,page,pageSize,total,totalPages}`；客户仅本人；ADMIN 403 |
-| GET | `/api/v1/orders/{内部id}` | CUSTOMER/STAFF | 详情（含 shipment 摘要）；客户越权 404 |
-| PATCH | `/api/v1/orders/{内部id}/status` | STAFF；CUSTOMER 仅取消本人 | `to` ∈ CONFIRMED/PICKING/IN_TRANSIT/DELIVERED/CANCELLED；`to=SHIPPED` 仍 400，必须走发货接口 |
-| GET | `/api/v1/orders/{内部id}/tracking` | CUSTOMER/STAFF | 运单与事件（时间正序）；未发货 404 `SHIPMENT_NOT_FOUND`；客户越权 404 |
+| POST | `/api/v1/orders` | CUSTOMER | identity from the session; if the body contains `email/customerId` it must match the session, otherwise 403. 201 `{order}` |
+| GET | `/api/v1/orders?orderNumber=ORD-…` | CUSTOMER/STAFF | exact lookup by ORD; a customer reading another's order gets 404 |
+| GET | `/api/v1/orders?page=&pageSize=&status=` | CUSTOMER/STAFF | paginated list `{orders,page,pageSize,total,totalPages}`; customers see only their own; ADMIN 403 |
+| GET | `/api/v1/orders/{internal id}` | CUSTOMER/STAFF | details (with shipment summary); cross-customer access 404 |
+| PATCH | `/api/v1/orders/{internal id}/status` | STAFF; CUSTOMER only cancels own | `to` ∈ CONFIRMED/PICKING/IN_TRANSIT/DELIVERED/CANCELLED; `to=SHIPPED` still 400, must go through the shipping endpoint |
+| GET | `/api/v1/orders/{internal id}/tracking` | CUSTOMER/STAFF | shipment and events (chronological); 404 `SHIPMENT_NOT_FOUND` before shipping; cross-customer access 404 |
 
-取消语义：`CREATED→CANCELLED` 不动库存与流水；`CONFIRMED→CANCELLED` 同一事务回补并每 SKU 一条 `ORDER_CANCEL_RELEASE` 正流水；`PICKING` 及之后 409；重复/并发最多成功一次，员工只能取消 CONFIRMED，ADMIN 403。
+Cancellation semantics: `CREATED→CANCELLED` leaves stock and ledger untouched; `CONFIRMED→CANCELLED` restores stock in the same transaction with one positive `ORDER_CANCEL_RELEASE` ledger entry per SKU; `PICKING` and later 409; repeated/concurrent attempts succeed at most once; staff can cancel only CONFIRMED; ADMIN 403.
 
-## 发货
+## Shipping
 
-`POST /api/v1/shipments`（STAFF）`{orderNumber,carrier}`：仅 `PICKING` 可发货；同一事务写入状态、唯一 `LG-` 运单、初始追踪事件与通知；重复 409 `SHIPMENT_EXISTS` 或 `INVALID_STATE_TRANSITION`；库存不再扣减。
+`POST /api/v1/shipments` (STAFF) `{orderNumber,carrier}`: only `PICKING` can ship; the same transaction writes the status, the unique `LG-` shipment, the initial tracking event, and a notification; duplicates 409 `SHIPMENT_EXISTS` or `INVALID_STATE_TRANSITION`; stock is not deducted again.
 
-## 库存
+## Inventory
 
-| 方法 | 路径 | 角色 | 说明 |
+| Method | Path | Role | Notes |
 | --- | --- | --- | --- |
-| GET | `/api/v1/inventory?page=&pageSize=&sku=&lowStock=1` | STAFF/ADMIN | 分页；`isLowStock = stock < lowStockThreshold`；含 `lowStockCount` |
+| GET | `/api/v1/inventory?page=&pageSize=&sku=&lowStock=1` | STAFF/ADMIN | paginated; `isLowStock = stock < lowStockThreshold`; includes `lowStockCount` |
 | GET | `/api/v1/inventory/low-stock` | STAFF/ADMIN | `{products,count}` |
-| POST | `/api/v1/inventory/{productId}/replenish` | STAFF | `{quantity}` 正整数（≤1,000,000），仅增量；写 `STOCK_REPLENISH` + 操作人；201 `{product,log}` |
-| GET | `/api/v1/inventory/logs?sku=&orderNumber=&page=&pageSize=` | STAFF/ADMIN | delta/reason/时间/关联订单/操作人；无删除接口 |
+| POST | `/api/v1/inventory/{productId}/replenish` | STAFF | `{quantity}` positive integer (≤1,000,000), increments only; writes `STOCK_REPLENISH` + operator; 201 `{product,log}` |
+| GET | `/api/v1/inventory/logs?sku=&orderNumber=&page=&pageSize=` | STAFF/ADMIN | delta/reason/time/related order/operator; no delete endpoint |
 
-## 通知
+## Notifications
 
-| 方法 | 路径 | 角色 | 说明 |
+| Method | Path | Role | Notes |
 | --- | --- | --- | --- |
-| GET | `/api/v1/notifications?page=&pageSize=&unread=1` | CUSTOMER | 仅本人；返回 `unreadCount` |
+| GET | `/api/v1/notifications?page=&pageSize=&unread=1` | CUSTOMER | own only; returns `unreadCount` |
 | GET | `/api/v1/notifications/unread-count` | CUSTOMER | `{unreadCount}` |
-| POST | `/api/v1/notifications/{id}/read` | CUSTOMER | 仅本人；他人/不存在 404 `NOTIFICATION_NOT_FOUND` |
+| POST | `/api/v1/notifications/{id}/read` | CUSTOMER | own only; others'/nonexistent 404 `NOTIFICATION_NOT_FOUND` |
 
-通知在确认/取消/发货/揽收/签收的同一事务内生成，`(orderId,type)` 唯一，重复请求不重发。
+Notifications are generated within the same transaction as confirm/cancel/ship/pickup/delivery; `(orderId,type)` is unique, and repeated requests do not resend.
 
-## 报表
+## Reports
 
-| 方法 | 路径 | 角色 | 说明 |
+| Method | Path | Role | Notes |
 | --- | --- | --- | --- |
-| GET | `/api/v1/reports/overview?from=YYYY-MM-DD&to=YYYY-MM-DD` | ADMIN | 默认最近 7 个 GMT+8 自然日；`{range,orders:{count,byStatus,nonCancelledAmountCents,deliveredAmountCents},inventory:{lowStockSkuCount,note},daily[]}` |
-| GET | `/api/v1/reports/export.csv?from=&to=` | ADMIN | UTF-8 BOM；列 `orderNumber,createdAtGmt8,timezone,status,statusLabel,totalCents,totalYuan`；公式注入前缀 `'`；无个人信息 |
+| GET | `/api/v1/reports/overview?from=YYYY-MM-DD&to=YYYY-MM-DD` | ADMIN | defaults to the last 7 GMT+8 calendar days; `{range,orders:{count,byStatus,nonCancelledAmountCents,deliveredAmountCents},inventory:{lowStockSkuCount,note},daily[]}` |
+| GET | `/api/v1/reports/export.csv?from=&to=` | ADMIN | UTF-8 BOM; columns `orderNumber,createdAtGmt8,timezone,status,statusLabel,totalCents,totalYuan`; formula-injection prefix `'`; no personal data |
 
-客户与员工访问报表 403；未登录 401。金额均为“订单金额”（无支付，不称收入）。
+Customers and staff accessing reports get 403; not logged in 401. All amounts are "order amounts" (no payments, never called revenue).

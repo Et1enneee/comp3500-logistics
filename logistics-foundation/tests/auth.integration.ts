@@ -23,7 +23,7 @@ test("Authentication & session / real isolated SQLite", { timeout: 180000 }, asy
       assert.equal(verifyPassword("wrong", stored.passwordHash), false);
       const again = hashPassword("Demo1234!");
       assert.notEqual(again, stored.passwordHash, "salt must differ between hashes");
-      // 已知不支持的格式返回 false，而不是抛异常
+      // Known unsupported formats return false instead of throwing
       assert.equal(verifyPassword("x", "demo"), false);
       assert.equal(verifyPassword("x", ""), false);
     });
@@ -45,7 +45,7 @@ test("Authentication & session / real isolated SQLite", { timeout: 180000 }, asy
       assert.equal(text.includes("passwordHash"), false);
       assert.equal(text.includes("Demo1234!"), false);
       assert.equal(text.includes("scrypt$"), false);
-      // 会话表里只有 token 的 SHA-256，没有原始 token
+      // The session table stores only the SHA-256 of the token, never the raw token
       const rawToken = decodeURIComponent((cookie.match(new RegExp(`${SESSION_COOKIE}=([^;]+)`)) ?? [])[1] ?? "");
       assert.ok(rawToken.length > 20);
       const stored = await db.session.findMany({ where: { userId: users.customerA.id } });

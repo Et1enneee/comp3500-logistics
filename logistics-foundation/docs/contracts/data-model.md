@@ -1,16 +1,16 @@
-# 冻结基线 v0.3.1 · 数据口径
+# Frozen Baseline v0.3.1 · Data Terminology
 
-结构以 prisma/schema.prisma 为准。本次无 schema 迁移；沿用尹培旭修复后的反关系和现有初始迁移。
+The structure is authoritative in prisma/schema.prisma. No schema migration this round; it keeps the inverse relations fixed by Yin Peixu and the existing initial migration.
 
-- Product.stock 在本候选实现中明确表示**可用库存**，而不是“含已预占的物理在库”。这是冻结实现对早期契约“账面在库”表述的语义收敛；本文件记录当前可运行行为。尹已源码复核确认无二次扣减；不推定所有团队旧文件已同步，也不推定杨已签收。完整需求覆盖见 ../closure/scope-and-srs-addendum.md。
-- 创建：预检可用库存；不减少 stock，不写 InventoryLog。重复 SKU 汇总，单价快照、总金额均用整数分。
-- 确认：CREATED → CONFIRMED；同一事务中 stock -= quantity，每种商品一条 delta=-quantity / reason=ORDER_CONFIRM / orderId 关联流水。
-- 不新增 reserved 字段，也不声称建立了独立 Reservation 实体。
-- 后续发货规则（v0.3 已接入）：PICKING → SHIPPED 走 POST /api/v1/shipments；同一事务内生成唯一运单号（LG-YYYYMMDD-XXXXXX）与初始 TrackingEvent；不再扣减已预占的 stock，也不写 InventoryLog。
-- 后续取消规则：仍在本轮范围外；未来 CONFIRMED 取消释放一次已占数量，写对应正流水（reason 定名 ORDER_CANCEL_RELEASE），状态与回补原子完成。当前未实现取消接口。
-- Order.orderNumber 是 ORD-YYYYMMDD-XXXX；Order.id 是内部主键。确认使用后者。
-- GET 返回客户 id/name/email，不返回 passwordHash；目前尚无对象级查询鉴权，不能用真实客户信息。
-- Shipment、TrackingEvent 已在 v0.3 接入运行功能（发货与追踪）；Notification 仍未实现。
-- TrackingEvent 只增不改：发货时写「仓库」，模拟揽收写「揽收网点」，模拟签收写「收件地址」；追踪接口按时间正序返回。
+- Product.stock explicitly means **available stock** in this candidate implementation, not "physical on-hand including reserved". This is the frozen implementation's semantic convergence on the early contract's "book on-hand" wording; this file records the currently runnable behavior. Yin has source-reviewed and confirmed no double deduction; it is not presumed that all teammates' old files are synced, nor that Yang has signed off. Full requirements coverage is in ../closure/scope-and-srs-addendum.md.
+- Creation: pre-checks available stock; does not decrease stock or write an InventoryLog. Duplicate SKUs are aggregated; unit-price snapshots and totals all use integer cents.
+- Confirmation: CREATED → CONFIRMED; in the same transaction stock -= quantity, one delta=-quantity / reason=ORDER_CONFIRM / orderId-linked ledger entry per product.
+- No reserved field is added, and no independent Reservation entity is claimed.
+- Later shipping rules (wired in v0.3): PICKING → SHIPPED goes through POST /api/v1/shipments; the unique shipment number (LG-YYYYMMDD-XXXXXX) and initial TrackingEvent are generated in the same transaction; the already-reserved stock is not deducted again and no InventoryLog is written.
+- Later cancellation rules: still out of scope this round; in the future a CONFIRMED cancellation releases the reserved quantity once, writes the matching positive ledger entry (reason will be named ORDER_CANCEL_RELEASE), and completes the status change and restock atomically. No cancellation API is currently implemented.
+- Order.orderNumber is ORD-YYYYMMDD-XXXX; Order.id is the internal primary key. Confirmation uses the latter.
+- GET returns customer id/name/email and never passwordHash; there is no object-level query authorization yet, so no real customer data may be used.
+- Shipment and TrackingEvent have running features wired in v0.3 (shipping and tracking); Notification is still not implemented.
+- TrackingEvent is append-only: shipping writes "Warehouse", simulated pickup writes "Pickup station", simulated delivery writes "Delivery address"; the tracking API returns events in chronological order.
 
-演示数据注意：SKU008 当前 seed 是库存 50 / 阈值 10。历史验收稿的 6 / 5 是测试 fixture，不代表 seed 已改。本包不通过改 seed 冒充预警测试通过。
+Demo data note: SKU008's current seed is stock 50 / threshold 10. The 6 / 5 in the historical acceptance draft is a test fixture and does not mean the seed changed. This package does not fake alert-test passes by changing the seed.

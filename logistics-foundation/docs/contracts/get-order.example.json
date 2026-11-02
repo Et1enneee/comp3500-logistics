@@ -16,14 +16,14 @@
         "unitPriceCents": 150,
         "product": {
           "sku": "SKU001",
-          "name": "矿泉水 500ml"
+          "name": "Mineral Water 500ml"
         }
       }
     ],
     "customer": {
       "id": "cmv6m4u960000kbbgjsaxx29x",
       "email": "customer@demo.com",
-      "name": "演示客户"
+      "name": "Demo Customer"
     }
   }
 }

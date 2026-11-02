@@ -5,7 +5,7 @@ import { createOrderPost } from "../lib/create-order";
 import { createOrderHandlers } from "../lib/order-api";
 import { createShipmentHandlers } from "../lib/shipment-api";
 
-// 完整主链（会话版）：下单 → 确认 → 拣货 → 发货 → 揽收 → 签收，附取消与追踪。
+// Full main chain (session-based): order → confirm → pick → ship → pickup → deliver, plus cancellation and tracking.
 test("Logistics chain / real isolated SQLite", { timeout: 180000 }, async t => {
   const { db, dispose } = await createTestDatabase("logistics-chain");
   try {
@@ -22,7 +22,7 @@ test("Logistics chain / real isolated SQLite", { timeout: 180000 }, async t => {
       apiRequest("http://localhost/api/v1/orders/id/status", { method: "PATCH", body: { to }, session }),
       id,
     );
-    const ship = (orderNumber: string, session = users.staff.session, carrier = "顺丰速运") => shipments.createShipment(
+    const ship = (orderNumber: string, session = users.staff.session, carrier = "SF Express") => shipments.createShipment(
       apiRequest("http://localhost/api/v1/shipments", { method: "POST", body: { orderNumber, carrier }, session }),
     );
     const track = (id: string, session = users.customerA.session) => handlers.getTracking(
@@ -68,7 +68,7 @@ test("Logistics chain / real isolated SQLite", { timeout: 180000 }, async t => {
       assert.equal(response.status, 201);
       const data = await response.json();
       assert.match(data.shipment.trackingNumber, /^LG-\d{8}-\d{6}$/);
-      assert.equal(data.shipment.carrier, "顺丰速运");
+      assert.equal(data.shipment.carrier, "SF Express");
       assert.equal(data.shipment.status, "SHIPPED");
       assert.deepEqual(data.order, { id: orderId, orderNumber, status: "SHIPPED", totalCents: 300 });
       assert.equal((await db.order.findUniqueOrThrow({ where: { id: orderId } })).status, "SHIPPED");
@@ -78,8 +78,8 @@ test("Logistics chain / real isolated SQLite", { timeout: 180000 }, async t => {
       assert.equal(shipment.trackingNumber, data.shipment.trackingNumber);
       const events = await db.trackingEvent.findMany({ where: { shipmentId: shipment.id } });
       assert.equal(events.length, 1);
-      assert.equal(events[0].location, "仓库");
-      // 发货通知只一条
+      assert.equal(events[0].location, "Warehouse");
+      // Only one shipped notification is produced.
       assert.equal(await db.notification.count({ where: { orderId, type: "SHIPMENT_SHIPPED" } }), 1);
     });
 
@@ -164,7 +164,7 @@ test("Logistics chain / real isolated SQLite", { timeout: 180000 }, async t => {
       assert.equal((await db.order.findUniqueOrThrow({ where: { id: orderId } })).status, "DELIVERED");
       assert.equal(await stock(), before);
       assert.equal(await db.inventoryLog.count({ where: { orderId } }), 1);
-      // 五类通知中的确认/发货/揽收/签收四条已生成
+      // Four of the five notification types have been generated: confirmed / shipped / picked up / delivered.
       const types = (await db.notification.findMany({ where: { orderId }, orderBy: { type: "asc" } })).map(note => note.type);
       assert.deepEqual(types, ["ORDER_CONFIRMED", "SHIPMENT_DELIVERED", "SHIPMENT_IN_TRANSIT", "SHIPMENT_SHIPPED"]);
     });
@@ -174,10 +174,10 @@ test("Logistics chain / real isolated SQLite", { timeout: 180000 }, async t => {
       assert.equal(response.status, 200);
       const data = await response.json();
       assert.match(data.trackingNumber, /^LG-\d{8}-\d{6}$/);
-      assert.equal(data.carrier, "顺丰速运");
+      assert.equal(data.carrier, "SF Express");
       assert.equal(data.status, "DELIVERED");
       assert.equal(data.events.length, 3);
-      assert.deepEqual(data.events.map((event: { location: string }) => event.location), ["仓库", "揽收网点", "收件地址"]);
+      assert.deepEqual(data.events.map((event: { location: string }) => event.location), ["Warehouse", "Pickup station", "Delivery address"]);
       const times = data.events.map((event: { at: string }) => new Date(event.at).getTime());
       assert.deepEqual(times, [...times].sort((a: number, b: number) => a - b));
 
@@ -188,7 +188,7 @@ test("Logistics chain / real isolated SQLite", { timeout: 180000 }, async t => {
       assert.deepEqual(Object.keys(body), ["error"]);
       assert.equal(JSON.stringify(body).includes(orderNumber), false);
 
-      // 客户 B 拿到内部 id 也不能读 A 的运单
+      // Customer B cannot read A's waybill even with the internal id.
       const foreign = await track(orderId, users.customerB.session);
       await expectApiError(foreign, 404, "ORDER_NOT_FOUND");
 
@@ -211,7 +211,7 @@ test("Logistics chain / real isolated SQLite", { timeout: 180000 }, async t => {
       assert.equal(cancelled.status, 200);
       const after = await db.order.findUniqueOrThrow({ where: { id: order.id } });
       assert.equal(after.status, "CANCELLED");
-      // 取消回补：库存恢复，且没有运单
+      // Cancel restores the stock, and no shipment exists.
       assert.equal(await stock(), stockBefore + 2);
       assert.equal(await db.shipment.count({ where: { orderId: order.id } }), 0);
     });

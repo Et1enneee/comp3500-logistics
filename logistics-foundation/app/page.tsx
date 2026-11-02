@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const session = await requirePageRole(["CUSTOMER"]);
-  if (!session) return <Forbidden detail="员工与管理员请使用各自的工作台，客户下单页仅对客户开放。" />;
+  if (!session) return <Forbidden detail="Staff and administrators should use their own workbenches; the customer ordering page is open to customers only." />;
   const [products, recent] = await Promise.all([
     prisma.product.findMany({
       orderBy: { sku: "asc" },
@@ -25,32 +25,32 @@ export default async function Home() {
   return (
     <main className="page">
       <div className="page-heading">
-        <p className="eyebrow">CUSTOMER / 商品与下单</p>
-        <h1>从一张订单开始</h1>
+        <p className="eyebrow">CUSTOMER / Products &amp; Ordering</p>
+        <h1>Start with an Order</h1>
         <p className="subtitle">
-          下单只创建订单并预检可用库存；员工确认时才在同一事务内扣减库存。之后可自助查看订单与物流时间线。
+          Placing an order only creates it and pre-checks available stock; stock is deducted within the same transaction only when staff confirm. Afterwards you can self-serve order details and the logistics timeline.
         </p>
-        <div className="step-row" aria-label="业务流程">
-          <span className="active">01 选择商品并下单</span>
-          <span>02 员工确认并预占库存</span>
-          <span>03 拣货、发货、生成运单</span>
-          <span>04 模拟揽收与签收</span>
-          <span>05 自助追踪与通知</span>
+        <div className="step-row" aria-label="Business flow">
+          <span className="active">01 Pick products and place an order</span>
+          <span>02 Staff confirm and reserve stock</span>
+          <span>03 Pick, ship, and create the shipment</span>
+          <span>04 Simulate pickup and delivery</span>
+          <span>05 Self-service tracking and notifications</span>
         </div>
       </div>
       <OrderForm products={products} csrfToken={session.csrfToken} />
       <section className="card" style={{ marginTop: 24 }}>
         <div className="card-head">
-          <h2>最近订单</h2>
-          <Link className="small" href="/orders">查看全部订单 →</Link>
+          <h2>Recent Orders</h2>
+          <Link className="small" href="/orders">View all orders →</Link>
         </div>
         {recent.length === 0 ? (
-          <div className="empty"><strong>还没有订单</strong>选择商品后提交，即可在这里看到自己的订单。</div>
+          <div className="empty"><strong>No orders yet</strong>Choose products and submit — your orders will appear here.</div>
         ) : (
           <div className="table-wrap">
             <table>
               <thead>
-                <tr><th scope="col">订单号</th><th scope="col">创建时间 (GMT+8)</th><th scope="col">状态</th><th scope="col" className="num">总额</th><th scope="col">操作</th></tr>
+                <tr><th scope="col">Order Number</th><th scope="col">Created At (GMT+8)</th><th scope="col">Status</th><th scope="col" className="num">Total</th><th scope="col">Actions</th></tr>
               </thead>
               <tbody>
                 {recent.map(order => (
@@ -59,7 +59,7 @@ export default async function Home() {
                     <td>{formatGmt8(order.createdAt)}</td>
                     <td><StatusBadge status={order.status} /></td>
                     <td className="num"><Money cents={order.totalCents} /></td>
-                    <td><Link href={`/orders/${order.id}`}>查看详情</Link></td>
+                    <td><Link href={`/orders/${order.id}`}>View details</Link></td>
                   </tr>
                 ))}
               </tbody>

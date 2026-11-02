@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await requirePageRole(["CUSTOMER"]);
-  if (!session) return <Forbidden detail="订单详情仅对客户开放。" />;
+  if (!session) return <Forbidden detail="Order details are open to customers only." />;
   const { id } = await params;
 
   let order;
@@ -23,7 +23,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
     throw error;
   }
 
-  // 未发货时追踪返回 SHIPMENT_NOT_FOUND，这是明确的空状态，不是错误栈。
+  // Before shipping, tracking returns SHIPMENT_NOT_FOUND — an explicit empty state, not an error stack.
   let tracking: Awaited<ReturnType<typeof queryTracking>> | null = null;
   let trackingNote: string | null = null;
   try {
@@ -34,37 +34,37 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
     } else if (error instanceof HttpError) {
       trackingNote = error.message;
     } else {
-      trackingNote = "运单追踪读取失败，可稍后刷新重试。";
+      trackingNote = "Failed to load shipment tracking. Please refresh and try again later.";
     }
   }
 
   return (
     <main className="page">
       <div className="page-heading">
-        <p className="eyebrow">CUSTOMER / 订单详情</p>
+        <p className="eyebrow">CUSTOMER / Order Details</p>
         <h1 className="mono">{order.orderNumber}</h1>
-        <p className="subtitle">单价为下单时快照；金额以整数分存储。所有时间按 {TIMEZONE_LABEL} 展示。</p>
-        <p><Link href="/orders">← 返回我的订单</Link></p>
+        <p className="subtitle">Unit prices are snapshots taken at order placement; amounts are stored as integer cents. All times are shown in {TIMEZONE_LABEL}.</p>
+        <p><Link href="/orders">← Back to My Orders</Link></p>
       </div>
 
       <div className="stack">
         <section className="card">
           <div className="card-head">
-            <h2>订单信息</h2>
+            <h2>Order Information</h2>
             <StatusBadge status={order.status} testId="order-status" />
           </div>
           <div className="card-body">
             <dl className="order-meta">
-              <div><dt>订单号（查询用 ORD）</dt><dd className="mono">{order.orderNumber}</dd></div>
-              <div><dt>创建时间 ({TIMEZONE_LABEL})</dt><dd>{formatGmt8(order.createdAt)}</dd></div>
-              <div><dt>最后更新 ({TIMEZONE_LABEL})</dt><dd>{formatGmt8(order.updatedAt)}</dd></div>
-              <div><dt>客户</dt><dd>{order.customer.name} · <span className="small">{order.customer.email}</span></dd></div>
+              <div><dt>Order Number (ORD for lookup)</dt><dd className="mono">{order.orderNumber}</dd></div>
+              <div><dt>Created At ({TIMEZONE_LABEL})</dt><dd>{formatGmt8(order.createdAt)}</dd></div>
+              <div><dt>Last Updated ({TIMEZONE_LABEL})</dt><dd>{formatGmt8(order.updatedAt)}</dd></div>
+              <div><dt>Customer</dt><dd>{order.customer.name} · <span className="small">{order.customer.email}</span></dd></div>
             </dl>
           </div>
           <div className="table-wrap">
             <table>
               <thead>
-                <tr><th scope="col">商品</th><th scope="col" className="num">下单单价</th><th scope="col" className="num">数量</th><th scope="col" className="num">小计</th></tr>
+                <tr><th scope="col">Product</th><th scope="col" className="num">Unit Price at Order Time</th><th scope="col" className="num">Quantity</th><th scope="col" className="num">Subtotal</th></tr>
               </thead>
               <tbody>
                 {order.items.map(item => (
@@ -79,28 +79,28 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             </table>
           </div>
           <div className="order-footer">
-            <span className="small muted">合计按下单时单价快照计算</span>
-            <strong>合计 <Money cents={order.totalCents} /></strong>
+            <span className="small muted">Total calculated from the unit-price snapshot at order time</span>
+            <strong>Total <Money cents={order.totalCents} /></strong>
           </div>
         </section>
 
         <section className="card">
-          <div className="card-head"><h2>运单与物流</h2>{order.shipment && <span className="tag">模拟物流</span>}</div>
+          <div className="card-head"><h2>Shipment &amp; Logistics</h2>{order.shipment && <span className="tag">Simulated logistics</span>}</div>
           {trackingNote && <div className="card-body"><div className="feedback error" role="alert" style={{ margin: 0 }}>{trackingNote}</div></div>}
           {!order.shipment && (
             <div className="empty">
-              <strong>尚未发货</strong>
-              员工确认、拣货并发货后会生成 LG 运单号；本页会在刷新后显示承运商与时间线。
+              <strong>Not shipped yet</strong>
+              Once staff confirm, pick, and ship the order, an LG tracking number is generated; this page will show the carrier and timeline after a refresh.
             </div>
           )}
           {order.shipment && (
             <>
               <div className="card-body">
                 <dl className="order-meta">
-                  <div><dt>运单号</dt><dd className="mono" data-testid="tracking-number">{order.shipment.trackingNumber}</dd></div>
-                  <div><dt>承运商</dt><dd>{order.shipment.carrier}</dd></div>
-                  <div><dt>发货时间 ({TIMEZONE_LABEL})</dt><dd>{order.shipment.shippedAt ? formatGmt8(order.shipment.shippedAt) : "—"}</dd></div>
-                  <div><dt>签收时间 ({TIMEZONE_LABEL})</dt><dd>{order.shipment.deliveredAt ? formatGmt8(order.shipment.deliveredAt) : "—"}</dd></div>
+                  <div><dt>Tracking Number</dt><dd className="mono" data-testid="tracking-number">{order.shipment.trackingNumber}</dd></div>
+                  <div><dt>Carrier</dt><dd>{order.shipment.carrier}</dd></div>
+                  <div><dt>Shipped At ({TIMEZONE_LABEL})</dt><dd>{order.shipment.shippedAt ? formatGmt8(order.shipment.shippedAt) : "—"}</dd></div>
+                  <div><dt>Delivered At ({TIMEZONE_LABEL})</dt><dd>{order.shipment.deliveredAt ? formatGmt8(order.shipment.deliveredAt) : "—"}</dd></div>
                 </dl>
               </div>
               {tracking ? (
@@ -113,20 +113,20 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                   ))}
                 </ul>
               ) : (
-                <div className="empty">运单已生成，追踪事件读取中或暂不可用，请稍后刷新。</div>
+                <div className="empty">The shipment exists, but tracking events are loading or temporarily unavailable. Please refresh later.</div>
               )}
               <div className="card-body" style={{ borderTop: "1px solid var(--line)" }}>
-                <p className="hint" style={{ margin: 0 }} data-testid="tracking-events">共 {tracking?.events.length ?? 0} 条追踪事件，按时间正序。</p>
+                <p className="hint" style={{ margin: 0 }} data-testid="tracking-events">{tracking?.events.length ?? 0} tracking events, in chronological order.</p>
               </div>
             </>
           )}
         </section>
 
         <section className="card">
-          <div className="card-head"><h2>订单操作</h2></div>
+          <div className="card-head"><h2>Order Actions</h2></div>
           <div className="card-body">
             <CancelOrderButton orderId={order.id} csrfToken={session.csrfToken} status={order.status} />
-            <p className="hint">取消规则：CREATED 取消不改变库存；CONFIRMED 取消会在同一事务内回补库存并写一条正释放流水；拣货及之后不支持取消。</p>
+            <p className="hint">Cancellation rules: cancelling a CREATED order does not change stock; cancelling a CONFIRMED order restores stock and writes a release ledger entry within the same transaction; cancellation is not supported once picking has started.</p>
           </div>
         </section>
       </div>

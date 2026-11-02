@@ -4,9 +4,9 @@ export default function NotFound() {
   return (
     <main className="page">
       <section className="card empty" role="alert">
-        <strong>404 · 未找到该页面</strong>
-        <p>链接可能已失效，或该订单不属于当前账号（出于隐私，不对他人订单泄露是否存在）。</p>
-        <p><Link className="button" href="/">返回首页</Link></p>
+        <strong>404 · Page Not Found</strong>
+        <p>The link may be broken, or the order does not belong to the current account (for privacy, the existence of other accounts&apos; orders is never revealed).</p>
+        <p><Link className="button" href="/">Back to Home</Link></p>
       </section>
     </main>
   );

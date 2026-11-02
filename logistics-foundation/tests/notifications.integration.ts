@@ -48,7 +48,7 @@ test("In-app notifications / real isolated SQLite", { timeout: 180000 }, async t
       assert.ok(a.notifications.every((note: { orderNumber: string | null }) => note.orderNumber !== null));
       assert.ok(a.unreadCount >= 2);
       const b = await (await list(users.customerB.session)).json();
-      assert.equal(b.total, 0, "客户 B 看不到 A 的通知");
+      assert.equal(b.total, 0, "Customer B cannot see A's notifications");
     });
 
     await t.test("mark read only affects own notification; others => 404", async () => {
@@ -100,7 +100,7 @@ test("In-app notifications / real isolated SQLite", { timeout: 180000 }, async t
       assert.equal(pick.status, 200);
       const { createShipmentHandlers } = await import("../lib/shipment-api");
       const shipped = await createShipmentHandlers(db).createShipment(apiRequest("http://localhost/api/v1/shipments", {
-        method: "POST", body: { orderNumber: order.orderNumber, carrier: "顺丰" }, session: users.staff.session,
+        method: "POST", body: { orderNumber: order.orderNumber, carrier: "SF Express" }, session: users.staff.session,
       }));
       assert.equal(shipped.status, 201);
       assert.equal((await orders.updateStatus(apiRequest("http://localhost/api/v1/orders/id/status", {

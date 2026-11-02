@@ -1,3 +1,11 @@
+## v0.4.2 · English localization (language only)
+
+- Translated all user-facing UI text, API messages, seed demo data, test titles/assertion messages, scripts, READMEs, CI comments, and live docs (acceptance, known-issues, test-plan, traceability, contracts) to English.
+- Machine-readable values are unchanged: error codes, status enums, CSV column names, API paths, and the literal `RESET_DEMO_DATA=YES` gate.
+- Test assertions that matched Chinese display strings were updated in sync with the translated source (e.g. report CSV status labels, carrier/location fixtures).
+- Historical evidence artifacts (verification logs, evidence history, legacy references, handoff records) are deliberately kept in Chinese as originally produced.
+- No change to business rules, permissions, database schema, state transitions, or API routes.
+
 ## v0.4.2 · 收尾修复
 
 - 页面/API 共用参数校验，非法状态、重复参数及小数/超界页码可恢复；查询失败不执行列表查询。

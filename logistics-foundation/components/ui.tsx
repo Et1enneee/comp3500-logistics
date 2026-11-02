@@ -13,7 +13,7 @@ const STATUS_CLASS: Record<string, string> = {
   CANCELLED: "cancelled",
 };
 
-/** 状态必须“文字 + 颜色”双通道，不能只靠颜色区分。 */
+/** Status must be conveyed on two channels — "text + color" — never color alone. */
 export function StatusBadge({ status, testId }: { status: string; testId?: string }) {
   const label = STATUS_LABEL[status as OrderStatus] ?? status;
   return (
@@ -31,24 +31,24 @@ export function Forbidden({ detail }: { detail: string }) {
   return (
     <main className="page">
       <section className="card empty" role="alert">
-        <strong>403 · 当前角色无权访问</strong>
+        <strong>403 · Your role cannot access this page</strong>
         <p>{detail}</p>
-        <p><Link className="button" href="/">返回首页</Link></p>
+        <p><Link className="button" href="/">Back to Home</Link></p>
       </section>
     </main>
   );
 }
 
-/** 查询错误保留可编辑输入，不查询数据库，也不渲染误导性的列表结果。 */
+/** Query errors keep the inputs editable, skip the database query, and never render misleading list results. */
 export function InvalidQuery({ message, basePath, query, fields }: {
   message: string; basePath: string; query: PageQuery; fields: string[];
 }) {
-  const labels: Record<string, string> = { page: "页码", pageSize: "每页条数", status: "状态", orderNumber: "订单号", sku: "商品 SKU", logPage: "流水页码", logSku: "流水 SKU", lowStock: "只看低库存（0/1）", unread: "只看未读（0/1）", from: "起始日期 (GMT+8)", to: "结束日期 (GMT+8)" };
+  const labels: Record<string, string> = { page: "Page", pageSize: "Page size", status: "Status", orderNumber: "Order number", sku: "Product SKU", logPage: "Ledger page", logSku: "Ledger SKU", lowStock: "Low stock only (0/1)", unread: "Unread only (0/1)", from: "From date (GMT+8)", to: "To date (GMT+8)" };
   return (
     <main className="page">
       <section className="card">
         <div className="card-body">
-          <div className="feedback error" role="alert"><strong>查询参数有误</strong><p>{message}。请修改后重试。</p></div>
+          <div className="feedback error" role="alert"><strong>Invalid query parameters</strong><p>{message}. Please correct them and try again.</p></div>
           <form className="filters" method="get" action={basePath}>
             {fields.map(name => (
               <div className="field" key={name}>
@@ -56,8 +56,8 @@ export function InvalidQuery({ message, basePath, query, fields }: {
                 <input id={name} name={name} type={name === "from" || name === "to" ? "date" : "text"} defaultValue={Array.isArray(query[name]) ? query[name].join(", ") : query[name] ?? (["page", "logPage"].includes(name) ? "1" : name === "pageSize" ? (basePath === "/inventory" ? "20" : "10") : "")} />
               </div>
             ))}
-            <button className="primary" type="submit">应用筛选</button>
-            <Link className="button" href={basePath}>清除筛选</Link>
+            <button className="primary" type="submit">Apply Filters</button>
+            <Link className="button" href={basePath}>Clear Filters</Link>
           </form>
         </div>
       </section>
@@ -83,7 +83,7 @@ interface PagerProps {
   pageParam?: string;
 }
 
-/** 分页导航：保留筛选条件，只改页码参数。 */
+/** Pagination navigation: keeps the filter conditions and changes only the page parameter. */
 export function Pager({ basePath, params, page, totalPages, total, pageParam = "page" }: PagerProps) {
   const href = (target: number) => {
     const search = new URLSearchParams();
@@ -94,23 +94,23 @@ export function Pager({ basePath, params, page, totalPages, total, pageParam = "
     return `${basePath}?${search.toString()}`;
   };
   return (
-    <nav className="pager" aria-label="分页">
-      <span className="muted small">共 {total} 条 · 第 {page} / {totalPages} 页</span>
+    <nav className="pager" aria-label="Pagination">
+      <span className="muted small">{total} items · Page {page} of {totalPages}</span>
       <span className="pager-links">
-        {page > 1 ? <Link className="button" href={href(page - 1)}>上一页</Link> : <span className="button disabled" aria-disabled="true">上一页</span>}
-        {page < totalPages ? <Link className="button" href={href(page + 1)}>下一页</Link> : <span className="button disabled" aria-disabled="true">下一页</span>}
+        {page > 1 ? <Link className="button" href={href(page - 1)}>Previous</Link> : <span className="button disabled" aria-disabled="true">Previous</span>}
+        {page < totalPages ? <Link className="button" href={href(page + 1)}>Next</Link> : <span className="button disabled" aria-disabled="true">Next</span>}
       </span>
     </nav>
   );
 }
 
 export const STATUS_FILTERS: { value: string; label: string }[] = [
-  { value: "", label: "全部状态" },
-  { value: "CREATED", label: "已创建" },
-  { value: "CONFIRMED", label: "已确认" },
-  { value: "PICKING", label: "拣货中" },
-  { value: "SHIPPED", label: "已发货" },
-  { value: "IN_TRANSIT", label: "在途" },
-  { value: "DELIVERED", label: "已签收" },
-  { value: "CANCELLED", label: "已取消" },
+  { value: "", label: "All statuses" },
+  { value: "CREATED", label: "Created" },
+  { value: "CONFIRMED", label: "Confirmed" },
+  { value: "PICKING", label: "Picking" },
+  { value: "SHIPPED", label: "Shipped" },
+  { value: "IN_TRANSIT", label: "In Transit" },
+  { value: "DELIVERED", label: "Delivered" },
+  { value: "CANCELLED", label: "Cancelled" },
 ];

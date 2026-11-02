@@ -10,18 +10,18 @@ export const ORDER_STATUS = {
 
 export type OrderStatus = (typeof ORDER_STATUS)[keyof typeof ORDER_STATUS];
 
-// 中文文案只存在这里，页面一律从这里取，不许在页面里硬编码
+// Display labels live only here; pages must read from this map and never hard-code labels.
 export const STATUS_LABEL: Record<OrderStatus, string> = {
-  CREATED: "已创建",
-  CONFIRMED: "已确认",
-  PICKING: "拣货中",
-  SHIPPED: "已发货",
-  IN_TRANSIT: "在途",
-  DELIVERED: "已签收",
-  CANCELLED: "已取消",
+  CREATED: "Created",
+  CONFIRMED: "Confirmed",
+  PICKING: "Picking",
+  SHIPPED: "Shipped",
+  IN_TRANSIT: "In Transit",
+  DELIVERED: "Delivered",
+  CANCELLED: "Cancelled",
 };
 
-// 合法转移表：from -> 可以去哪些状态
+// Legal transition table: from -> which statuses it may move to.
 export const ALLOWED_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   CREATED: ["CONFIRMED", "CANCELLED"],
   CONFIRMED: ["PICKING", "CANCELLED"],

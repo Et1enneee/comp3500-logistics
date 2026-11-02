@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 
-// 证据副本、基线与交付包共用此规则；源码摘要包括图片和清单，不包括运行产物。
+// Shared rules for evidence copies, baselines, and delivery packages; the source digest includes images and manifests, but not runtime artifacts.
 const excludedNames = new Set(["node_modules", ".next", ".git", "artifacts", "evidence", ".DS_Store"]);
 export function isSourcePath(relative) {
   const parts = relative.split(/[\\/]/);
@@ -18,7 +18,7 @@ export async function sourceFiles(root, prefix = "") {
   for (const entry of await fs.readdir(path.join(root, prefix), { withFileTypes: true })) {
     const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
     if (!isSourcePath(relative)) continue;
-    if (entry.isSymbolicLink()) throw new Error(`源码中不允许指向副本外的符号链接: ${relative}`);
+    if (entry.isSymbolicLink()) throw new Error(`symlinks pointing outside the copy are not allowed in the source tree: ${relative}`);
     if (entry.isDirectory()) files.push(...await sourceFiles(root, relative));
     else if (entry.isFile()) files.push(relative);
   }

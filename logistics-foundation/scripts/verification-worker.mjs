@@ -6,10 +6,10 @@ import path from "node:path";
 import os from "node:os";
 
 /**
- * 证据总控脚本：真实执行全部检查，原始 stdout/stderr 与退出码落盘。
- * 输出（默认 ../evidence，可用 EVIDENCE_ROOT 覆盖）：
+ * Evidence orchestration script: runs every check for real, persisting raw stdout/stderr and exit codes.
+ * Output (default ../evidence, overridable via EVIDENCE_ROOT):
  *   test-logs/*.log, screenshots/*.png, results.json, performance.json, audit.json
- * 不伪造任何结果；某一步失败仍继续跑完其余步骤，但最终退出码非 0。
+ * No results are fabricated; if a step fails, the remaining steps still run, but the final exit code is non-zero.
  */
 export async function runVerification({ evidenceRoot }) {
 const projectDir = process.cwd();
@@ -74,7 +74,7 @@ function run(name, command, args, options = {}) {
   });
 }
 
-/** 证据脱敏：把本机绝对路径替换为符号，保留其余原始输出。 */
+/** Evidence sanitisation: replaces local absolute paths with symbols, keeping the rest of the output raw. */
 async function sanitizeEvidence() {
   const replacements = [
     [projectDir, "."],
@@ -116,11 +116,11 @@ async function startServer() {
       const response = await fetch(baseUrl + "/login");
       if (response.ok) return true;
     } catch {
-      // 未就绪
+      // not ready yet
     }
     await new Promise(resolve => setTimeout(resolve, 1000));
   }
-  throw new Error("服务器未能在 60 秒内就绪，见 test-logs/server.log");
+  throw new Error("The server failed to become ready within 60 seconds; see test-logs/server.log");
 }
 
 async function stopServer() {
@@ -143,7 +143,7 @@ async function loginForCheck(email, password) {
 }
 
 /**
- * 重启保留检查（P1-D）：创建订单 → 重启服务 → 同一 Cookie 会话与订单/库存仍在。
+ * Restart persistence check (P1-D): create an order → restart the server → the same Cookie session plus the order/inventory still exist.
  */
 async function restartCheck() {
   const password = process.env.DEMO_PASSWORD || "Demo1234!";
@@ -178,9 +178,9 @@ async function restartCheck() {
   };
   await fs.writeFile(path.join(evidenceRoot, "restart-check.json"), JSON.stringify(report, null, 2));
   if (!report.orderSurvivedRestart || !report.sessionSurvivedRestart || !report.stockUnchanged) {
-    throw new Error("重启保留检查失败: " + JSON.stringify(report));
+    throw new Error("Restart persistence check failed: " + JSON.stringify(report));
   }
-  console.log("重启保留检查通过：订单、会话、库存均在");
+  console.log("Restart persistence check passed: order, session and stock all survived");
   return report;
 }
 
@@ -199,17 +199,17 @@ try {
     env: { MIGRATION_REPORT: path.join(evidenceRoot, "migration-check.json") },
   });
 
-  // 漏洞发现会使 npm audit 返回非零；不自动升级，完整保留两种安装范围的原始 stdout JSON。
+  // Vulnerability findings make npm audit exit non-zero; no auto-upgrades are performed, and the raw stdout JSON of both install scopes is kept in full.
   const auditSummary = { capturedAt: new Date().toISOString(), scans: {} };
   for (const [name, flags, file] of [["full", [], "audit.json"], ["omitDev", ["--omit=dev"], "audit-omit-dev.json"]]) {
     const result = await run(name === "full" ? "audit" : "audit-omit-dev", "npm", ["audit", ...flags, "--json"], {
       optional: true, stdoutFile: path.join(evidenceRoot, file),
     });
     const payload = JSON.parse(await fs.readFile(path.join(evidenceRoot, file), "utf8"));
-    if (!payload.metadata?.vulnerabilities || !payload.vulnerabilities || payload.error) throw new Error(`audit ${name} 未返回有效扫描结果`);
+    if (!payload.metadata?.vulnerabilities || !payload.vulnerabilities || payload.error) throw new Error(`audit ${name} did not return a valid scan result`);
     auditSummary.scans[name] = { file, exitCode: result.exitCode, counts: payload.metadata.vulnerabilities };
   }
-  auditSummary.riskStatement = "完整扫描及 --omit=dev 均有未修复依赖风险；omit=dev 仍包含 prisma → @prisma/config → deepmerge-ts 的 high 链，不能将其排除为仅开发依赖或断言运行环境无风险。当前未证明业务 HTTP 路径可利用，也不以此推断不可利用。moderate 见 ESLint/minimatch 链原始 JSON。未执行 audit fix --force 或破坏性升级。";
+  auditSummary.riskStatement = "Both the full scan and --omit=dev show unresolved dependency risks; the omit=dev scan still includes the high-severity chain prisma → @prisma/config → deepmerge-ts, so it cannot be excluded as a dev-only risk or used to claim the runtime environment is risk-free. No exploitable business HTTP path has been demonstrated, and this must not be taken as proof of non-exploitability either. See the raw ESLint/minimatch chain JSON for moderate findings. No audit fix --force or destructive upgrades were performed.";
   await fs.writeFile(path.join(evidenceRoot, "audit-summary.json"), JSON.stringify(auditSummary, null, 2) + "\n");
 
   const chromium = await run("chromium", "npx", ["playwright", "install", "chromium"]);
@@ -269,14 +269,14 @@ try {
       restartCheck: restartReport ? "passed" : "not-run",
     },
     notes: [
-      "所有日志为本脚本实际执行的原始输出；仅把本机绝对路径脱敏为符号（项目根=.，家目录=~，临时目录=$TMP），其余未修改或美化。",
-      "audit.json 与 audit-omit-dev.json 是本轮 npm audit 的原始 stdout JSON；audit-summary.json 记录实际数量、退出码和风险边界，不把 omit=dev 仍有的 high 说成已排除运行环境风险。未执行破坏性升级。",
-      "浏览器截图由 Playwright 在真实运行的应用上生成，位于 screenshots/。",
+      "All logs are the raw output of commands actually executed by this script; only local absolute paths are sanitised into symbols (project root=., home directory=~, temp directory=$TMP); nothing else was modified or beautified.",
+      "audit.json and audit-omit-dev.json are the raw stdout JSON of this round's npm audit; audit-summary.json records the actual counts, exit codes and risk boundaries, and does not present the high-severity chain still present under omit=dev as excluded or as a risk-free runtime. No destructive upgrades were performed.",
+      "The browser screenshots were produced by Playwright against the real running application and are stored under screenshots/.",
     ],
   };
   await fs.writeFile(path.join(evidenceRoot, "results.json"), JSON.stringify(results, null, 2));
-  console.log(`\n证据已写入 ${evidenceRoot}`);
-  console.log(`步骤 ${steps.length} 个，失败 ${failed.length} 个${failed.length ? "：" + failed.map(step => step.name).join(", ") : ""}`);
+  console.log(`\nEvidence written to ${evidenceRoot}`);
+  console.log(`${steps.length} steps, ${failed.length} failed${failed.length ? ": " + failed.map(step => step.name).join(", ") : ""}`);
   if (failed.length) process.exitCode = 1;
 } catch (error) {
   console.error(error);
