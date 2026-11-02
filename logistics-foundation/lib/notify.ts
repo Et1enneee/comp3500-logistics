@@ -2,18 +2,19 @@ import type { Prisma } from "@prisma/client";
 import { formatGmt8, TIMEZONE_LABEL } from "@/lib/time";
 
 export const NOTIFICATION_TYPES = {
-  ORDER_CONFIRMED: "已确认",
-  ORDER_CANCELLED: "已取消",
-  SHIPMENT_SHIPPED: "已发货",
-  SHIPMENT_IN_TRANSIT: "已揽收",
-  SHIPMENT_DELIVERED: "已签收",
+  ORDER_CONFIRMED: "confirmed",
+  ORDER_CANCELLED: "cancelled",
+  SHIPMENT_SHIPPED: "shipped",
+  SHIPMENT_IN_TRANSIT: "picked up",
+  SHIPMENT_DELIVERED: "delivered",
 } as const;
 
 export type NotificationType = keyof typeof NOTIFICATION_TYPES;
 
 /**
- * 在业务事务内写站内通知：失败整体回滚，不会出现“订单成功、通知假装成功”。
- * (orderId, type) 唯一：重复/并发请求最多一条。
+ * Writes an in-app notification inside the business transaction: a failure rolls everything back,
+ * so "order succeeded, notification pretended to succeed" can never happen.
+ * (orderId, type) is unique: duplicate/concurrent requests produce at most one row.
  */
 export async function notifyOrderEvent(
   tx: Prisma.TransactionClient,
@@ -21,7 +22,7 @@ export async function notifyOrderEvent(
 ): Promise<void> {
   const at = params.at ?? new Date();
   const label = NOTIFICATION_TYPES[params.type];
-  const content = `订单 ${params.orderNumber} ${label}（${formatGmt8(at)} ${TIMEZONE_LABEL}）`;
+  const content = `Order ${params.orderNumber} ${label} (${formatGmt8(at)} ${TIMEZONE_LABEL})`;
   await tx.notification.upsert({
     where: { orderId_type: { orderId: params.orderId, type: params.type } },
     update: {},

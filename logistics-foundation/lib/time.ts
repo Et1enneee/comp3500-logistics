@@ -1,4 +1,4 @@
-// 全项目统一时区口径：数据库保存 UTC；界面与报表按 GMT+8 展示和分日。
+// Project-wide timezone convention: the database stores UTC; the UI and reports display and bucket by GMT+8.
 export const GMT8_OFFSET_MS = 8 * 60 * 60 * 1000;
 export const TIMEZONE_LABEL = "GMT+8";
 
@@ -6,7 +6,7 @@ function pad(value: number, length = 2) {
   return String(value).padStart(length, "0");
 }
 
-/** UTC 时间 → GMT+8 的 “YYYY-MM-DD HH:mm:ss”。 */
+/** UTC time -> "YYYY-MM-DD HH:mm:ss" in GMT+8. */
 export function formatGmt8(value: Date | string): string {
   const date = typeof value === "string" ? new Date(value) : value;
   const shifted = new Date(date.getTime() + GMT8_OFFSET_MS);
@@ -16,17 +16,17 @@ export function formatGmt8(value: Date | string): string {
   );
 }
 
-/** UTC 时间 → GMT+8 的 “YYYY-MM-DD”。 */
+/** UTC time -> "YYYY-MM-DD" in GMT+8. */
 export function gmt8DateString(value: Date | string): string {
   return formatGmt8(value).slice(0, 10);
 }
 
-/** GMT+8 的今天（自然日字符串）。 */
+/** Today (calendar-day string) in GMT+8. */
 export function todayGmt8(now: Date = new Date()): string {
   return gmt8DateString(now);
 }
 
-/** 严格解析 “YYYY-MM-DD”，非法日期返回 null。 */
+/** Strictly parses "YYYY-MM-DD"; returns null for invalid dates. */
 export function parseDateString(value: string | null | undefined): { year: number; month: number; day: number } | null {
   if (!value) return null;
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
@@ -39,12 +39,12 @@ export function parseDateString(value: string | null | undefined): { year: numbe
   return { year, month, day };
 }
 
-/** GMT+8 某自然日 00:00 对应的 UTC 瞬间。 */
+/** The UTC instant corresponding to 00:00 of a GMT+8 calendar day. */
 export function gmt8DayStartUtc(year: number, month: number, day: number): Date {
   return new Date(Date.UTC(year, month - 1, day) - GMT8_OFFSET_MS);
 }
 
-/** GMT+8 自然日字符串加 n 天，返回新的字符串。 */
+/** Adds n days to a GMT+8 calendar-day string and returns a new string. */
 export function addDaysToDateString(value: string, days: number): string {
   const parsed = parseDateString(value);
   if (!parsed) return value;
@@ -55,15 +55,15 @@ export function addDaysToDateString(value: string, days: number): string {
 export interface DateRange {
   from: string;
   to: string;
-  /** 含起始日 00:00:00 (GMT+8)，以 UTC 表示。 */
+  /** The start day's 00:00:00 (GMT+8), expressed in UTC (inclusive). */
   startUtc: Date;
-  /** 不含结束日次日 00:00:00 (GMT+8)，以 UTC 表示。 */
+  /** The day after the end date's 00:00:00 (GMT+8), expressed in UTC (exclusive). */
   endUtc: Date;
 }
 
 /**
- * 解析查询里的 from/to（GMT+8 自然日，起始含、结束含整天）。
- * 缺省为最近 7 个自然日（含今天）。非法输入返回错误信息。
+ * Parses from/to from the query (GMT+8 calendar days; start inclusive, end covering the whole day).
+ * Defaults to the last 7 calendar days (including today). Invalid input returns an error message.
  */
 export function resolveDateRange(
   fromRaw: string | null,
@@ -74,12 +74,12 @@ export function resolveDateRange(
   const from = fromRaw ? fromRaw : addDaysToDateString(to, -6);
   const fromParts = parseDateString(from);
   const toParts = parseDateString(to);
-  if (!fromParts) return { ok: false, message: "起始日期须为 YYYY-MM-DD" };
-  if (!toParts) return { ok: false, message: "结束日期须为 YYYY-MM-DD" };
-  if (from > to) return { ok: false, message: "起始日期不能晚于结束日期" };
+  if (!fromParts) return { ok: false, message: "The from date must be in YYYY-MM-DD format" };
+  if (!toParts) return { ok: false, message: "The to date must be in YYYY-MM-DD format" };
+  if (from > to) return { ok: false, message: "The from date cannot be after the to date" };
   const endExclusive = addDaysToDateString(to, 1);
   const endParts = parseDateString(endExclusive);
-  if (!endParts) return { ok: false, message: "日期范围超出可处理范围" };
+  if (!endParts) return { ok: false, message: "The date range is out of the processable range" };
   return {
     ok: true,
     range: {
@@ -91,7 +91,7 @@ export function resolveDateRange(
   };
 }
 
-/** 生成范围内每个 GMT+8 自然日：用于趋势图的零值补齐。 */
+/** Yields every GMT+8 calendar day in the range: used to zero-fill the trend chart. */
 export function eachDateInRange(from: string, to: string): string[] {
   if (!parseDateString(from) || !parseDateString(to) || from > to) return [];
   const dates: string[] = [];

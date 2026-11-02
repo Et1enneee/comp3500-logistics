@@ -1,19 +1,19 @@
-# 订单状态：设计范围 vs 当前实现
+# Order Status: Design Scope vs Current Implementation
 
-七状态/七转移的设计模型以 lib/constants.ts 与 Prisma enum 为准，原有 9 条状态机单测保留。状态模型允许某个转换，不等于 HTTP 接口已经实现。
+The design model of seven states / seven transitions is authoritative in lib/constants.ts and the Prisma enum; the original 9 state-machine unit tests are kept. The state model allowing a transition does not mean the HTTP API has implemented it.
 
-| 转换 | 设计规则 | 当前实现 |
+| Transition | Design Rule | Current Implementation |
 | --- | --- | --- |
-| CREATED → CONFIRMED | STAFF；库存充足；预占及流水原子完成 | v0.2 已实现并测试 |
-| CREATED → CANCELLED | 客户取消；不回库存 | 未实现（本轮不做） |
-| CONFIRMED → CANCELLED | 员工/客户按原规则取消；释放已预占 | 未实现；未来 reason 定名 ORDER_CANCEL_RELEASE |
-| CONFIRMED → PICKING | 员工开始拣货 | v0.3 已实现并测试（PATCH /status） |
-| PICKING → SHIPPED | 员工发货、生成唯一运单；不重复扣预占库存 | v0.3 已实现并测试（POST /shipments） |
-| SHIPPED → IN_TRANSIT | 模拟承运商更新 | v0.3 已实现并测试（PATCH /status） |
-| IN_TRANSIT → DELIVERED | 模拟送达/签收 | v0.3 已实现并测试（PATCH /status） |
+| CREATED → CONFIRMED | STAFF; sufficient stock; reservation and ledger atomically completed | Implemented and tested in v0.2 |
+| CREATED → CANCELLED | Customer cancels; no stock restock | Not implemented (out of scope this round) |
+| CONFIRMED → CANCELLED | Staff/customer cancels per the original rules; releases the reservation | Not implemented; future reason will be named ORDER_CANCEL_RELEASE |
+| CONFIRMED → PICKING | Staff starts picking | Implemented and tested in v0.3 (PATCH /status) |
+| PICKING → SHIPPED | Staff ships and generates the unique shipment; no double deduction of reserved stock | Implemented and tested in v0.3 (POST /shipments) |
+| SHIPPED → IN_TRANSIT | Simulated carrier update | Implemented and tested in v0.3 (PATCH /status) |
+| IN_TRANSIT → DELIVERED | Simulated delivery/sign-off | Implemented and tested in v0.3 (PATCH /status) |
 
-v0.3 的 PATCH 接受 to=CONFIRMED/PICKING/IN_TRANSIT/DELIVERED；to=SHIPPED 与未实现目标返回 400 INVALID_ARGUMENT，不能把它与“已实现通用状态接口后的非法跳转 409”混为一谈。目标状态与原状态不符时返回 409 INVALID_STATE_TRANSITION，业务数据不变。
+The v0.3 PATCH accepts to=CONFIRMED/PICKING/IN_TRANSIT/DELIVERED; to=SHIPPED and unimplemented targets return 400 INVALID_ARGUMENT — this must not be confused with the "illegal-transition 409 after a generic status API is implemented". When the target status does not match the source status, it returns 409 INVALID_STATE_TRANSITION with business data unchanged.
 
-Customer 取消和 Staff 确认是两个不同用例；未来用例图应分别表达权限。真实认证、所有权校验及新增端点仍需设计与验收。RETURNED 不在本包范围。
+Customer cancellation and staff confirmation are two different use cases; a future use-case diagram should express their permissions separately. Real authentication, ownership checks, and new endpoints still need design and acceptance. RETURNED is out of scope for this package.
 
-当前用例说明和已实现/待实现分区见 ../closure/use-cases.md 与 ../closure/usecase.puml；取消仍不属于已实现接口。
+Current use-case descriptions and the implemented/pending split are in ../closure/use-cases.md and ../closure/usecase.puml; cancellation is still not among the implemented APIs.

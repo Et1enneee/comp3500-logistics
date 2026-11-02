@@ -23,9 +23,9 @@ test("Inventory, replenishment & alerts / real isolated SQLite", { timeout: 1800
       apiRequest("http://localhost/api/v1/inventory/logs" + query, { session }),
     );
 
-    const at = await db.product.create({ data: { sku: "SKU007", name: "透明胶带", priceCents: 500, stock: 4, lowStockThreshold: 5 } });
-    const edge = await db.product.create({ data: { sku: "SKU-EDGE", name: "等于阈值", priceCents: 100, stock: 5, lowStockThreshold: 5 } });
-    const healthy = await db.product.create({ data: { sku: "SKU-OK", name: "充足", priceCents: 100, stock: 50, lowStockThreshold: 5 } });
+    const at = await db.product.create({ data: { sku: "SKU007", name: "Clear Tape", priceCents: 500, stock: 4, lowStockThreshold: 5 } });
+    const edge = await db.product.create({ data: { sku: "SKU-EDGE", name: "At Threshold", priceCents: 100, stock: 5, lowStockThreshold: 5 } });
+    const healthy = await db.product.create({ data: { sku: "SKU-OK", name: "Healthy", priceCents: 100, stock: 50, lowStockThreshold: 5 } });
 
     await t.test("strict comparison: 4<5 warns, 5=5 does not", async () => {
       const response = await lowStock();
@@ -143,8 +143,8 @@ test("Inventory, replenishment & alerts / real isolated SQLite", { timeout: 1800
     });
 
     await t.test("no delete/overwrite endpoint exists: stock only increases via replenish", async () => {
-      const p = await db.product.create({ data: { sku: "SKU-NODEL", name: "不可覆盖", priceCents: 100, stock: 3, lowStockThreshold: 5 } });
-      // 只有 POST replenish 一个写入口；GET 不修改数据。
+      const p = await db.product.create({ data: { sku: "SKU-NODEL", name: "No Overwrite", priceCents: 100, stock: 3, lowStockThreshold: 5 } });
+      // POST replenish is the only write entry point; GET never mutates data.
       await list();
       assert.equal((await db.product.findUniqueOrThrow({ where: { id: p.id } })).stock, 3);
       const page = await queryInventory(db, { page: 1, pageSize: 10, lowStockOnly: true });

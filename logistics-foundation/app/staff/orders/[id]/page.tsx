@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 
 export default async function StaffOrderPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await requirePageRole(["STAFF"]);
-  if (!session) return <Forbidden detail="订单履约操作仅对员工开放。" />;
+  if (!session) return <Forbidden detail="Order fulfillment actions are open to staff only." />;
   const { id } = await params;
 
   let order;
@@ -27,26 +27,26 @@ export default async function StaffOrderPage({ params }: { params: Promise<{ id:
   return (
     <main className="page">
       <div className="page-heading">
-        <p className="eyebrow">STAFF / 订单履约</p>
+        <p className="eyebrow">STAFF / Order Fulfillment</p>
         <h1 className="mono">{order.orderNumber}</h1>
-        <p className="subtitle">每个动作都由服务端复核状态与角色；完成后以服务器读取结果为准。</p>
-        <p><Link href="/staff">← 返回订单队列</Link></p>
+        <p className="subtitle">Every action is re-validated on the server for status and role; after completion, the server-read result is authoritative.</p>
+        <p><Link href="/staff">← Back to Order Queue</Link></p>
       </div>
 
       <div className="stack">
         <section className="card">
-          <div className="card-head"><h2>订单详情</h2><StatusBadge status={order.status} testId="order-status" /></div>
+          <div className="card-head"><h2>Order Details</h2><StatusBadge status={order.status} testId="order-status" /></div>
           <div className="card-body">
             <dl className="order-meta">
-              <div><dt>订单号</dt><dd className="mono">{order.orderNumber}</dd></div>
-              <div><dt>客户</dt><dd>{order.customer.name} · <span className="small">{order.customer.email}</span></dd></div>
-              <div><dt>创建时间 ({TIMEZONE_LABEL})</dt><dd>{formatGmt8(order.createdAt)}</dd></div>
-              <div><dt>内部 ID（接口自动使用）</dt><dd className="mono">{order.id}</dd></div>
+              <div><dt>Order Number</dt><dd className="mono">{order.orderNumber}</dd></div>
+              <div><dt>Customer</dt><dd>{order.customer.name} · <span className="small">{order.customer.email}</span></dd></div>
+              <div><dt>Created At ({TIMEZONE_LABEL})</dt><dd>{formatGmt8(order.createdAt)}</dd></div>
+              <div><dt>Internal ID (used automatically by the API)</dt><dd className="mono">{order.id}</dd></div>
             </dl>
           </div>
           <div className="table-wrap">
             <table>
-              <thead><tr><th scope="col">商品</th><th scope="col" className="num">下单单价</th><th scope="col" className="num">数量</th><th scope="col" className="num">小计</th></tr></thead>
+              <thead><tr><th scope="col">Product</th><th scope="col" className="num">Unit Price at Order Time</th><th scope="col" className="num">Quantity</th><th scope="col" className="num">Subtotal</th></tr></thead>
               <tbody>
                 {order.items.map(item => (
                   <tr key={item.id}>
@@ -59,18 +59,18 @@ export default async function StaffOrderPage({ params }: { params: Promise<{ id:
               </tbody>
             </table>
           </div>
-          <div className="order-footer"><span className="small muted">单价采用下单时快照</span><strong>合计 <Money cents={order.totalCents} /></strong></div>
+          <div className="order-footer"><span className="small muted">Unit prices use the snapshot from order time</span><strong>Total <Money cents={order.totalCents} /></strong></div>
         </section>
 
         <section className="card">
-          <div className="card-head"><h2>可执行动作</h2><span className="tag">模拟物流</span></div>
+          <div className="card-head"><h2>Available Actions</h2><span className="tag">Simulated logistics</span></div>
           <div className="card-body">
             <StaffActions orderId={order.id} orderNumber={order.orderNumber} status={order.status} csrfToken={session.csrfToken} />
           </div>
         </section>
 
         <section className="card">
-          <div className="card-head"><h2>运单追踪</h2>{order.shipment && <span className="small muted">运单状态 {order.shipment.status}</span>}</div>
+          <div className="card-head"><h2>Shipment Tracking</h2>{order.shipment && <span className="small muted">Shipment status {order.shipment.status}</span>}</div>
           <TrackingPanel orderId={order.id} hasShipment={Boolean(order.shipment)} refreshKey={order.updatedAt.toISOString()} />
         </section>
       </div>

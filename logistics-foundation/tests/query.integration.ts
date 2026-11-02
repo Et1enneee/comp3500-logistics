@@ -8,24 +8,24 @@ import { createInventoryHandlers } from "../lib/inventory-api";
 import { createNotificationHandlers } from "../lib/notifications-api";
 import { createReportHandlers } from "../lib/reports-api";
 
-describe("共享分页参数", () => {
-  it("缺省与合法整数保持原口径", () => {
+describe("Shared pagination parameters", () => {
+  it("defaults and valid integers keep the established semantics", () => {
     assert.deepEqual(parsePagination(new URLSearchParams()), { page: 1, pageSize: 10, skip: 0 });
     assert.deepEqual(parsePagination(new URLSearchParams("page=2&pageSize=20")), { page: 2, pageSize: 20, skip: 20 });
   });
   for (const page of ["1.5", "1.0", "1e2", "0x10", "Infinity", "0", "-1", "", "9007199254740992", "2147483648"]) {
-    it("拒绝非法或超界页码 " + page, () => {
+    it("rejects invalid or out-of-range page " + page, () => {
       assert.throws(() => parsePagination(new URLSearchParams({ page })));
     });
   }
-  it("拒绝重复分页参数和小数每页条数", () => {
+  it("rejects duplicate pagination parameters and fractional page sizes", () => {
     assert.throws(() => parsePagination(new URLSearchParams("page=1&page=2")));
     assert.throws(() => parsePagination(new URLSearchParams("pageSize=2.5")));
   });
 });
 
-describe("页面/API 共用参数解析", () => {
-  it("非法状态、小数、重复参数在页面返回可恢复错误", () => {
+describe("Shared page/API parameter parsing", () => {
+  it("invalid status, fractions and duplicates return recoverable page errors", () => {
     for (const query of [{ status: "INVALID" }, { status: ["CREATED", "CONFIRMED"] }, { page: "1.5" }, { page: ["1", "2"] }]) {
       assert.equal(parsePageQuery(query, parseOrderParams).ok, false);
     }
@@ -34,7 +34,7 @@ describe("页面/API 共用参数解析", () => {
     assert.equal(parsePageQuery({ unread: ["1", "0"] }, parseNotificationParams).ok, false);
     assert.equal(parsePageQuery({ from: ["2026-10-01", "2026-10-02"] }, parseReportParams).ok, false);
   });
-  it("合法筛选结果与直接 API 解析一致，库存和流水保留独立参数", () => {
+  it("valid filter results match direct API parsing; inventory and logs keep separate parameters", () => {
     assert.deepEqual(parsePageQuery({ page: "2", status: "CREATED" }, parseOrderParams), { ok: true, value: parseOrderParams(new URLSearchParams("page=2&status=CREATED")) });
     const result = parsePageQuery({ page: "2", logPage: "3", sku: "SKU001", logSku: "SKU007" }, parseInventoryPageParams);
     assert.ok(result.ok);
@@ -43,7 +43,7 @@ describe("页面/API 共用参数解析", () => {
     assert.equal(result.value.logs.page, 3);
     assert.equal(result.value.logs.sku, "SKU007");
   });
-  it("仅把用户参数错误转换为反馈，意外错误继续抛出", () => {
+  it("only user parameter errors become feedback; unexpected errors still throw", () => {
     assert.throws(() => parsePageQuery({}, () => { throw new Error("unexpected"); }), /unexpected/);
   });
 });

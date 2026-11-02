@@ -4,7 +4,7 @@ import { apiRequest, createTestDatabase, createUsers, expectApiError } from "./h
 import { createOrderPost } from "../lib/create-order";
 import { createOrderHandlers } from "../lib/order-api";
 
-// 客户创建订单：身份来自会话；创建只预检库存，不扣库存、不写流水。
+// Customer creates an order: identity comes from the session; creation only pre-checks stock — no deduction, no ledger entry.
 test("Foundation creation / real isolated SQLite", { timeout: 180000 }, async t => {
   const { db, dispose } = await createTestDatabase("foundation-create");
   try {
@@ -42,7 +42,7 @@ test("Foundation creation / real isolated SQLite", { timeout: 180000 }, async t 
       const count = await db.order.count();
       const response = await create({ items: [{ sku: "SKU001", quantity: 6 }, { sku: "SKU001", quantity: 6 }] });
       const error = await expectApiError(response, 400, "INSUFFICIENT_STOCK_SKU001");
-      assert.match(error.error.message, /库存/);
+      assert.match(error.error.message, /available stock/);
       assert.equal(await db.order.count(), count);
     });
 
@@ -105,7 +105,7 @@ test("Foundation creation / real isolated SQLite", { timeout: 180000 }, async t 
         await create({ customerId: users.customerB.id, items: [{ sku: "SKU001", quantity: 1 }] }),
         403, "FORBIDDEN",
       );
-      // 与本人会话一致时兼容旧字段，但 customerId 仍以会话为准。
+      // Legacy fields are accepted when they match the session, but customerId still follows the session.
       const ok = await create({ email: users.customerA.email, items: [{ sku: "SKU001", quantity: 1 }] });
       assert.equal(ok.status, 201);
       const { order } = await ok.json();

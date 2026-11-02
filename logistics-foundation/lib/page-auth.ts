@@ -8,7 +8,7 @@ export interface PageSession {
   csrfToken: string;
 }
 
-/** 页面侧读取会话（与 API 同一张 Session 表、同一过期规则）。 */
+/** Page-side session read (same Session table and expiry rules as the API). */
 export async function getPageSession(): Promise<PageSession | null> {
   const store = await cookies();
   const token = store.get(SESSION_COOKIE)?.value;
@@ -21,7 +21,7 @@ export async function getPageSession(): Promise<PageSession | null> {
   return { user: row.user as SessionUser, csrfToken: row.csrfToken };
 }
 
-/** 未登录跳转登录页；角色不符返回 null，由页面渲染 403 提示。 */
+/** Not signed in redirects to the sign-in page; a role mismatch returns null and the page renders a 403 notice. */
 export async function requirePageRole(roles: SessionUser["role"][]): Promise<PageSession | null> {
   const session = await getPageSession();
   if (!session) redirect("/login");
@@ -29,7 +29,7 @@ export async function requirePageRole(roles: SessionUser["role"][]): Promise<Pag
   return session;
 }
 
-/** 首页按角色分流。 */
+/** Routes the home page by role. */
 export function homePathForRole(role: SessionUser["role"]): string {
   if (role === "STAFF") return "/staff";
   if (role === "ADMIN") return "/admin";

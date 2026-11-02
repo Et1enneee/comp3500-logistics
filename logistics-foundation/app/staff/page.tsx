@@ -15,14 +15,14 @@ export default async function StaffPage({
   searchParams: Promise<PageQuery>;
 }) {
   const session = await requirePageRole(["STAFF"]);
-  if (!session) return <Forbidden detail="订单工作台仅对员工开放；管理员使用只读运营报表。" />;
+  if (!session) return <Forbidden detail="The Order Workbench is open to staff only; administrators use the read-only operations reports." />;
   const query = await searchParams;
   const parsed = parsePageQuery(query, parseOrderParams);
   if (!parsed.ok) return <InvalidQuery message={parsed.message} basePath="/staff" query={query} fields={["page", "pageSize", "status", "orderNumber"]} />;
   const { page, pageSize, orderNumber } = parsed.value;
   const status = parsed.value.status ?? "";
 
-  // 保留按 ORD 精确查询：命中则直接跳转详情（含操作面板）。
+  // Keep the exact ORD lookup: a hit goes straight to the detail page (with the action panel).
   if (orderNumber) {
     const exact = await prisma.order.findUnique({
       where: { orderNumber: orderNumber },
@@ -32,14 +32,14 @@ export default async function StaffPage({
       return (
         <main className="page">
           <div className="page-heading">
-            <p className="eyebrow">STAFF / 订单工作台</p>
-            <h1>已找到订单</h1>
-            <p className="subtitle">按 ORD 精确查询命中，正在跳转详情。</p>
+            <p className="eyebrow">STAFF / Order Workbench</p>
+            <h1>Order Found</h1>
+            <p className="subtitle">The exact ORD lookup matched; opening the details.</p>
           </div>
           <section className="card">
             <div className="card-body">
-              <p>订单 <span className="mono">{orderNumber}</span> 存在。</p>
-              <p><Link className="button primary" href={`/staff/orders/${exact.id}`}>打开订单详情 →</Link></p>
+              <p>Order <span className="mono">{orderNumber}</span> exists.</p>
+              <p><Link className="button primary" href={`/staff/orders/${exact.id}`}>Open Order Details →</Link></p>
             </div>
           </section>
         </main>
@@ -47,8 +47,8 @@ export default async function StaffPage({
     }
     return (
       <main className="page">
-        <div className="page-heading"><p className="eyebrow">STAFF / 订单工作台</p><h1>未找到订单</h1></div>
-        <section className="card"><EmptyState title={`没有订单号 ${orderNumber}`}>请核对 ORD 订单号，或返回队列重新筛选。</EmptyState></section>
+        <div className="page-heading"><p className="eyebrow">STAFF / Order Workbench</p><h1>Order Not Found</h1></div>
+        <section className="card"><EmptyState title={`No order number ${orderNumber}`}>Please double-check the ORD order number, or go back to the queue and filter again.</EmptyState></section>
       </main>
     );
   }
@@ -60,22 +60,22 @@ export default async function StaffPage({
   return (
     <main className="page">
       <div className="page-heading">
-        <p className="eyebrow">STAFF / 订单履约</p>
-        <h1>订单工作台</h1>
-        <p className="subtitle">按状态处理履约队列。确认、拣货、发货、模拟物流与取消都由服务端独立校验状态与角色。</p>
+        <p className="eyebrow">STAFF / Order Fulfillment</p>
+        <h1>Order Workbench</h1>
+        <p className="subtitle">Work the fulfillment queue by status. Confirmation, picking, shipping, simulated logistics, and cancellation are all independently validated on the server for status and role.</p>
       </div>
 
       <section className="card" style={{ marginBottom: 24 }}>
-        <div className="card-head"><h2>按订单号精确查询</h2><span className="small muted">使用 ORD 单号</span></div>
+        <div className="card-head"><h2>Exact Lookup by Order Number</h2><span className="small muted">Uses the ORD number</span></div>
         <div className="card-body">
           <form className="inline-form" method="get" action="/staff">
             <div className="field" style={{ flex: 1 }}>
-              <label htmlFor="order-number">订单号</label>
+              <label htmlFor="order-number">Order number</label>
               <input id="order-number" name="orderNumber" placeholder="ORD-YYYYMMDD-XXXX" autoComplete="off" />
             </div>
-            <button className="primary" type="submit">查询订单</button>
+            <button className="primary" type="submit">Find Order</button>
           </form>
-          <p className="hint">也可以直接在下方队列中按状态筛选；待确认数量：{countByStatus.get("CREATED") ?? 0} 张。</p>
+          <p className="hint">You can also filter the queue below by status; awaiting confirmation: {countByStatus.get("CREATED") ?? 0}.</p>
         </div>
       </section>
 
@@ -83,35 +83,35 @@ export default async function StaffPage({
         <div className="toolbar">
           <form className="filters" method="get" action="/staff">
             <div className="field">
-              <label htmlFor="status-filter">状态筛选</label>
+              <label htmlFor="status-filter">Status filter</label>
               <select id="status-filter" name="status" defaultValue={status}>
                 {STATUS_FILTERS.map(item => (
                   <option key={item.value} value={item.value}>
-                    {item.label}{item.value ? `（${countByStatus.get(item.value as OrderStatus) ?? 0}）` : `（${result.total}）`}
+                    {item.label}{item.value ? ` (${countByStatus.get(item.value as OrderStatus) ?? 0})` : ` (${result.total})`}
                   </option>
                 ))}
               </select>
             </div>
-            <button className="primary" type="submit">筛选</button>
+            <button className="primary" type="submit">Filter</button>
           </form>
-          <span className="small muted">共 {result.total} 张订单</span>
+          <span className="small muted">{result.total} orders total</span>
         </div>
         {result.orders.length === 0 ? (
-          <EmptyState title="当前筛选没有订单">切换状态或使用订单号精确查询。</EmptyState>
+          <EmptyState title="No orders under the current filter">Switch the status or use the exact order-number lookup.</EmptyState>
         ) : (
-          <><p className="only-mobile">表格可左右滑动查看全部列。</p>
+          <><p className="only-mobile">Scroll the table horizontally to see all columns.</p>
           <div className="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th scope="col">订单号</th>
-                  <th scope="col">客户</th>
-                  <th scope="col">创建时间 (GMT+8)</th>
-                  <th scope="col">状态</th>
-                  <th scope="col" className="num">明细</th>
-                  <th scope="col" className="num">总额</th>
-                  <th scope="col">运单</th>
-                  <th scope="col">操作</th>
+                  <th scope="col">Order Number</th>
+                  <th scope="col">Customer</th>
+                  <th scope="col">Created At (GMT+8)</th>
+                  <th scope="col">Status</th>
+                  <th scope="col" className="num">Items</th>
+                  <th scope="col" className="num">Total</th>
+                  <th scope="col">Tracking Number</th>
+                  <th scope="col">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -124,7 +124,7 @@ export default async function StaffPage({
                     <td className="num">{order.itemCount}</td>
                     <td className="num"><Money cents={order.totalCents} /></td>
                     <td className="mono small">{order.trackingNumber ?? "—"}</td>
-                    <td><Link href={`/staff/orders/${order.id}`}>处理</Link></td>
+                    <td><Link href={`/staff/orders/${order.id}`}>Process</Link></td>
                   </tr>
                 ))}
               </tbody>

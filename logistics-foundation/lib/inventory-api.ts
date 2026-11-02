@@ -22,9 +22,9 @@ export interface InventoryQuery {
   sku?: string;
 }
 
-/** 库存含义固定为“可用库存”；预警严格 stock < threshold（等于阈值不报警）。 */
+/** Stock always means "available stock"; an alert requires strictly stock < threshold (equal to the threshold does not alert). */
 export async function queryInventory(db: PrismaClient, query: InventoryQuery) {
-  // Prisma 不支持列与列比较，读取后按 stock < lowStockThreshold 过滤。
+  // Prisma cannot compare two columns, so rows are read and then filtered by stock < lowStockThreshold.
   const all = await db.product.findMany({
     where: query.sku ? { sku: query.sku } : undefined,
     orderBy: { sku: "asc" },
@@ -119,7 +119,7 @@ export function createInventoryHandlers(db: PrismaClient) {
     }
   }
 
-  /** GET /api/v1/inventory/low-stock：独立预警区数据源。 */
+  /** GET /api/v1/inventory/low-stock: data source for the standalone alert panel. */
   async function listLowStock(req: Request): Promise<Response> {
     try {
       await requireSession(db, req, { roles: ["STAFF", "ADMIN"] });
@@ -136,25 +136,25 @@ export function createInventoryHandlers(db: PrismaClient) {
     }
   }
 
-  /** POST /api/v1/inventory/{productId}/replenish { quantity }：只能增量，不能覆盖。 */
+  /** POST /api/v1/inventory/{productId}/replenish { quantity }: increments only, never overwrites. */
   async function replenish(req: Request, productId: string): Promise<Response> {
     try {
       const { user } = await requireSession(db, req, { roles: ["STAFF"] });
-      if (!productId?.trim()) throw new HttpError(400, "INVALID_ARGUMENT", "请提供商品 ID");
+      if (!productId?.trim()) throw new HttpError(400, "INVALID_ARGUMENT", "Please provide the product ID");
       const body = await readJsonBody(req);
       const quantity = body.quantity;
       if (!Number.isSafeInteger(quantity) || (quantity as number) <= 0) {
-        throw new HttpError(400, "INVALID_ARGUMENT", "补货数量必须为正整数");
+        throw new HttpError(400, "INVALID_ARGUMENT", "The replenishment quantity must be a positive integer");
       }
       if ((quantity as number) > MAX_QUANTITY) {
-        throw new HttpError(400, "INVALID_ARGUMENT", `单次补货不得超过 ${MAX_QUANTITY} 件`);
+        throw new HttpError(400, "INVALID_ARGUMENT", `A single replenishment must not exceed ${MAX_QUANTITY} units`);
       }
       const amount = quantity as number;
       const result = await db.$transaction(async tx => {
         const existing = await tx.product.findUnique({ where: { id: productId } });
-        if (!existing) throw new HttpError(404, "PRODUCT_NOT_FOUND", "商品不存在");
+        if (!existing) throw new HttpError(404, "PRODUCT_NOT_FOUND", "Product not found");
         if (existing.stock + amount > 2147483647) {
-          throw new HttpError(400, "INVALID_ARGUMENT", "库存超出允许范围");
+          throw new HttpError(400, "INVALID_ARGUMENT", "Stock is out of the allowed range");
         }
         const product = await tx.product.update({
           where: { id: productId },

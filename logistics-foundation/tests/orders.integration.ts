@@ -4,7 +4,7 @@ import type { Prisma } from "@prisma/client";
 import { apiRequest, createTestDatabase, createUsers, expectApiError } from "./harness";
 import { createOrderHandlers } from "../lib/order-api";
 
-// 确认/状态机/权限：业务断言沿用基线，只把“演示邮箱头”换成真实会话。
+// Confirmation / state machine / permissions: business assertions follow the baseline; only the demo email header is replaced with a real session.
 test("Order confirmation and status / real isolated SQLite", { timeout: 180000 }, async t => {
   const { db, peer, dispose } = await createTestDatabase("order-confirm");
   try {
@@ -154,7 +154,7 @@ test("Order confirmation and status / real isolated SQLite", { timeout: 180000 }
       assert.equal(after.logs[0].actorId, users.staff.id);
       await expectApiError(await patch(base.id, { to: "CONFIRMED" }), 409, "INVALID_STATE_TRANSITION");
       assert.deepEqual(await snapshot(base.id, [baseProduct.id]), after);
-      // 确认产生了站内通知（P1-A），且不重复。
+      // Confirmation produces one in-app notification (P1-A), never duplicated.
       const notes = await db.notification.findMany({ where: { orderId: base.id } });
       assert.equal(notes.length, 1);
       assert.equal(notes[0].type, "ORDER_CONFIRMED");
@@ -265,7 +265,7 @@ test("Order confirmation and status / real isolated SQLite", { timeout: 180000 }
       const after = await snapshot(order.id, [p.id]);
       assert.equal(after.products[0].stock, 7);
       assert.equal(after.logs.length, 1);
-      // 并发确认不应产生两条通知。
+      // Concurrent confirmations must not produce two notifications.
       assert.equal(await db.notification.count({ where: { orderId: order.id, type: "ORDER_CONFIRMED" } }), 1);
     });
 

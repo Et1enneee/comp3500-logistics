@@ -8,7 +8,7 @@ export interface NotificationQuery {
   unreadOnly: boolean;
 }
 
-/** 站内通知查询：只返回本人记录；页面与 API 共用。 */
+/** In-app notification query: returns only the user's own records; shared by the page and the API. */
 export async function queryNotifications(db: PrismaClient, userId: string, query: NotificationQuery) {
   const where = { userId, ...(query.unreadOnly ? { read: false } : {}) };
   const skip = (query.page - 1) * query.pageSize;
@@ -62,13 +62,13 @@ export function createNotificationHandlers(db: PrismaClient) {
     }
   }
 
-  /** POST /api/v1/notifications/{id}/read：他人通知与不存在同样 404。 */
+  /** POST /api/v1/notifications/{id}/read: someone else's notification and a missing one both return 404. */
   async function markRead(req: Request, id: string): Promise<Response> {
     try {
       const { user } = await requireSession(db, req, { roles: ["CUSTOMER"] });
-      if (!id?.trim()) throw new HttpError(400, "INVALID_ARGUMENT", "请提供通知 ID");
+      if (!id?.trim()) throw new HttpError(400, "INVALID_ARGUMENT", "Please provide the notification ID");
       const updated = await db.notification.updateMany({ where: { id, userId: user.id }, data: { read: true } });
-      if (updated.count !== 1) throw new HttpError(404, "NOTIFICATION_NOT_FOUND", "通知不存在");
+      if (updated.count !== 1) throw new HttpError(404, "NOTIFICATION_NOT_FOUND", "Notification not found");
       const unreadCount = await db.notification.count({ where: { userId: user.id, read: false } });
       return Response.json({ ok: true, unreadCount });
     } catch (error) {

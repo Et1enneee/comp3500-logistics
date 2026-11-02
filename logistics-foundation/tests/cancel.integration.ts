@@ -4,7 +4,7 @@ import type { Prisma } from "@prisma/client";
 import { apiRequest, createTestDatabase, createUsers, expectApiError } from "./harness";
 import { createOrderHandlers } from "../lib/order-api";
 
-// 取消与一次性库存释放（P0-D）。
+// Cancellation and one-shot stock release (P0-D).
 test("Cancellation semantics / real isolated SQLite", { timeout: 180000 }, async t => {
   const { db, peer, dispose } = await createTestDatabase("cancel");
   try {
@@ -69,10 +69,10 @@ test("Cancellation semantics / real isolated SQLite", { timeout: 180000 }, async
       const releases = await db.inventoryLog.findMany({
         where: { orderId: order.id, reason: "ORDER_CANCEL_RELEASE" }, orderBy: { delta: "desc" },
       });
-      assert.equal(releases.length, 2, "同 SKU 先汇总：两条明细合成一条释放流水");
+      assert.equal(releases.length, 2, "same SKU aggregated first: two lines merge into one release log");
       assert.deepEqual(releases.map(log => log.delta), [3, 3]);
       assert.ok(releases.every(log => log.actorId === users.customerA.id));
-      // 原有确认负流水保留，不删除
+      // The original confirmation deduction logs are kept, not deleted.
       assert.equal(await db.inventoryLog.count({ where: { orderId: order.id, reason: "ORDER_CONFIRM" } }), 2);
     });
 
@@ -124,10 +124,10 @@ test("Cancellation semantics / real isolated SQLite", { timeout: 180000 }, async
       const finalStatus = (await db.order.findUniqueOrThrow({ where: { id: order.id } })).status;
       const stock = await stockOf(p.id);
       if (finalStatus === "CANCELLED") {
-        assert.equal(stock, 10, "取消成功必须回补库存");
+        assert.equal(stock, 10, "a successful cancellation must restore the reserved stock");
       } else {
         assert.equal(finalStatus, "PICKING");
-        assert.equal(stock, 8, "拣货成功则库存保持已预占");
+        assert.equal(stock, 8, "if picking wins, the stock stays reserved");
         assert.equal(await db.inventoryLog.count({ where: { orderId: order.id, reason: "ORDER_CANCEL_RELEASE" } }), 0);
       }
     });
@@ -156,7 +156,7 @@ test("Cancellation semantics / real isolated SQLite", { timeout: 180000 }, async
       const data = await expectApiError(response, 404, "ORDER_NOT_FOUND");
       assert.equal(JSON.stringify(data).includes(order.orderNumber), false);
       assert.equal((await db.order.findUniqueOrThrow({ where: { id: order.id } })).status, "CREATED");
-      // 也不产生任何通知泄露
+      // And no notification is leaked either.
       assert.equal(await db.notification.count({ where: { orderId: order.id } }), 0);
     });
 
@@ -227,7 +227,7 @@ test("Cancellation semantics / real isolated SQLite", { timeout: 180000 }, async
         order.id,
       );
       await expectApiError(response, 500, "INTERNAL_ERROR");
-      assert.equal(await stockOf(a.id), before.a, "第一条商品回补也必须回滚");
+      assert.equal(await stockOf(a.id), before.a, "the restore of the first product must also roll back");
       assert.equal(await stockOf(b.id), before.b);
       assert.equal(await db.inventoryLog.count({ where: { orderId: order.id } }), before.logs);
       assert.equal((await db.order.findUniqueOrThrow({ where: { id: order.id } })).status, before.status);

@@ -21,7 +21,7 @@ jobs:
       run:
         working-directory: logistics-foundation
     env:
-      # 测试用固定非生产演示口令；CI 不使用真实 secret。
+      # Fixed non-production demo password for tests; CI does not use real secrets.
       DEMO_PASSWORD: Demo1234!
     steps:
       - uses: actions/checkout@v4

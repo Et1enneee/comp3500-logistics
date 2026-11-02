@@ -16,10 +16,10 @@ export interface TestDatabase {
 }
 
 /**
- * 每个测试文件使用独立临时 SQLite：
- * - 绝不连接项目 dev.db；
- * - schema 从 prisma/schema.prisma 复制并把 url 换成临时文件，
- *   保证“测试用的就是交付的 schema”。
+ * Every test file uses its own temporary SQLite database:
+ * - it never connects to the project's dev.db;
+ * - the schema is copied from prisma/schema.prisma with the url swapped to the temp file,
+ *   guaranteeing "what the tests run against is exactly the delivered schema".
  */
 export async function createTestDatabase(prefix: string): Promise<TestDatabase> {
   const directory = await mkdtemp(join(tmpdir(), `${prefix}-`));
@@ -59,7 +59,7 @@ export interface TestSession {
   token: string;
 }
 
-/** 直接在数据库里建会话（登录流程本身在 auth 测试里覆盖 http 层）。 */
+/** Creates sessions directly in the database (the login flow itself is covered at the http layer in the auth tests). */
 export async function createTestSession(db: PrismaClient, userId: string, options: { expiresAt?: Date } = {}): Promise<TestSession> {
   const token = randomUUID();
   const csrf = randomUUID();
@@ -114,13 +114,13 @@ export interface FixtureUsers {
   admin: { id: string; email: string; session: TestSession };
 }
 
-/** 四个角色账号 + 会话；密码哈希用生产同一实现。 */
+/** Four role accounts + sessions; password hashing uses the same implementation as production. */
 export async function createUsers(db: PrismaClient): Promise<FixtureUsers> {
   const passwordHash = hashPassword("Demo1234!");
-  const customerA = await db.user.create({ data: { email: "a@test.local", name: "客户A", passwordHash, role: "CUSTOMER" } });
-  const customerB = await db.user.create({ data: { email: "b@test.local", name: "客户B", passwordHash, role: "CUSTOMER" } });
-  const staff = await db.user.create({ data: { email: "staff@test.local", name: "员工", passwordHash, role: "STAFF" } });
-  const admin = await db.user.create({ data: { email: "admin@test.local", name: "管理员", passwordHash, role: "ADMIN" } });
+  const customerA = await db.user.create({ data: { email: "a@test.local", name: "Customer A", passwordHash, role: "CUSTOMER" } });
+  const customerB = await db.user.create({ data: { email: "b@test.local", name: "Customer B", passwordHash, role: "CUSTOMER" } });
+  const staff = await db.user.create({ data: { email: "staff@test.local", name: "Staff", passwordHash, role: "STAFF" } });
+  const admin = await db.user.create({ data: { email: "admin@test.local", name: "Admin", passwordHash, role: "ADMIN" } });
   return {
     customerA: { ...customerA, session: await createTestSession(db, customerA.id) },
     customerB: { ...customerB, session: await createTestSession(db, customerB.id) },

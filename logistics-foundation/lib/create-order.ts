@@ -3,8 +3,8 @@ import { failure, HttpError, readJsonBody, requireSession } from "@/lib/http";
 
 /**
  * POST /api/v1/orders
- * 身份来自服务端会话，不信任 POST 里的 email/customerId。
- * 创建只校验可用库存并写 CREATED，不扣库存、不写流水。
+ * Identity comes from the server-side session; email/customerId in the POST body is never trusted.
+ * Creation only validates available stock and writes CREATED — no stock deduction, no ledger entry.
  */
 export function createOrderPost(db: PrismaClient) {
   return async function POST(req: Request): Promise<Response> {
@@ -13,17 +13,17 @@ export function createOrderPost(db: PrismaClient) {
       const body = await readJsonBody(req);
       const rawItems = body.items;
       if (!Array.isArray(rawItems) || rawItems.length === 0 || rawItems.length > 100) {
-        throw new HttpError(400, "INVALID_ARGUMENT", "请提供 1–100 条有效商品明细");
+        throw new HttpError(400, "INVALID_ARGUMENT", "Please provide 1–100 valid order item lines");
       }
-      // 兼容旧客户端字段：若仍传 email，必须与会话一致，不能替别人下单。
+      // Legacy client compatibility: if email is still sent, it must match the session — no ordering on behalf of others.
       if ("email" in body) {
         const email = body.email;
         if (typeof email !== "string" || email.trim().toLowerCase() !== user.email.toLowerCase()) {
-          throw new HttpError(403, "FORBIDDEN", "请求中的客户邮箱与会话身份不一致");
+          throw new HttpError(403, "FORBIDDEN", "The customer email in the request does not match the session identity");
         }
       }
       if ("customerId" in body && body.customerId !== user.id) {
-        throw new HttpError(403, "FORBIDDEN", "请求中的客户 ID 与会话身份不一致");
+        throw new HttpError(403, "FORBIDDEN", "The customer ID in the request does not match the session identity");
       }
 
       const quantities = new Map<string, number>();
@@ -35,13 +35,13 @@ export function createOrderPost(db: PrismaClient) {
           !Number.isSafeInteger((item as { quantity?: unknown }).quantity) ||
           (item as { quantity: number }).quantity <= 0
         ) {
-          throw new HttpError(400, "INVALID_ARGUMENT", "每条明细须包含商品 SKU 和正整数数量");
+          throw new HttpError(400, "INVALID_ARGUMENT", "Each item line must contain a product SKU and a positive integer quantity");
         }
         const entry = item as { sku: string; quantity: number };
         const sku = entry.sku.trim();
         const total = (quantities.get(sku) ?? 0) + entry.quantity;
         if (!Number.isSafeInteger(total) || total > 2147483647) {
-          throw new HttpError(400, "INVALID_ARGUMENT", "商品数量超出允许范围");
+          throw new HttpError(400, "INVALID_ARGUMENT", "The product quantity is out of the allowed range");
         }
         quantities.set(sku, total);
       }
@@ -54,21 +54,21 @@ export function createOrderPost(db: PrismaClient) {
             const lines: { productId: string; quantity: number; unitPriceCents: number }[] = [];
             for (const [sku, quantity] of quantities) {
               const product = products.find(candidate => candidate.sku === sku);
-              if (!product) throw new HttpError(400, `SKU_NOT_FOUND_${sku}`, `商品 ${sku} 不存在`);
+              if (!product) throw new HttpError(400, `SKU_NOT_FOUND_${sku}`, `Product ${sku} does not exist`);
               if (product.stock < quantity) {
                 throw new HttpError(
                   400,
                   `INSUFFICIENT_STOCK_${sku}`,
-                  `${product.name}（${sku}）可用库存为 ${product.stock}，不足 ${quantity} 件。请减少数量后重试。`,
+                  `${product.name} (${sku}) has only ${product.stock} available stock, which is less than ${quantity}. Please reduce the quantity and try again.`,
                 );
               }
               totalCents += product.priceCents * quantity;
               if (!Number.isSafeInteger(totalCents) || totalCents > 2147483647) {
-                throw new HttpError(400, "INVALID_ARGUMENT", "订单金额超出允许范围");
+                throw new HttpError(400, "INVALID_ARGUMENT", "The order amount is out of the allowed range");
               }
               lines.push({ productId: product.id, quantity, unitPriceCents: product.priceCents });
             }
-            // 保留既有 UTC 编号日历口径；每天 4 位序号。
+            // Keep the existing UTC calendar-day numbering; 4-digit sequence per day.
             const today = new Date().toISOString().slice(0, 10).replaceAll("-", "");
             const prefix = `ORD-${today}-`;
             const latest = await tx.order.findFirst({
@@ -78,7 +78,7 @@ export function createOrderPost(db: PrismaClient) {
             });
             const sequence = latest ? Number(latest.orderNumber.slice(prefix.length)) + 1 : 1;
             if (!Number.isInteger(sequence) || sequence > 9999) {
-              throw new HttpError(503, "TEMPORARILY_UNAVAILABLE", "当日订单编号不可分配，请联系负责人");
+              throw new HttpError(503, "TEMPORARILY_UNAVAILABLE", "No order number can be allocated for today; please contact the project owner");
             }
             return tx.order.create({
               data: {

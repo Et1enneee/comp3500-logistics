@@ -1,24 +1,24 @@
 # Group 42 · Logistics Management System v0.4.2
 
-唯一应用位于 `logistics-foundation/`，根目录转发全部运行、测试和证据命令。沿用 v0.3.1 底座、Next.js / React / TypeScript / Prisma 6 / SQLite 与既有锁文件。
+The sole application lives in `logistics-foundation/`; the root directory forwards all run, test, and evidence commands. It keeps the v0.3.1 foundation, Next.js / React / TypeScript / Prisma 6 / SQLite, and the existing lockfile.
 
-## 启动（Node 24，本轮验证 24.22.2）
+## Startup (Node 24; verified this round on 24.22.2)
 
 ```bash
 npm run setup
 npm run db:setup
-# 仅全新或可丢弃演示库；此命令会删除该库原数据：
+# Only for a brand-new or disposable demo database; this command deletes existing data in that database:
 RESET_DEMO_DATA=YES npm run db:seed:demo
 npm run dev:local
 ```
 
-打开 http://127.0.0.1:3000 。旧库仅运行迁移；需升级旧演示密码时使用 `RESET_PASSWORDS=YES npm run db:reset-passwords`，保留订单/库存。Windows 环境变量写法见应用 README。
+Open http://127.0.0.1:3000. Existing databases only run migrations; to upgrade legacy demo passwords use `RESET_PASSWORDS=YES npm run db:reset-passwords`, which preserves orders and inventory. For Windows environment-variable syntax see the application README.
 
-## 当前能力
+## Current Capabilities
 
-真实登录/退出、持久会话与客户对象隔离；客户商品目录/下单/我的订单/物流追踪/取消；员工确认、拣货、发货及模拟揽收/签收；确认后取消一次释放库存；库存预警/补货/流水；站内通知；ADMIN 只读报表与 CSV。默认演示账号与密码配置见应用 README。本地模拟物流，无真实支付或承运商接入。
+Real login/logout with persistent sessions and per-customer object isolation; customer catalog, order placement, my orders, shipment tracking, and cancellation; staff confirmation, picking, shipping, and simulated pickup/delivery; a single cancellation after confirmation releases reserved stock; inventory alerts, replenishment, and stock ledger; in-app notifications; ADMIN read-only reports with CSV export. Default demo accounts and password configuration are documented in the application README. Logistics is simulated locally; there is no real payment or carrier integration.
 
-## 检查与隔离证据
+## Checks and Isolated Evidence
 
 ```bash
 npm run typecheck
@@ -28,21 +28,21 @@ npm run test:delivery
 npm run verify:migration
 npm run lint
 npm run build
-# 源码修改后先重建清单，再生成本轮证据：
+# Rebuild the manifest first after source changes, then generate this round's evidence:
 npm run baseline
-# 显式确认后，仅在独立临时源码副本中安装、迁移和重建可丢弃数据库：
+# After explicit confirmation, installs, migrates, and rebuilds a disposable database only in a separate temporary source copy:
 RESET_DEMO_DATA=YES npm run evidence
 ```
 
-`evidence` 不使用原项目数据库。输出默认在应用上一级 `evidence/`，可用 `EVIDENCE_ROOT` 指定。低层 `test:browser` 会修改它所连接的演示库；推荐使用完整隔离证据入口。服务启动、就绪检查、性能与浏览器检查、重启验证、服务清理由证据流程管理。
+`evidence` does not touch the original project database. Output defaults to `evidence/` one level above the application and can be redirected with `EVIDENCE_ROOT`. The lower-level `test:browser` mutates the demo database it connects to; prefer the fully isolated evidence entry point. Service startup, readiness checks, performance and browser checks, restart verification, and service teardown are managed by the evidence pipeline.
 
-当前 CI 在 `.github/workflows/ci.yml`；性能与浏览器检查共享同一个服务生命周期。远端运行仍需上传后查看实际 Actions，交付包仅声明本地实测。
+The current CI lives in `.github/workflows/ci.yml`; performance and browser checks share the same service lifecycle. Running it remotely still requires uploading and checking the actual Actions run; the delivery package only claims locally verified results.
 
-## 阅读入口
+## Reading Entry Points
 
-- `logistics-foundation/README.md`：账号、业务规则和运行步骤。
-- `logistics-foundation/docs/known-issues.md`：依赖审计、SQLite、可用性与测试边界。
-- `logistics-foundation/docs/contracts/`、`docs/traceability.md`：接口与需求追踪。
-- `logistics-foundation/docs/reference/legacy/`：历史材料，不代表当前能力。
+- `logistics-foundation/README.md`: accounts, business rules, and run steps.
+- `logistics-foundation/docs/known-issues.md`: dependency audit, SQLite, availability, and testing boundaries.
+- `logistics-foundation/docs/contracts/` and `docs/traceability.md`: interfaces and requirements traceability.
+- `logistics-foundation/docs/reference/legacy/`: historical material, not a statement of current capabilities.
 
-交付源码排除依赖、构建缓存、数据库、真实环境变量和旧证据；交付包中的 `evidence/results.json`、`delivery.json` 与 `SHA256SUMS.txt` 用于核对本轮源码和证据。课程报告、演示材料与正式提交记录仍由团队另行管理。
+The delivered source excludes dependencies, build caches, databases, real environment variables, and past evidence; `evidence/results.json`, `delivery.json`, and `SHA256SUMS.txt` in the delivery package are used to verify this round's source and evidence. The course report, demo materials, and official submission records remain managed separately by the team.

@@ -28,9 +28,10 @@ export interface ReportRange {
 }
 
 /**
- * ADMIN 运营看板（P1-B）：全部来自数据库聚合。
- * 口径：按订单 createdAt 归属 GMT+8 自然日；起始含、结束日次日 00:00 不含。
- * 金额只称“订单金额”，本项目没有支付，不能叫“已收款”。
+ * ADMIN operations dashboard (P1-B): everything comes from database aggregates.
+ * Convention: orders are attributed to GMT+8 calendar days by createdAt; the start day is inclusive,
+ * and the day after the end date's 00:00 is exclusive.
+ * Amounts are called "order amounts" only — this project has no payments, so never "collected revenue".
  */
 export async function computeOverview(db: PrismaClient, range: ReportRange): Promise<ReportOverview> {
   const orders = await db.order.findMany({
@@ -66,7 +67,7 @@ export async function computeOverview(db: PrismaClient, range: ReportRange): Pro
     orders: { count: orders.length, byStatus, nonCancelledAmountCents, deliveredAmountCents },
     inventory: {
       lowStockSkuCount: products.filter(product => product.stock < product.lowStockThreshold).length,
-      note: "当前库存快照，不随订单日期过滤",
+      note: "Current inventory snapshot; not filtered by order date",
       timezone: TIMEZONE_LABEL,
     },
     daily: [...perDay.entries()].map(([date, value]) => ({ date, ...value })),
@@ -80,7 +81,7 @@ export function resolveRangeOrThrow(from: string | null, to: string | null): Rep
   return parseReportParams(params);
 }
 
-/** CSV 单元格：转义引号并阻断 = + - @ 开头的公式注入。 */
+/** CSV cell: escapes quotes and blocks formula injection starting with = + - @. */
 export function csvCell(value: string): string {
   let text = value;
   if (/^[=+\-@\t\r]/.test(text)) text = "'" + text;
@@ -100,7 +101,7 @@ export function createReportHandlers(db: PrismaClient) {
     }
   }
 
-  /** CSV 导出：与当前筛选一致；不含密码或多余个人资料。 */
+  /** CSV export: matches the current filter; contains no passwords or extra personal data. */
   async function exportCsv(req: Request): Promise<Response> {
     try {
       await requireSession(db, req, { roles: ["ADMIN"] });

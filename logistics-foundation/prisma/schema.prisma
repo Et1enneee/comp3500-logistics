@@ -36,7 +36,7 @@ model User {
   inventoryLogs InventoryLog[]
 }
 
-// 真实登录会话：数据库只保存 token 的 SHA-256，原始 token 仅在浏览器 HttpOnly Cookie 中。
+// Real sign-in sessions: the database stores only the SHA-256 of the token; the raw token lives only in the browser's HttpOnly cookie.
 model Session {
   id        String   @id @default(cuid())
   tokenHash String   @unique
@@ -127,7 +127,7 @@ model Notification {
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  // 同一订单同一事件只允许一条通知：重复/并发请求不会多发。
+  // At most one notification per order per event type: duplicate/concurrent requests never notify twice.
   @@unique([orderId, type])
   @@index([userId, read])
   @@index([userId, createdAt])

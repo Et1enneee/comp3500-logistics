@@ -7,11 +7,11 @@ import { PrismaClient } from "@prisma/client";
 import { createAuthHandlers } from "../lib/auth-api";
 
 /**
- * 迁移保留数据校验（P0-F）：
- * 1) 只应用 v0.3.1 第一版迁移，写入“旧库”用户/订单/库存/流水/通知；
- * 2) 追加 v0.4.0 迁移并再次 deploy；
- * 3) 断言旧数据一条不少、新表/新列就位、历史行不被编造操作人；
- * 4) 旧 demo 哈希在真实登录下失效；用 reset-demo-passwords 工具升级后可用，且订单仍在。
+ * Migration data-preservation verification (P0-F):
+ * 1) Apply only the first v0.3.1 migration, then insert "legacy database" users/orders/inventory/ledger/notifications;
+ * 2) Add the v0.4.0 migration and deploy again;
+ * 3) Assert every legacy row survives, the new tables/columns are in place, and historical rows get no fabricated operator;
+ * 4) The legacy demo hash fails real login; after upgrading it with the reset-demo-passwords tool it works, and the order is still there.
  */
 
 const require = createRequire(resolve("package.json"));
@@ -34,7 +34,7 @@ async function main() {
     await mkdir(join(prismaDir, "migrations"), { recursive: true });
     const schemaSource = await readFile(resolve("prisma/schema.prisma"), "utf8");
     const schema = schemaSource.replace(/url\s*=\s*"file:\.\/dev\.db"/, 'url = env("ORDER_TEST_DATABASE_URL")');
-    if (schema === schemaSource) throw new Error("未能替换 schema 数据源，拒绝继续");
+    if (schema === schemaSource) throw new Error("Failed to replace the schema datasource; refusing to continue");
     await writeFile(join(prismaDir, "schema.prisma"), schema);
     await cp(resolve("prisma/migrations", legacyMigration), join(prismaDir, "migrations", legacyMigration), { recursive: true });
     await writeFile(
@@ -53,11 +53,11 @@ async function main() {
     const legacy = new PrismaClient({ datasources: { db: { url: dbUrl } } });
     await legacy.$connect();
     const customer = await legacy.user.create({
-      data: { email: "customer.a@demo.com", name: "旧客户", passwordHash: "demo", role: "CUSTOMER" },
+      data: { email: "customer.a@demo.com", name: "Legacy Customer", passwordHash: "demo", role: "CUSTOMER" },
     });
-    await legacy.user.create({ data: { email: "staff@demo.com", name: "旧员工", passwordHash: "demo", role: "STAFF" } });
+    await legacy.user.create({ data: { email: "staff@demo.com", name: "Legacy Staff", passwordHash: "demo", role: "STAFF" } });
     const product = await legacy.product.create({
-      data: { sku: "SKU001", name: "矿泉水 500ml", priceCents: 150, stock: 97, lowStockThreshold: 20 },
+      data: { sku: "SKU001", name: "Mineral Water 500ml", priceCents: 150, stock: 97, lowStockThreshold: 20 },
     });
     const order = await legacy.order.create({
       data: {
@@ -65,12 +65,12 @@ async function main() {
         items: { create: [{ productId: product.id, quantity: 3, unitPriceCents: 150 }] },
       },
     });
-    // 旧库没有新增列：用 createMany 写入，避免 Prisma 回读 v0.4 才有的列。
+    // The legacy schema lacks the new columns: use createMany so Prisma does not read back v0.4-only columns.
     await legacy.inventoryLog.createMany({
       data: [{ productId: product.id, orderId: order.id, delta: -3, reason: "ORDER_CONFIRM" }],
     });
     await legacy.notification.createMany({
-      data: [{ userId: customer.id, type: "LEGACY_NOTE", content: "历史通知" }],
+      data: [{ userId: customer.id, type: "LEGACY_NOTE", content: "Legacy notification" }],
     });
     await legacy.$disconnect();
 
@@ -89,11 +89,11 @@ async function main() {
     const legacyNote = await migrated.notification.findFirstOrThrow({ where: { type: "LEGACY_NOTE" } });
     const legacyOrder = await migrated.order.findUniqueOrThrow({ where: { orderNumber: "ORD-20261001-0001" } });
     if (ordersAfter !== 1 || itemsAfter !== 1 || logsAfter !== 1 || productsAfter !== 1 || notificationsAfter !== 1) {
-      throw new Error(`旧数据数量不符: orders=${ordersAfter} items=${itemsAfter} logs=${logsAfter} products=${productsAfter} notifications=${notificationsAfter}`);
+      throw new Error(`Legacy row counts mismatch: orders=${ordersAfter} items=${itemsAfter} logs=${logsAfter} products=${productsAfter} notifications=${notificationsAfter}`);
     }
-    if (legacyOrder.status !== "CONFIRMED" || legacyOrder.totalCents !== 450) throw new Error("旧订单字段被改变");
-    if (legacyLog.actorId !== null) throw new Error("新列 actorId 应为 null，而不是凭空编造操作人");
-    if (legacyNote.orderId !== null) throw new Error("历史通知不应被绑定到订单");
+    if (legacyOrder.status !== "CONFIRMED" || legacyOrder.totalCents !== 450) throw new Error("Legacy order fields were changed");
+    if (legacyLog.actorId !== null) throw new Error("The new actorId column must be null, not a fabricated operator");
+    if (legacyNote.orderId !== null) throw new Error("The legacy notification must not be bound to an order");
     record("existing orders, stock, ledger and notifications preserved", {
       orders: ordersAfter, items: itemsAfter, logs: logsAfter, products: productsAfter, notifications: notificationsAfter,
     });
@@ -102,12 +102,12 @@ async function main() {
       SELECT name FROM sqlite_master WHERE type='table' ORDER BY name`;
     const tableNames = tables.map(row => row.name);
     for (const table of ["Session", "Notification", "InventoryLog"]) {
-      if (!tableNames.includes(table)) throw new Error(`缺少表 ${table}`);
+      if (!tableNames.includes(table)) throw new Error(`Missing table ${table}`);
     }
     const sessionColumns = await migrated.$queryRaw<{ name: string }[]>`PRAGMA table_info("Session")`;
     const columnNames = sessionColumns.map(row => row.name);
     for (const column of ["tokenHash", "csrfToken", "expiresAt"]) {
-      if (!columnNames.includes(column)) throw new Error(`Session 缺少列 ${column}`);
+      if (!columnNames.includes(column)) throw new Error(`Session is missing column ${column}`);
     }
     record("new tables and columns exist after migration", { tables: tableNames.filter(name => ["Session", "Notification", "InventoryLog"].includes(name)) });
 
@@ -118,7 +118,7 @@ async function main() {
       body: JSON.stringify({ email: "customer.a@demo.com", password: "Demo1234!" }),
     });
     const beforeReset = await auth.login(loginRequest());
-    if (beforeReset.status !== 401) throw new Error(`旧 demo 哈希不应能登录，实际 ${beforeReset.status}`);
+    if (beforeReset.status !== 401) throw new Error(`The legacy demo hash must not be able to log in, got ${beforeReset.status}`);
     record("legacy demo password hash is rejected by real login", { status: beforeReset.status });
 
     execFileSync(process.execPath, [tsxCli, resolve("scripts/reset-demo-passwords.ts")], {
@@ -127,9 +127,9 @@ async function main() {
       timeout: 120000,
     });
     const afterReset = await auth.login(loginRequest());
-    if (afterReset.status !== 200) throw new Error(`重设密码后登录应成功，实际 ${afterReset.status}`);
+    if (afterReset.status !== 200) throw new Error(`Login should succeed after the password reset, got ${afterReset.status}`);
     const ordersStillThere = await migrated.order.count();
-    if (ordersStillThere !== 1) throw new Error("重设密码不应删除订单");
+    if (ordersStillThere !== 1) throw new Error("The password reset must not delete orders");
     record("reset-passwords tool upgrades hash without deleting data", {
       loginStatus: afterReset.status, ordersAfterReset: ordersStillThere,
     });
@@ -141,7 +141,7 @@ async function main() {
       resolve(reportPath),
       JSON.stringify({ ok: true, checkedAt: new Date().toISOString(), checks }, null, 2),
     );
-    console.log("迁移保留数据校验通过");
+    console.log("Migration data-preservation verification passed");
   } finally {
     await rm(directory, { recursive: true, force: true });
   }

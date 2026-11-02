@@ -13,7 +13,7 @@ test("ADMIN reports & CSV / real isolated SQLite", { timeout: 180000 }, async t 
     const product = await db.product.create({ data: { sku: "SKU001", name: "Water", priceCents: 100, stock: 1000, lowStockThreshold: 5 } });
     let serial = 0;
 
-    /** 直接写订单并指定 createdAt，用于精确核对 GMT+8 分日边界。 */
+    /** Insert an order directly with an explicit createdAt, to verify GMT+8 day boundaries precisely. */
     async function insertOrder(options: {
       status: string; totalCents: number; createdAt: Date; customerId?: string; orderNumber?: string;
     }) {
@@ -80,7 +80,7 @@ test("ADMIN reports & CSV / real isolated SQLite", { timeout: 180000 }, async t 
     await t.test("multi-day range fills zero days and sums per day", async () => {
       const report = await computeOverview(db, resolveRangeOrThrow("2026-02-28", "2026-03-02"));
       assert.deepEqual(report.daily.map(day => day.date), ["2026-02-28", "2026-03-01", "2026-03-02"]);
-      // 2026-02-28 23:59:59.999 GMT+8 的边界样本应归入 02-28（前一个测试插入）
+      // The boundary sample at 2026-02-28 23:59:59.999 GMT+8 belongs to 02-28 (inserted by the previous test).
       assert.equal(report.daily[0].count, 1);
       assert.equal(report.daily[1].count, 3);
       assert.equal(report.daily[1].cancelledCount, 1);
@@ -114,7 +114,7 @@ test("ADMIN reports & CSV / real isolated SQLite", { timeout: 180000 }, async t 
       const two = await computeOverview(db, resolveRangeOrThrow("2025-01-01", "2025-01-01"));
       assert.equal(one.inventory.lowStockSkuCount, 1);
       assert.equal(two.inventory.lowStockSkuCount, 1);
-      assert.match(one.inventory.note, /不随订单日期过滤/);
+      assert.match(one.inventory.note, /not filtered by order date/);
     });
 
     await t.test("pagination of order lists does not change report totals", async () => {
@@ -158,12 +158,12 @@ test("ADMIN reports & CSV / real isolated SQLite", { timeout: 180000 }, async t 
       assert.match(response.headers.get("content-type") ?? "", /text\/csv/);
       assert.match(response.headers.get("content-disposition") ?? "", /attachment/);
       const bytes = new Uint8Array(await response.clone().arrayBuffer());
-      assert.deepEqual([...bytes.slice(0, 3)], [0xef, 0xbb, 0xbf], "Excel 需要 UTF-8 BOM");
+      assert.deepEqual([...bytes.slice(0, 3)], [0xef, 0xbb, 0xbf], "Excel requires a UTF-8 BOM");
       const text = await response.text();
       const lines = text.replace(/^\uFEFF/, "").trim().split("\r\n");
       assert.equal(lines[0], "orderNumber,createdAtGmt8,timezone,status,statusLabel,totalCents,totalYuan");
-      assert.equal(lines.length, 4, "表头 + 3 张订单");
-      assert.ok(text.includes("ORD-R-0001,2026-03-01 00:00:00,GMT+8,DELIVERED,已签收,1000,10.00"));
+      assert.equal(lines.length, 4, "header + 3 orders");
+      assert.ok(text.includes("ORD-R-0001,2026-03-01 00:00:00,GMT+8,DELIVERED,Delivered,1000,10.00"));
       assert.equal(text.includes(users.customerA.email), false);
       assert.equal(text.includes("customer"), false);
       assert.equal(text.toLowerCase().includes("password"), false);

@@ -13,22 +13,22 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
     <main className="page">
       <div className="login-shell">
         <div className="page-heading">
-          <p className="eyebrow">登录</p>
-          <h1>进入物流工作台</h1>
-          <p className="subtitle">客户下单与自助追踪；员工履约与库存；管理员只读运营报表。身份与权限全部由服务端会话判定。</p>
+          <p className="eyebrow">Sign In</p>
+          <h1>Enter the Logistics Workspace</h1>
+          <p className="subtitle">Customers place orders and track them; staff fulfill orders and manage inventory; administrators get read-only operations reports. Identity and permissions are determined entirely by the server-side session.</p>
         </div>
         <section className="card login-card">
           <div className="card-body">
             <LoginForm nextPath={nextPath} />
             <div className="login-help">
-              <strong>本地演示账号</strong>
+              <strong>Local demo accounts</strong>
               <ul>
-                <li>customer.a@demo.com · 演示客户 A</li>
-                <li>customer.b@demo.com · 演示客户 B</li>
-                <li>staff@demo.com · 演示员工</li>
-                <li>admin@demo.com · 演示管理员（只读）</li>
+                <li>customer.a@demo.com · Demo Customer A</li>
+                <li>customer.b@demo.com · Demo Customer B</li>
+                <li>staff@demo.com · Demo Staff</li>
+                <li>admin@demo.com · Demo Administrator (read-only)</li>
               </ul>
-              <p style={{ marginTop: 12 }}>默认密码见项目 README 或执行 seed 时的输出（由 DEMO_PASSWORD 配置）。不同角色看到的入口不同。</p>
+              <p style={{ marginTop: 12 }}>The default password is documented in the project README and printed by the seed script (configurable via DEMO_PASSWORD). Each role lands on a different home page.</p>
             </div>
           </div>
         </section>

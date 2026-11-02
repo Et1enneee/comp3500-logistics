@@ -6,21 +6,21 @@ type Key = "CONFIRMED" | "PICKING" | "IN_TRANSIT" | "DELIVERED" | "CANCELLED";
 type Feedback = { kind: "success" | "error" | "info"; text: string } | null;
 
 const ACTION_LABEL: Record<Key, string> = {
-  CONFIRMED: "确认订单",
-  PICKING: "开始拣货",
-  IN_TRANSIT: "模拟揽收",
-  DELIVERED: "模拟签收",
-  CANCELLED: "取消订单（员工）",
+  CONFIRMED: "Confirm Order",
+  PICKING: "Start Picking",
+  IN_TRANSIT: "Simulate Pickup",
+  DELIVERED: "Simulate Delivery",
+  CANCELLED: "Cancel Order (Staff)",
 };
 
-/** 员工履约动作面板：每次操作后重新从服务器读取，不依赖本地状态推断。 */
+/** Staff fulfillment action panel: re-reads from the server after every action; never infers from local state. */
 export default function StaffActions({ orderId, orderNumber, status, csrfToken }: {
   orderId: string; orderNumber: string; status: string; csrfToken: string;
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState<Key | "SHIPPED" | null>(null);
   const [feedback, setFeedback] = useState<Feedback>(null);
-  const [carrier, setCarrier] = useState("顺丰速运");
+  const [carrier, setCarrier] = useState("SF Express");
   const [confirmingCancel, setConfirmingCancel] = useState(false);
   const [confirmingStock, setConfirmingStock] = useState(false);
   const lock = useRef(false);
@@ -42,24 +42,24 @@ export default function StaffActions({ orderId, orderNumber, status, csrfToken }
       );
       const data = await response.json().catch(() => null);
       if (!response.ok) {
-        setFeedback({ kind: "error", text: `${data?.error?.message || "操作失败"}（HTTP ${response.status}）` });
+        setFeedback({ kind: "error", text: `${data?.error?.message || "Operation failed"} (HTTP ${response.status})` });
         router.refresh();
         return;
       }
       const successText: Record<string, string> = {
-        CONFIRMED: "已确认。库存预占与 ORDER_CONFIRM 流水已由同一事务写入。",
-        PICKING: "已进入拣货中；库存不再变动。",
-        SHIPPED: `已发货，运单号 ${data?.shipment?.trackingNumber ?? "已生成"}；库存不再二次扣减。`,
-        IN_TRANSIT: "已模拟揽收，追踪事件已追加。",
-        DELIVERED: "已模拟签收，订单完成。",
-        CANCELLED: "已取消；CONFIRMED 订单已回补库存并写释放流水。",
+        CONFIRMED: "Confirmed. The stock reservation and the ORDER_CONFIRM ledger entry were written in the same transaction.",
+        PICKING: "Now picking; stock no longer changes.",
+        SHIPPED: `Shipped with tracking number ${data?.shipment?.trackingNumber ?? "generated"}; stock is not deducted a second time.`,
+        IN_TRANSIT: "Pickup simulated; tracking events appended.",
+        DELIVERED: "Delivery simulated; the order is complete.",
+        CANCELLED: "Cancelled; the confirmed order's stock was restored and a release ledger entry written.",
       };
-      setFeedback({ kind: "success", text: successText[action] ?? "操作成功。" });
+      setFeedback({ kind: "success", text: successText[action] ?? "Operation succeeded." });
       setConfirmingCancel(false);
       setConfirmingStock(false);
       router.refresh();
     } catch {
-      setFeedback({ kind: "info", text: "网络中断，操作结果未知。请刷新页面核对状态，不要连续重试。" });
+      setFeedback({ kind: "info", text: "The network dropped; the result of the operation is unknown. Refresh the page to check the status instead of retrying repeatedly." });
       router.refresh();
     } finally {
       lock.current = false;
@@ -84,64 +84,64 @@ export default function StaffActions({ orderId, orderNumber, status, csrfToken }
       )}
       {status === "PICKING" && (
         <div className="field">
-          <label htmlFor="carrier">承运商（发货时写入运单）</label>
+          <label htmlFor="carrier">Carrier (written to the shipment when shipping)</label>
           <input id="carrier" value={carrier} disabled={!!busy} onChange={event => setCarrier(event.target.value)} />
         </div>
       )}
       <div className="confirm-actions" style={{ minWidth: 0 }}>
         {nextAction === "CONFIRMED" && !confirmingStock && (
-          <button className="primary" onClick={() => setConfirmingStock(true)} disabled={!!busy}>确认订单</button>
+          <button className="primary" onClick={() => setConfirmingStock(true)} disabled={!!busy}>Confirm Order</button>
         )}
         {nextAction === "CONFIRMED" && confirmingStock && (
-          <div className="feedback info" role="alertdialog" aria-label="确认占用库存" style={{ margin: 0 }}>
-            <strong>确认订单 {orderNumber}？</strong>
-            <p>将按订单数量扣减可用库存；确认前仍可返回。</p>
+          <div className="feedback info" role="alertdialog" aria-label="Confirm stock reservation" style={{ margin: 0 }}>
+            <strong>Confirm order {orderNumber}?</strong>
+            <p>This will deduct available stock by the ordered quantities; you can still go back before confirming.</p>
             <div className="inline-actions">
               <button className="primary" onClick={() => run("CONFIRMED")} disabled={!!busy}>
-                {busy === "CONFIRMED" ? "处理中…" : "确认扣减库存"}
+                {busy === "CONFIRMED" ? "Working…" : "Confirm Stock Deduction"}
               </button>
-              <button onClick={() => setConfirmingStock(false)} disabled={!!busy}>返回</button>
+              <button onClick={() => setConfirmingStock(false)} disabled={!!busy}>Back</button>
             </div>
           </div>
         )}
         {nextAction && nextAction !== "PICKING" && nextAction !== "CONFIRMED" && (
           <button className="primary" onClick={() => run(nextAction)} disabled={!!busy}>
-            {busy === nextAction ? "处理中…" : ACTION_LABEL[nextAction]}
+            {busy === nextAction ? "Working…" : ACTION_LABEL[nextAction]}
           </button>
         )}
         {status === "CONFIRMED" && (
           <button className="primary" onClick={() => run("PICKING")} disabled={!!busy}>
-            {busy === "PICKING" ? "处理中…" : "开始拣货"}
+            {busy === "PICKING" ? "Working…" : "Start Picking"}
           </button>
         )}
         {status === "PICKING" && (
           <button className="primary" onClick={() => run("SHIPPED")} disabled={!!busy || !carrier.trim()}>
-            {busy === "SHIPPED" ? "正在发货…" : "发货并生成运单"}
+            {busy === "SHIPPED" ? "Shipping…" : "Ship Order"}
           </button>
         )}
         {cancelAllowed && !confirmingCancel && (
           <button className="danger" onClick={() => setConfirmingCancel(true)} disabled={!!busy}>
-            取消该订单
+            Cancel This Order
           </button>
         )}
         {cancelAllowed && confirmingCancel && (
-          <div className="feedback info" role="alertdialog" aria-label="员工取消确认" style={{ margin: 0 }}>
-            <strong>确认取消已确认订单？</strong>
-            <p>库存将回补一次并写入 ORDER_CANCEL_RELEASE 正流水；订单不可恢复。</p>
+          <div className="feedback info" role="alertdialog" aria-label="Staff cancellation confirmation" style={{ margin: 0 }}>
+            <strong>Cancel this confirmed order?</strong>
+            <p>Stock will be restored once and a positive ORDER_CANCEL_RELEASE ledger entry written; the order cannot be recovered.</p>
             <div className="inline-actions">
               <button className="danger" onClick={() => run("CANCELLED")} disabled={!!busy}>
-                {busy === "CANCELLED" ? "正在取消…" : "确认取消"}
+                {busy === "CANCELLED" ? "Cancelling…" : "Confirm Cancellation"}
               </button>
-              <button onClick={() => setConfirmingCancel(false)}>返回</button>
+              <button onClick={() => setConfirmingCancel(false)}>Back</button>
             </div>
           </div>
         )}
         {!nextAction && status !== "CONFIRMED" && status !== "PICKING" && (
-          <p className="hint" style={{ margin: 0 }}>当前状态没有可执行的履约动作{cancelAllowed ? "，仅可取消" : ""}。</p>
+          <p className="hint" style={{ margin: 0 }}>No fulfillment actions are available for the current status{cancelAllowed ? "; only cancellation is available" : ""}.</p>
         )}
       </div>
       <p className="hint" style={{ margin: 0 }}>
-        规则：PATCH 只能做确认/拣货/揽收/签收/取消；发货必须走 POST /api/v1/shipments。重复或并发操作返回 409，不会重复扣减或重复生成运单。
+        Rules: PATCH handles confirm/pick/pickup/delivery/cancel; shipping must go through POST /api/v1/shipments. Duplicate or concurrent operations return 409 and never double-deduct stock or create duplicate shipments.
       </p>
     </div>
   );

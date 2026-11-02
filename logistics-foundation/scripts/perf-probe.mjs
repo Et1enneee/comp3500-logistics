@@ -5,13 +5,13 @@ import path from "node:path";
 import os from "node:os";
 
 /**
- * 性能测量（NFR-01/02）：明确记录环境、样本量、冷热状态与测量区间。
- * - API：每个端点 3 次预热 + 30 次顺序请求，报告 mean/max/p95。
- * - 界面：生产构建下，从 goto 到列表首行可见的时间，3 次取样。
- * 失败如实暴露（退出码非 0），不删慢样本。
+ * Performance measurement (NFR-01/02): explicitly records the environment, sample sizes, cold/warm state and measurement window.
+ * - API: 3 warm-up + 30 sequential requests per endpoint, reporting mean/max/p95.
+ * - UI: on a production build, time from goto until the first list row is visible, 3 samples.
+ * Failures are surfaced as-is (non-zero exit code); slow samples are never deleted.
  */
 const BASE = process.env.PERF_BASE_URL || "http://127.0.0.1:3100";
-if (!["127.0.0.1", "localhost"].includes(new URL(BASE).hostname)) throw new Error("只允许本机测量");
+if (!["127.0.0.1", "localhost"].includes(new URL(BASE).hostname)) throw new Error("Only local measurements are allowed");
 const PASSWORD = process.env.DEMO_PASSWORD || "Demo1234!";
 const SAMPLES = Number(process.env.PERF_SAMPLES || 30);
 const UI_SAMPLES = Number(process.env.PERF_UI_SAMPLES || 3);
@@ -37,9 +37,9 @@ async function login(email) {
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ email, password: PASSWORD }),
   });
-  if (!response.ok) throw new Error(`登录失败 ${email}: ${response.status}`);
+  if (!response.ok) throw new Error(`Login failed for ${email}: ${response.status}`);
   const cookie = (response.headers.get("set-cookie") || "").split(";")[0];
-  if (!cookie.includes("g42_session=")) throw new Error("未收到会话 Cookie");
+  if (!cookie.includes("g42_session=")) throw new Error("No session cookie received");
   return cookie;
 }
 
@@ -67,7 +67,7 @@ async function uiProbe(browser, name, pathName, email, waitSelector) {
   await page.locator("#login-password").fill(PASSWORD);
   await Promise.all([
     page.waitForURL(url => !url.pathname.startsWith("/login")),
-    page.getByRole("button", { name: "登录", exact: true }).click(),
+    page.getByRole("button", { name: "Sign In", exact: true }).click(),
   ]);
   const samples = [];
   for (let index = 0; index < UI_SAMPLES; index++) {
@@ -76,7 +76,7 @@ async function uiProbe(browser, name, pathName, email, waitSelector) {
     await page.locator(waitSelector).first().waitFor({ state: "visible", timeout: 15000 });
     samples.push(performance.now() - started);
   }
-  const result = { name, path: pathName, metric: "goto → 首行/首卡可见", ...stats(samples) };
+  const result = { name, path: pathName, metric: "goto → first row/card visible", ...stats(samples) };
   await context.close();
   return result;
 }
@@ -127,10 +127,10 @@ async function main() {
       totalMemoryMB: Math.round(os.totalmem() / 1024 / 1024),
     },
     methodology: {
-      api: `${SAMPLES} 次顺序请求（每端点先 3 次预热），测量完整 HTTP 往返含响应体读取；同一进程、单用户 Cookie，本机回环。`,
-      ui: `${UI_SAMPLES} 次生产构建页面导航，度量 goto 到列表首行/首个统计卡可见；单 Chromium 无缓存清空，非首次冷启动。`,
+      api: `${SAMPLES} sequential requests per endpoint (after 3 warm-up requests), measuring the full HTTP round trip including reading the response body; same process, single-user cookie, local loopback.`,
+      ui: `${UI_SAMPLES} production-build page navigations, measuring goto until the first list row / first stat card is visible; a single Chromium instance without cache clearing, not a first cold start.`,
       targets: { apiLocalP95: "≤ 2000ms", uiFirstContentP95: "≤ 3000ms" },
-      caveat: "本机回环测量，不代表公网或高并发；未做长时间可用性测试。",
+      caveat: "Local loopback measurements; not representative of public networks or high concurrency; no long-duration availability testing was performed.",
     },
     fixture,
     api,
@@ -145,7 +145,7 @@ async function main() {
   await fs.writeFile(OUT, JSON.stringify(report, null, 2));
   console.log(`API p95: ${api.map(entry => `${entry.name}=${entry.p95Ms}ms`).join(", ")}`);
   console.log(`UI p95: ${ui.map(entry => `${entry.name}=${entry.p95Ms}ms`).join(", ")}`);
-  console.log(`目标达成: API=${report.targetsMet.api} UI=${report.targetsMet.ui}`);
+  console.log(`Targets met: API=${report.targetsMet.api} UI=${report.targetsMet.ui}`);
   if (!report.targetsMet.api || !report.targetsMet.ui) process.exitCode = 1;
 }
 

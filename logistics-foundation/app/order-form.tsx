@@ -30,7 +30,7 @@ export default function OrderForm({ products, csrfToken }: { products: CatalogPr
     if (lock.current) return;
     setState({ kind: "idle" });
     if (invalid || lines.length === 0) {
-      setState({ kind: "error", message: "请至少选择一件商品，数量须为有效的非负整数。" });
+      setState({ kind: "error", message: "Please select at least one product; quantities must be valid non-negative integers." });
       return;
     }
     lock.current = true;
@@ -43,7 +43,7 @@ export default function OrderForm({ products, csrfToken }: { products: CatalogPr
       });
       const data = await response.json().catch(() => null);
       if (!response.ok) {
-        setState({ kind: "error", message: data?.error?.message || `提交失败（HTTP ${response.status}），请稍后重试。` });
+        setState({ kind: "error", message: data?.error?.message || `Submission failed (HTTP ${response.status}). Please try again later.` });
         return;
       }
       setState({
@@ -55,10 +55,10 @@ export default function OrderForm({ products, csrfToken }: { products: CatalogPr
       setQuantities({});
       router.refresh();
     } catch {
-      // 网络结果未知：绝不引导重复下单，只引导去“我的订单”核对。
+      // Network result unknown: never encourage a duplicate order; direct the user to "My Orders" to verify first.
       setState({
         kind: "unknown",
-        message: "网络中断，未确认订单是否创建。请先到「我的订单」核对，不要盲目重复提交。",
+        message: "The network dropped before the result was confirmed. Please check \"My Orders\" first instead of blindly submitting again.",
       });
     } finally {
       lock.current = false;
@@ -69,32 +69,32 @@ export default function OrderForm({ products, csrfToken }: { products: CatalogPr
     <>
       {state.kind === "created" && (
         <section className="feedback success" role="status">
-          <strong>订单已创建 · 已创建 / CREATED</strong>
+          <strong>Order Created · Created / CREATED</strong>
           <p className="mono" data-testid="created-order-number">{state.orderNumber}</p>
-          <p>合计 {money(state.totalCents)}。创建时不扣库存；员工确认时才预占可用库存。</p>
+          <p>Total {money(state.totalCents)}. No stock is deducted at creation; available stock is reserved only when staff confirm.</p>
           <div className="inline-actions">
-            <Link className="button primary" href={`/orders/${state.id}`}>查看订单详情 →</Link>
-            <Link className="button" href="/orders">我的订单</Link>
+            <Link className="button primary" href={`/orders/${state.id}`}>View Order Details →</Link>
+            <Link className="button" href="/orders">My Orders</Link>
           </div>
         </section>
       )}
       {state.kind === "error" && (
-        <div className="feedback error" role="alert"><strong>订单未提交成功</strong><p>{state.message}</p></div>
+        <div className="feedback error" role="alert"><strong>Order Not Submitted</strong><p>{state.message}</p></div>
       )}
       {state.kind === "unknown" && (
         <div className="feedback info" role="alert">
-          <strong>提交结果未知</strong>
+          <strong>Submission Result Unknown</strong>
           <p>{state.message}</p>
-          <p><Link className="button" href="/orders">去「我的订单」核对</Link></p>
+          <p><Link className="button" href="/orders">Check &quot;My Orders&quot;</Link></p>
         </div>
       )}
       <form onSubmit={submit} noValidate className="workspace">
         <section className="card">
-          <div className="card-head"><h2>商品目录</h2><span className="small muted">价格与可用库存来自数据库</span></div>
+          <div className="card-head"><h2>Product Catalog</h2><span className="small muted">Prices and available stock come from the database</span></div>
           <div className="table-wrap">
             <table>
               <thead>
-                <tr><th scope="col">商品</th><th scope="col" className="num">单价</th><th scope="col" className="num">可用库存</th><th scope="col">数量</th></tr>
+                <tr><th scope="col">Product</th><th scope="col" className="num">Unit Price</th><th scope="col" className="num">Available Stock</th><th scope="col">Quantity</th></tr>
               </thead>
               <tbody>
                 {products.map(product => (
@@ -105,11 +105,11 @@ export default function OrderForm({ products, csrfToken }: { products: CatalogPr
                     </td>
                     <td className="num">{money(product.priceCents)}</td>
                     <td className={`num ${product.stock < product.lowStockThreshold ? "low" : ""}`} data-testid={`stock-${product.sku}`}>
-                      {product.stock}{product.stock < product.lowStockThreshold ? " · 偏低" : ""}
+                      {product.stock}{product.stock < product.lowStockThreshold ? " · Low" : ""}
                     </td>
                     <td>
                       <input
-                        aria-label={`${product.sku} 数量`}
+                        aria-label={`${product.sku} quantity`}
                         name={product.sku}
                         type="number"
                         inputMode="numeric"
@@ -124,7 +124,7 @@ export default function OrderForm({ products, csrfToken }: { products: CatalogPr
                   </tr>
                 ))}
                 {products.length === 0 && (
-                  <tr><td colSpan={4}>暂无商品。请由项目负责人按运行说明初始化演示数据。</td></tr>
+                  <tr><td colSpan={4}>No products yet. The project owner should initialize the demo data according to the run instructions.</td></tr>
                 )}
               </tbody>
             </table>
@@ -133,24 +133,24 @@ export default function OrderForm({ products, csrfToken }: { products: CatalogPr
         <aside className="aside-stack">
           <section className="card">
             <div className="card-body">
-              <p className="small muted">当前身份</p>
-              <p className="mono">由登录会话自动确定，无需填写邮箱</p>
-              <h2>订单摘要</h2>
+              <p className="small muted">Current identity</p>
+              <p className="mono">Determined automatically from your sign-in session; no email input needed</p>
+              <h2>Order Summary</h2>
               <ul className="summary-lines">
                 {lines.map(({ product, quantity }) => (
                   <li key={product.sku}><span>{product.name} × {quantity}</span><strong>{money(product.priceCents * quantity)}</strong></li>
                 ))}
-                {lines.length === 0 && <li className="muted">尚未选择商品</li>}
+                {lines.length === 0 && <li className="muted">No products selected yet</li>}
               </ul>
-              <p className="small muted">预估合计 · 以服务端计算与下单时价格快照为准</p>
+              <p className="small muted">Estimated total · The server-side calculation and the price snapshot at submission time are authoritative</p>
               <div className="summary-total" data-testid="cart-total">{money(total)}</div>
               <button className="primary full" type="submit" disabled={busy || products.length === 0}>
-                {busy ? "正在提交…" : "提交订单"}
+                {busy ? "Submitting…" : "Place Order"}
               </button>
-              <p className="hint">提交时预检库存，不锁定商品；员工确认时在事务内重新校验扣减。</p>
+              <p className="hint">Stock is pre-checked at submission without locking products; staff re-validate and deduct inside a transaction upon confirmation.</p>
             </div>
           </section>
-          <div className="note"><strong>可自助完成</strong>下单后可在「我的订单」查看明细、状态与物流时间线；未发货前可取消（CREATED / CONFIRMED）。</div>
+          <div className="note"><strong>Self-service available</strong>After placing an order, view its details, status, and logistics timeline under &quot;My Orders&quot;; you can cancel before shipping (CREATED / CONFIRMED).</div>
         </aside>
       </form>
     </>

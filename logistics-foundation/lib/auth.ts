@@ -1,7 +1,7 @@
 import { createHash, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 import type { PrismaClient } from "@prisma/client";
 
-// 密码哈希使用 Node 内置的 scrypt（成熟 KDF），不自行设计算法，也不新增加密依赖。
+// Password hashing uses Node's built-in scrypt (a mature KDF); no custom algorithm and no new crypto dependency.
 const SCRYPT_N = 16384;
 const SCRYPT_r = 8;
 const SCRYPT_p = 1;
@@ -23,7 +23,7 @@ export interface SessionInfo {
 }
 
 export const SESSION_COOKIE = "g42_session";
-export const SESSION_TTL_MS = 8 * 60 * 60 * 1000; // 8 小时
+export const SESSION_TTL_MS = 8 * 60 * 60 * 1000; // 8 hours
 export const CSRF_HEADER = "x-csrf-token";
 
 export function hashPassword(password: string): string {
@@ -58,7 +58,7 @@ export function hashToken(token: string): string {
   return createHash("sha256").update(token).digest("hex");
 }
 
-/** 读取 Cookie 头的单个值，无则返回 null。 */
+/** Reads a single value from the Cookie header; returns null when absent. */
 export function readCookie(req: Request, name: string): string | null {
   const header = req.headers.get("cookie");
   if (!header) return null;
@@ -92,7 +92,7 @@ export function sessionCookie(req: Request, token: string, expiresAt: Date): str
     "SameSite=Lax",
     `Max-Age=${maxAge}`,
   ];
-  // 本机 HTTP 演示不加 Secure，否则浏览器不会保存；HTTPS 下自动加上。
+  // The local HTTP demo omits Secure (otherwise browsers would not store the cookie); HTTPS adds it automatically.
   if (isHttpsRequest(req)) parts.push("Secure");
   return parts.join("; ");
 }
@@ -116,7 +116,7 @@ export interface Authenticated {
   session: SessionInfo;
 }
 
-/** 从请求 Cookie 解析会话；过期会话会被删除并视为未登录。 */
+/** Parses the session from the request cookie; expired sessions are deleted and treated as signed out. */
 export async function readSession(db: PrismaClient, req: Request): Promise<Authenticated | null> {
   const token = readCookie(req, SESSION_COOKIE);
   if (!token) return null;
@@ -136,12 +136,12 @@ export async function readSession(db: PrismaClient, req: Request): Promise<Authe
 }
 
 export async function destroySession(db: PrismaClient, sessionId: string): Promise<void> {
-  // 并发退出已删除的会话可视为成功；实际存储失败必须反馈给调用者。
+  // A concurrent sign-out that already deleted the session counts as success; real storage failures must surface to the caller.
   await db.session.deleteMany({ where: { id: sessionId } });
 }
 
-// 按规范化邮箱计数，客户端更换代理来源头不能重置账户的失败次数。
-// 进程内限制：重启/多进程的边界见 known-issues.md。
+// Counts by normalized email so a client rotating proxy headers cannot reset an account's failure count.
+// In-process limit: see known-issues.md for restart/multi-process boundaries.
 const LOGIN_WINDOW_MS = 10 * 60 * 1000;
 const LOGIN_MAX_FAILURES = 5;
 const loginFailures = new Map<string, { count: number; resetAt: number }>();
@@ -173,7 +173,7 @@ export function clearLoginFailures(key: string): void {
   loginFailures.delete(key);
 }
 
-/** 仅用于测试：清空限流状态。 */
+/** Test-only: clears the rate-limit state. */
 export function resetLoginRateLimit(): void {
   loginFailures.clear();
 }
