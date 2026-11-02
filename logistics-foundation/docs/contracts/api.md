@@ -35,7 +35,7 @@ Body: `{ "to": "CONFIRMED" | "PICKING" | "IN_TRANSIT" | "DELIVERED" }` (since v0
 Shipping (PICKING → SHIPPED). STAFF demo accounts only.
 Headers: Content-Type: application/json; X-Demo-User-Email (required).
 Body: `{ "orderNumber": "ORD-YYYYMMDD-XXXX", "carrier": "SF Express" }` (carrier 1–40 characters).
-201：`{ "shipment": { "id": "…", "trackingNumber": "LG-YYYYMMDD-XXXXXX", "carrier": "…", "status": "SHIPPED", "shippedAt": "…" }, "order": { "id": "…", "orderNumber": "…", "status": "SHIPPED", "totalCents": 300 } }`
+201: `{ "shipment": { "id": "…", "trackingNumber": "LG-YYYYMMDD-XXXXXX", "carrier": "…", "status": "SHIPPED", "shippedAt": "…" }, "order": { "id": "…", "orderNumber": "…", "status": "SHIPPED", "totalCents": 300 } }`
 Completed within one transaction: order PICKING→SHIPPED (conditional update), generates the unique shipment number for the day, writes one initial TrackingEvent (warehouse).
 Stock: no deduction, no InventoryLog (stock was already reserved at confirmation).
 Errors: 400 INVALID_ARGUMENT (invalid JSON / missing order number / missing carrier / non-JSON Content-Type); 401 UNAUTHENTICATED; 403 FORBIDDEN (not STAFF); 404 ORDER_NOT_FOUND; 409 SHIPMENT_EXISTS (shipment already exists / already shipped; repeated requests do not create a second one); 409 INVALID_STATE_TRANSITION (not PICKING); 500/503.
