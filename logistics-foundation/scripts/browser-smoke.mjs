@@ -161,10 +161,45 @@ try {
     await shot(page, "01-customer-catalog");
   });
 
+  await check("staff assigns a shipped order and driver completes simulated delivery", async () => {
+    const seeded = await db.shipment.findFirstOrThrow({ where: { driverId: null, order: { status: "SHIPPED" } }, include: { order: true } });
+    const driver = await makeUser("driver@demo.com");
+    try {
+      await staff.page.goto(`${base}/staff/orders/${seeded.orderId}`);
+      assert.ok(seeded.order.deliveryAddress, "Seeded demonstration address is required");
+      assert.equal((await staff.page.content()).includes(seeded.order.deliveryAddress), false, "Staff page exposed the delivery address");
+      const driverRow = await db.user.findUniqueOrThrow({ where: { email: "driver@demo.com" } });
+      await staff.page.locator("#driver-select").selectOption(driverRow.id);
+      await staff.page.getByRole("button", { name: "Assign Driver" }).click();
+      await staff.page.getByRole("status").filter({ hasText: "Driver assigned" }).waitFor();
+      assert.equal((await db.shipment.findUniqueOrThrow({ where: { id: seeded.id } })).driverId, driverRow.id);
+      await driver.page.goto(base + "/driver");
+      await driver.page.getByRole("heading", { name: "My Deliveries" }).waitFor();
+      const card = driver.page.locator("section.card").filter({ hasText: seeded.order.orderNumber });
+      assert.ok((await card.innerText()).includes(seeded.order.deliveryAddress), "Assigned driver must see the delivery address");
+      await card.getByRole("button", { name: "Simulate Pickup" }).click();
+      await card.getByRole("button", { name: "Simulate Delivery" }).waitFor();
+      await card.getByRole("button", { name: "Simulate Delivery" }).click();
+      await card.getByText("Completed", { exact: true }).waitFor();
+      assert.equal((await db.order.findUniqueOrThrow({ where: { id: seeded.orderId } })).status, "DELIVERED");
+      const html = await driver.page.content();
+      for (const value of ["Demo Customer A", "customer.a@demo.com", "Demo Customer B", "customer.b@demo.com"]) assert.equal(html.includes(value), false);
+      await shot(driver.page, "34-driver-delivery");
+      await driver.page.setViewportSize({ width: 390, height: 844 });
+      assert.ok(await noOverflow(driver.page), "Driver page should fit a mobile viewport");
+      await shot(driver.page, "35-driver-mobile");
+    } finally { await driver.context.close(); }
+  });
+
   await check("customer A creates an order: CREATED, stock unchanged, no ledger row", async () => {
     const page = customerA.page;
     const skuBefore = (await db.product.findUniqueOrThrow({ where: { sku: "SKU002" } })).stock;
     await page.getByLabel("SKU002 quantity").fill("2");
+    const beforeCount = await db.order.count();
+    await page.getByRole("button", { name: "Place Order", exact: true }).click();
+    await page.getByRole("alert").filter({ hasText: "Please enter a delivery address" }).waitFor();
+    assert.equal(await db.order.count(), beforeCount);
+    await page.getByLabel("Delivery address").fill("Browser Demo Address, Example Street");
     const waiting = page.waitForResponse(response => response.url().endsWith("/api/v1/orders") && response.request().method() === "POST");
     await page.getByRole("button", { name: "Place Order", exact: true }).click();
     const response = await waiting;
@@ -184,6 +219,7 @@ try {
     await page.getByRole("link", { name: "View Order Details →" }).click();
     await page.waitForURL(`**/orders/${orderId}`);
     assert.ok((await page.locator("main").innerText()).includes("Not shipped yet"));
+    assert.ok((await page.locator("main").innerText()).includes("Browser Demo Address, Example Street"));
     assert.equal(await page.getByTestId("tracking-number").count(), 0);
     await shot(page, "03-customer-detail-empty");
   });
@@ -372,6 +408,7 @@ try {
   await check("cancel chain: confirm SKU007 order then cancel restores stock exactly once", async () => {
     const page = customerA.page;
     await page.goto(base + "/");
+    await page.getByLabel("Delivery address").fill("Browser Demo Address, Example Street");
     await page.getByLabel("SKU007 quantity").fill("2");
     const waiting = page.waitForResponse(response => response.url().endsWith("/api/v1/orders") && response.request().method() === "POST");
     await page.getByRole("button", { name: "Place Order", exact: true }).click();
@@ -442,6 +479,7 @@ try {
     const page = customerA.page;
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto(base + "/");
+    await page.getByLabel("Delivery address").fill("Browser Demo Address, Example Street");
     await page.getByLabel("SKU005 quantity").fill("1");
     const upstream = page.waitForResponse(response => response.url().endsWith("/api/v1/orders") && response.request().method() === "POST");
     await page.getByRole("button", { name: "Place Order", exact: true }).click();
@@ -472,6 +510,7 @@ try {
     const page = customerA.page;
     await page.goto(base + "/");
     const count = await db.order.count();
+    await page.getByLabel("Delivery address").fill("Browser Demo Address, Example Street");
     await page.getByLabel("SKU007 quantity").fill("9999");
     await page.getByRole("button", { name: "Place Order", exact: true }).click();
     await page.getByRole("alert").filter({ hasText: "available stock" }).waitFor();

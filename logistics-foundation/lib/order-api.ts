@@ -21,7 +21,7 @@ type TransitionTarget = (typeof TRANSITION_TARGETS)[number];
 
 export interface Actor {
   id: string;
-  role: "CUSTOMER" | "STAFF" | "ADMIN";
+  role: "CUSTOMER" | "STAFF" | "DRIVER" | "ADMIN";
 }
 
 const LIST_SELECT = {
@@ -56,7 +56,7 @@ export async function queryOrderList(
   actor: Actor,
   query: OrderListQuery,
 ): Promise<{ orders: ReturnType<typeof mapListRow>[]; page: number; pageSize: number; total: number; totalPages: number }> {
-  if (actor.role === "ADMIN") throw new HttpError(403, "FORBIDDEN", "Administrators do not view customer order details; they use aggregated reports only");
+  if (actor.role !== "CUSTOMER" && actor.role !== "STAFF") throw new HttpError(403, "FORBIDDEN", "This role cannot view customer order details");
   const where: { customerId?: string; status?: OrderStatus } = {};
   if (actor.role === "CUSTOMER") where.customerId = actor.id;
   if (query.status) {
@@ -125,7 +125,7 @@ export async function queryOrderDetail(
   actor: Actor,
   id: string,
 ) {
-  if (actor.role === "ADMIN") throw new HttpError(403, "FORBIDDEN", "Administrators do not view customer order details; they use aggregated reports only");
+  if (actor.role !== "CUSTOMER" && actor.role !== "STAFF") throw new HttpError(403, "FORBIDDEN", "This role cannot view customer order details");
   if (!id?.trim()) throw new HttpError(400, "INVALID_ARGUMENT", "Please provide the order's internal ID");
   const order = await db.order.findUnique({ where: { id }, include: DETAIL_INCLUDE });
   if (!order) throw new HttpError(404, "ORDER_NOT_FOUND", "Order not found");
@@ -140,7 +140,7 @@ export async function queryOrderByNumber(
   actor: Actor,
   orderNumber: string,
 ) {
-  if (actor.role === "ADMIN") throw new HttpError(403, "FORBIDDEN", "Administrators do not view customer order details; they use aggregated reports only");
+  if (actor.role !== "CUSTOMER" && actor.role !== "STAFF") throw new HttpError(403, "FORBIDDEN", "This role cannot view customer order details");
   if (!orderNumber.trim()) throw new HttpError(400, "INVALID_ARGUMENT", "Please provide the order number");
   const order = await db.order.findUnique({ where: { orderNumber }, include: DETAIL_INCLUDE });
   if (!order) throw new HttpError(404, "ORDER_NOT_FOUND", "Order not found");
@@ -151,7 +151,7 @@ export async function queryOrderByNumber(
 }
 
 export async function queryTracking(db: PrismaClient, actor: Actor, id: string) {
-  if (actor.role === "ADMIN") throw new HttpError(403, "FORBIDDEN", "Administrators do not view customer shipments");
+  if (actor.role !== "CUSTOMER" && actor.role !== "STAFF") throw new HttpError(403, "FORBIDDEN", "This role cannot view customer shipments");
   if (!id?.trim()) throw new HttpError(400, "INVALID_ARGUMENT", "Please provide the order's internal ID");
   const order = await db.order.findUnique({
     where: { id },
@@ -216,7 +216,7 @@ export function createOrderHandlers(db: PrismaClient) {
    */
   async function updateStatus(req: Request, id: string): Promise<Response> {
     try {
-      const { user } = await requireSession(db, req, { roles: ["STAFF", "CUSTOMER"] });
+      const { user } = await requireSession(db, req, { roles: ["STAFF", "CUSTOMER", "DRIVER"] });
       if (!id?.trim()) throw new HttpError(400, "INVALID_ARGUMENT", "Please provide the order's internal ID");
       const body = await readJsonBody(req);
       if (!("to" in body)) throw new HttpError(400, "INVALID_ARGUMENT", "The request body must contain \"to\"");
@@ -231,9 +231,12 @@ export function createOrderHandlers(db: PrismaClient) {
       if (user.role === "CUSTOMER" && to !== "CANCELLED") {
         throw new HttpError(403, "FORBIDDEN", "Customers can only cancel their own orders; they cannot perform staff fulfillment actions");
       }
+      if (user.role === "DRIVER" && to !== "IN_TRANSIT" && to !== "DELIVERED") {
+        throw new HttpError(403, "FORBIDDEN", "Drivers can only update assigned pickup and delivery");
+      }
       if (to === "CANCELLED") return await cancelOrder(id, user);
       if (to === "CONFIRMED") return await confirmOrder(id, user.id);
-      return await advanceOrder(id, to);
+      return await advanceOrder(id, to, user.role === "DRIVER" ? user.id : undefined);
     } catch (error) {
       return failure(error, "Order status unexpected failure");
     }
@@ -296,19 +299,19 @@ export function createOrderHandlers(db: PrismaClient) {
     }
   }
 
-  async function advanceOrder(id: string, to: "PICKING" | "IN_TRANSIT" | "DELIVERED"): Promise<Response> {
+  async function advanceOrder(id: string, to: "PICKING" | "IN_TRANSIT" | "DELIVERED", driverId?: string): Promise<Response> {
     const expectedFrom = to === "PICKING" ? "CONFIRMED" : to === "IN_TRANSIT" ? "SHIPPED" : "IN_TRANSIT";
     const actionLabel = to === "PICKING" ? "start picking" : to === "IN_TRANSIT" ? "simulate pickup" : "simulate delivery";
     for (let attempt = 0; ; attempt++) {
       try {
         const order = await db.$transaction(async tx => {
           const claimed = await tx.order.updateMany({
-            where: { id, status: expectedFrom },
+            where: { id, status: expectedFrom, ...(driverId ? { shipment: { is: { driverId } } } : {}) },
             data: { status: to },
           });
           if (claimed.count !== 1) {
-            const exists = await tx.order.findUnique({ where: { id }, select: { id: true } });
-            if (!exists) throw new HttpError(404, "ORDER_NOT_FOUND", "Order not found");
+            const exists = await tx.order.findUnique({ where: { id }, select: { id: true, shipment: { select: { driverId: true } } } });
+            if (!exists || (driverId && exists.shipment?.driverId !== driverId)) throw new HttpError(404, "ORDER_NOT_FOUND", "Order not found");
             throw new HttpError(409, "INVALID_STATE_TRANSITION", `Only ${expectedFrom} orders can ${actionLabel}, and the operation cannot be repeated`);
           }
           const current = await tx.order.findUniqueOrThrow({
@@ -329,7 +332,7 @@ export function createOrderHandlers(db: PrismaClient) {
               data: {
                 shipmentId: shipment.id,
                 location: to === "IN_TRANSIT" ? "Pickup station" : "Delivery address",
-                description: to === "IN_TRANSIT" ? `Picked up by carrier ${shipment.carrier}` : "Signed for by the recipient",
+                description: to === "IN_TRANSIT" ? `Simulated pickup by carrier ${shipment.carrier}` : "Simulated delivery completed",
               },
             });
           }

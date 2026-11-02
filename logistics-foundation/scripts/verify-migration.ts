@@ -19,6 +19,8 @@ const prismaCli = require.resolve("prisma/build/index.js");
 const tsxCli = require.resolve("tsx/cli");
 const legacyMigration = "20261013114356_init";
 const newMigration = "20261030120000_auth_inventory_notifications";
+const driverMigration = "20261102110000_driver_assignment";
+const addressMigration = "20261102120000_delivery_address";
 const checks: { name: string; detail: unknown }[] = [];
 
 function record(name: string, detail: unknown) {
@@ -64,7 +66,10 @@ async function main() {
         orderNumber: "ORD-20261001-0001", customerId: customer.id, status: "CONFIRMED", totalCents: 450,
         items: { create: [{ productId: product.id, quantity: 3, unitPriceCents: 150 }] },
       },
+      select: { id: true },
     });
+    // Preserve a real legacy shipment across the later optional driver-assignment migration.
+    await legacy.shipment.createMany({ data: [{ orderId: order.id, trackingNumber: "LG-LEGACY-1", carrier: "Legacy", status: "SHIPPED" }] });
     // The legacy schema lacks the new columns: use createMany so Prisma does not read back v0.4-only columns.
     await legacy.inventoryLog.createMany({
       data: [{ productId: product.id, orderId: order.id, delta: -3, reason: "ORDER_CONFIRM" }],
@@ -78,6 +83,14 @@ async function main() {
     deploy();
     record("v0.4.0 migration applied on top of existing data", { migration: newMigration });
 
+    await cp(resolve("prisma/migrations", driverMigration), join(prismaDir, "migrations", driverMigration), { recursive: true });
+    deploy();
+    record("driver assignment migration applied without resetting existing data", { migration: driverMigration });
+
+    await cp(resolve("prisma/migrations", addressMigration), join(prismaDir, "migrations", addressMigration), { recursive: true });
+    deploy();
+    record("delivery address migration applied without inventing legacy addresses", { migration: addressMigration });
+
     const migrated = new PrismaClient({ datasources: { db: { url: dbUrl } } });
     await migrated.$connect();
     const ordersAfter = await migrated.order.count();
@@ -88,6 +101,9 @@ async function main() {
     const legacyLog = await migrated.inventoryLog.findFirstOrThrow({ where: { reason: "ORDER_CONFIRM" } });
     const legacyNote = await migrated.notification.findFirstOrThrow({ where: { type: "LEGACY_NOTE" } });
     const legacyOrder = await migrated.order.findUniqueOrThrow({ where: { orderNumber: "ORD-20261001-0001" } });
+    const legacyShipment = await migrated.shipment.findUniqueOrThrow({ where: { trackingNumber: "LG-LEGACY-1" } });
+    if (legacyOrder.deliveryAddress !== null) throw new Error("Legacy order must not be assigned a fabricated address");
+    if (legacyShipment.driverId !== null || legacyShipment.orderId !== legacyOrder.id) throw new Error("Legacy shipment or empty assignment not preserved");
     if (ordersAfter !== 1 || itemsAfter !== 1 || logsAfter !== 1 || productsAfter !== 1 || notificationsAfter !== 1) {
       throw new Error(`Legacy row counts mismatch: orders=${ordersAfter} items=${itemsAfter} logs=${logsAfter} products=${productsAfter} notifications=${notificationsAfter}`);
     }

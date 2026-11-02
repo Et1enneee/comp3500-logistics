@@ -34,7 +34,7 @@ const baseline = {
   source_files: hashes,
   verification_summary: {
     counts_source: "Test counts are taken from the measured summary in this round's evidence/results.json; the baseline does not pre-fill test counts.",
-    migrations: ["20261013114356_init", "20261030120000_auth_inventory_notifications"],
+    migrations: ["20261013114356_init", "20261030120000_auth_inventory_notifications", "20261102110000_driver_assignment", "20261102120000_delivery_address"],
     evidence: "The evidence package evidence/results.json records each step's command, exit code, duration, and source digest.",
   },
 };

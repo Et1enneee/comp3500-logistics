@@ -18,7 +18,8 @@
     "verify:migration": "tsx scripts/verify-migration.ts",
     "evidence": "node scripts/run-verification.mjs",
     "baseline": "node scripts/write-baseline.mjs",
-    "test:delivery": "node --test tests/delivery.check.mjs"
+    "test:delivery": "node --test tests/delivery.check.mjs",
+    "db:driver-demo": "tsx scripts/create-demo-driver.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

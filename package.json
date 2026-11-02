@@ -21,6 +21,7 @@
     "baseline": "npm --prefix logistics-foundation run baseline",
     "verify:migration": "npm --prefix logistics-foundation run verify:migration",
     "db:reset-passwords": "npm --prefix logistics-foundation run db:reset-passwords",
-    "test:delivery": "npm --prefix logistics-foundation run test:delivery"
+    "test:delivery": "npm --prefix logistics-foundation run test:delivery",
+    "db:driver-demo": "npm --prefix logistics-foundation run db:driver-demo"
   }
 }
