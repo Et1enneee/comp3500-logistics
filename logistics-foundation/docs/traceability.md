@@ -13,7 +13,7 @@ IDs follow the original requirements document; the table below reflects only the
 | FR-07 | Users/roles/auth, Must | scrypt passwords, Session + HttpOnly cookie, CSRF, rate limiting, 401/403/404 boundaries | `tests/auth.integration.ts`; `lib/auth.ts`, `lib/http.ts` | Implemented |
 | NFR-01 | Core queries ≤2s, list first paint ≤3s, Must | production build, 30 API samples, 3 UI samples | `evidence/performance.json` | Meets target locally; not public-network/high-concurrency |
 | NFR-02 | Available 08:00–24:00 daily, Must | no long-term run | — | Not verified (short tests are not a substitute) |
-| NFR-03 | Least privilege, Must | role matrix + object-level 404; tests pin this decision | `tests/auth.integration.ts`, `tests/orders.integration.ts` | Implemented |
+| NFR-03 | Least privilege, Must | role matrix + object-level 404; staff order responses omit customer identity and customer ID; customer actors in inventory logs are anonymized | `tests/auth.integration.ts`, `tests/orders.integration.ts`, `tests/privacy.integration.ts` | Implemented for the current simulated workflow |
 | NFR-04 | Core operations ≤3 steps, Should | customer order placement, staff confirm/ship etc. fit within ≤3 major actions per screen; no formal timed walkthrough | browser script steps | Partial (not formally accepted) |
 | NFR-05 | Code standards/contracts/CI, Must | typecheck/lint/unit/integration/build/browser all executable; root CI configuration complete | `evidence/test-logs/`, `.github/workflows/ci.yml` | All green locally; remote CI is judged by the actual run after upload |
 

@@ -80,7 +80,7 @@ export async function queryInventoryLogs(db: PrismaClient, query: InventoryLogQu
       take: query.pageSize,
       include: {
         product: { select: { sku: true, name: true } },
-        actor: { select: { name: true, email: true } },
+        actor: { select: { name: true, email: true, role: true } },
       },
     }),
     db.inventoryLog.count({ where }),
@@ -98,7 +98,9 @@ export async function queryInventoryLogs(db: PrismaClient, query: InventoryLogQu
       createdAt: row.createdAt,
       product: row.product,
       orderNumber: row.orderId ? orderNumberById.get(row.orderId) ?? null : null,
-      actor: row.actor ? { name: row.actor.name, email: row.actor.email } : null,
+      actor: row.actor ? (row.actor.role === "CUSTOMER"
+        ? { name: "Customer", email: null }
+        : { name: row.actor.name, email: row.actor.email }) : null,
     })),
     page: query.page,
     pageSize: query.pageSize,
