@@ -1,6 +1,6 @@
 {
   "version": "v0.4.2-delivery",
-  "created_at_utc": "2026-11-02T06:12:05.164Z",
+  "created_at_utc": "2026-11-02T06:21:32.470Z",
   "derived_from": {
     "upstream_commit": "eddab17be9a29b7fb11769b60ac6afce1b3288c0",
     "upstream_source_zip_sha256": "92b1a918b99e99245079ef70e1761df55c83598f857f4760fd94c0190c545d24",
@@ -64,7 +64,7 @@
     "docs/closure/use-cases.md": "f899278400bc568b9db9d1c1d48942cf722f1f480b9d8989ef33db8bdce21ec2",
     "docs/closure/usecase.puml": "1163347e1dad6c57d692f88dbe60554b3b35e4a6a8407f37e04ec726b76ec3da",
     "docs/closure/verification-matrix.md": "ce57b40a323eeef71e5465da8adb883c83c6f72c65322e98e0e70a2f122d762b",
-    "docs/contracts/api.md": "d0fba697da248bcccd2e0c5842fae964807d10bb6e03f1fca6e0c45e0be07197",
+    "docs/contracts/api.md": "bc36ea53e3ab982003be1ffc63f6363cf32f703d388da0caf7d90ad3e6342293",
     "docs/contracts/data-model.md": "46e4b5dbf8c2e6db4f3d5edcb8c9976730e7843d01d1bfa6f783c376f9aaf9cd",
     "docs/contracts/get-order.example.json": "fdfe7ce3a22d9cc4038c02aa9959d951be2184afb19f1bab6d176437d20408cb",
     "docs/contracts/glossary.md": "6228ab07068cc49dc3d3bb0aa534ea10b7cb09cc1ccb96378bebe39533bdfd9f",

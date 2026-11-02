@@ -1,6 +1,8 @@
-# v0.3.1 Order and Logistics API (current implementation)
+# v0.3.1 Order and Logistics API (historical record)
 
-The current implementation covers order placement, lookup by order number, staff confirm/pick, shipping, tracking, and simulated pickup/delivery. It keeps the original order-confirmation semantics and does not support cancellation. Scope and verification entries are in ../closure/README.md; real authentication, customer ownership, and unimplemented designs must not be inferred as done from this API table.
+> This section documents the v0.3.1 contract as originally shipped, and is retained for historical context. It is superseded where it differs by the **"v0.4.0 API Additions"** section below, which documents the current capabilities (real sessions, order center, cancellation, inventory, notifications, and reports).
+
+This v0.3.1 contract covers order placement, lookup by order number, staff confirm/pick, shipping, tracking, and simulated pickup/delivery via the demo-email header, and does not support cancellation. It keeps the original order-confirmation semantics. Scope and verification entries are in ../closure/README.md.
 
 ## GET /api/v1/orders?orderNumber=ORD-…
 
@@ -24,7 +26,7 @@ Body: `{ "to": "CONFIRMED" | "PICKING" | "IN_TRANSIT" | "DELIVERED" }` (since v0
 | DELIVERED | IN_TRANSIT | shipment status→DELIVERED, writes deliveredAt; adds a delivery TrackingEvent (delivery address) |
 
 - Shipping (→SHIPPED) is not accepted via PATCH: returns 400 INVALID_ARGUMENT with a message pointing to POST /api/v1/shipments.
-- Other targets (e.g. CANCELLED) are not implemented in this version: 400 INVALID_ARGUMENT.
+- Other targets (e.g. CANCELLED) are not implemented in v0.3.1: 400 INVALID_ARGUMENT. Cancellation was added in v0.4.0; see the additions below.
 - Repeated submission to the same target: 409 INVALID_STATE_TRANSITION with no side effects.
 - IN_TRANSIT/DELIVERED when the order has no shipment: 409 SHIPMENT_NOT_FOUND and the order status rolls back.
 - On success the frontend GETs the same ORD order number again to refresh details; since v0.3 the frontend also reads tracking.
@@ -64,9 +66,9 @@ All API errors in this round use `{ "error": { "code": "…", "message": "human-
 Validation order: parameters/JSON → demo identity → in-transaction status and stock. When multiple errors coexist, they are returned in this order.
 Empty items or illegal legacy quantities return 400 with no stock changes. Confirmation still defensively checks legacy order quantities; this candidate POST has verified positive integer quantities.
 
-## Identity Limitations
+## Identity Limitations (v0.3.1 only)
 
-The email is only a demo identifier and can be impersonated; it is not login authentication and constitutes no security acceptance. It must be used only in an isolated demo environment and must not be deployed directly as a public production confirmation API. Query identity permissions are out of scope here.
+In v0.3.1 the email header is only a demo identifier and can be impersonated; it is not login authentication and constitutes no security acceptance. It must be used only in an isolated demo environment. This limitation is superseded by the real server-side session authentication added in v0.4.0 (see below); the demo-email header no longer has any effect.
 
 ## Frontend Call Example (illustrative; demo email taken from the selection box)
 
@@ -107,6 +109,8 @@ Request JSON: `{"email":"customer@demo.com","items":[{"sku":"SKU001","quantity":
 ---
 
 # v0.4.0 API Additions (real sessions / order center / inventory / notifications / reports)
+
+> Current as of v0.4.2. This section documents the implemented, test-covered API surface and supersedes the v0.3.1 contract above wherever they differ.
 
 ## Authentication and Sessions
 
