@@ -205,6 +205,9 @@ try {
     const page = staff.page;
     await page.goto(base + "/staff");
     await page.getByRole("heading", { name: "Order Workbench" }).waitFor();
+    for (const value of ["Demo Customer A", "customer.a@demo.com", "Demo Customer B", "customer.b@demo.com"]) {
+      assert.equal((await page.content()).includes(value), false, `Staff queue exposed ${value}`);
+    }
     const totalText = await page.locator(".toolbar .small.muted").last().textContent();
     assert.match(totalText, /\d+ orders total/);
     assert.ok(Number(totalText.match(/(\d+) orders total/)[1]) >= 50);
@@ -218,6 +221,9 @@ try {
     await page.getByRole("button", { name: "Find Order" }).click();
     await page.getByRole("link", { name: "Open Order Details →" }).click();
     await page.waitForURL(`**/staff/orders/${orderId}`);
+    for (const value of ["Demo Customer A", "customer.a@demo.com", "Demo Customer B", "customer.b@demo.com"]) {
+      assert.equal((await page.content()).includes(value), false, `Staff detail exposed ${value}`);
+    }
   });
 
   await check("staff confirm reserves stock once and shows server-read state", async () => {
