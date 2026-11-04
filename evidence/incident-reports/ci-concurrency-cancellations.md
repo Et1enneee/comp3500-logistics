@@ -26,3 +26,9 @@ successor commits, and the branch content later merged to main green.
 No test failures. No workflow changes required. Platform warnings
 (Node.js 20 deprecation, ubuntu-latest migration) are GitHub announcements
 unrelated to this repository’s code.
+
+## Addendum
+
+- Event: run `41757351466` · commit `50f07a0` · step `Verify current source manifest` — root cause `docs/traceability.md` changed without regenerating the manifest; disposition: regenerate after diff review.
+- FR-08 merge commit `841f7c7` has no independent workflow run: it was pushed to `main` together with `50f07a0` in a single push (`7fabec7..50f07a0`), so only one run exists at head `50f07a0`.
+- Conclusion: the manifest gate flagged a stale manifest before any quality gate ran; resolved by regenerating the manifest after diff review — the gate works as designed.

@@ -1,12 +1,12 @@
 {
   "version": "v0.4.2-delivery",
-  "created_at_utc": "2026-11-02T10:42:05.077Z",
+  "created_at_utc": "2026-11-04T02:05:36.756Z",
   "derived_from": {
     "upstream_commit": "eddab17be9a29b7fb11769b60ac6afce1b3288c0",
     "upstream_source_zip_sha256": "92b1a918b99e99245079ef70e1761df55c83598f857f4760fd94c0190c545d24",
     "note": "Incremental development on the accepted v0.3.1 foundation; the core business chain was not rewritten, and neither the framework nor Prisma major versions were upgraded."
   },
-  "file_count": 177,
+  "file_count": 179,
   "source_files": {
     ".gitignore": "9e1e6b4f373f7905787276c9dd20e6c047f2427e76a409e154c745c3aeef20d7",
     "AGENTS.md": "063098f6cb31bb44c6f8fbea25b3876de7ee1e5f7d00a50dbab506f6415eb7f0",
@@ -74,6 +74,8 @@
     "docs/contracts/get-order.example.json": "fdfe7ce3a22d9cc4038c02aa9959d951be2184afb19f1bab6d176437d20408cb",
     "docs/contracts/glossary.md": "6228ab07068cc49dc3d3bb0aa534ea10b7cb09cc1ccb96378bebe39533bdfd9f",
     "docs/contracts/state-machine.md": "c31cdc67c2f276ae96262b1aa889e23506322b9c2fecbb9a161bb1b3a1ccf1c7",
+    "docs/diagrams/sequence-diagram.puml": "a10184ed619bc994db56206603e21fd6c5f40ac15fb52bf022471941c790cbc9",
+    "docs/diagrams/state-machine.puml": "fbf152fb54b59c627d991e6c60b4065af89003384e2f5f61f4d71d79b40d3e2f",
     "docs/driver-module.md": "3eb4a0a1a63bd5e6d47f491baaf48fc160437f15abd4101f4182cce83a5f56ad",
     "docs/evidence-history/v0.2-v0.3/01-customer-desktop.png": "b6dc1ab776f999b730ecffb509d9bef7f008035923f459be75521fb795e02488",
     "docs/evidence-history/v0.2-v0.3/02-staff-empty.png": "d42b2a763ce517a8876d70eeb15adfa1452b67123cefc9da95a60f76d4dd1acc",
@@ -108,7 +110,7 @@
     "docs/reference/legacy/traceability-v0.md": "3c88f51d54b94eda667db472d0707bc3d0cb22dea5203df03475205dba18d6c4",
     "docs/reference/legacy/usability.md": "7f9f2734aa65133ad430d435208fe13277b87634dda5238c43a66628a8cd6396",
     "docs/test-plan.md": "621e1d678bf1ae2f5783dc7a74520aa611e8be4a7018cce41d329522a65f9688",
-    "docs/traceability.md": "44c97055c692d065c740e71f45559528b209d01a9ac19d8afc3f7f5f5299b349",
+    "docs/traceability.md": "041425e2c6f2185e7ee938cbf20bd63221db1be94e8e400f2a9c9064200a8983",
     "docs/verification-foundation.md": "b57cb79ef452d57eef2648a22182210824d9416cbaa24b8d8448e19e771a5c06",
     "docs/verification-logs/v0.3.1/browser.log": "12b13657d1a75a60dcb9647ccf083a1c9f5cfbf9bb8e0f5d7798ac25ed58fb8b",
     "docs/verification-logs/v0.3.1/build.log": "17dc234def96a40540282809a871ddc11c6c07114817bf03d479811b8e17f784",
