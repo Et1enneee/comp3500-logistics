@@ -1,0 +1,19 @@
+@startuml
+title State Machine Diagram - Order Lifecycle (FR-02)
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+[*] --> CREATED : createOrderPost()
+CREATED --> CONFIRMED : confirmOrder()\nstock -qty (exactly once)
+CONFIRMED --> PICKING : advanceOrder(id, "PICKING")
+PICKING --> SHIPPED : createShipment()
+SHIPPED --> DELIVERED : advanceOrder(id, "DELIVERED")
+CREATED --> CANCELLED : cancelOrder()\nno restock (nothing reserved)
+CONFIRMED --> CANCELLED : cancelOrder()\nrestock +qty (exactly once)
+PICKING --> PICKING : cancelOrder()\nrejected (409)
+DELIVERED --> [*]
+CANCELLED --> [*]
+note right of CONFIRMED
+  Cancel is idempotent:
+  restock happens exactly once
+end note
+@enduml

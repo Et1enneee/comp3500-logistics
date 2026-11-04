@@ -1,0 +1,31 @@
+@startuml
+title Sequence Diagram - Confirm Order (function-call level)
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+actor "Staff" as s
+participant "OrdersAPI\n(route handler)" as api
+participant "OrderService" as svc
+database "SQLite\nvia Prisma" as db
+s -> api : POST /api/v1/orders/{id}/confirm
+activate api
+api -> svc : confirmOrder(orderId, session.user)
+activate svc
+svc -> db : getOrder(orderId)
+db --> svc : { state: "CREATED" }
+alt [state == CREATED]
+  svc -> db : $transaction(\n  product.updateMany(id, qty)\n  [condition: stock >= qty],\n  updateStatus(id, "CONFIRMED"),\n  inventoryLog.create(orderId, -qty),\n  notifyOrderEvent(orderId, "CONFIRMED")\n)
+  note right
+    conditional deduct:
+    0 rows updated -> rollback
+    (no double-deduct, ever)
+  end note
+  db --> svc : { count: 1 }, COMMIT
+  svc --> api : 200 { order }
+  api --> s : 200 OK
+else [state != CREATED || count == 0]
+  svc --> api : 409 Conflict (rollback)
+  api --> s : 409 { error }
+end
+deactivate svc
+deactivate api
+@enduml

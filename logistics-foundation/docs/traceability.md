@@ -16,6 +16,6 @@ IDs follow the original requirements document; the table below reflects only the
 | NFR-02 | Available 08:00–24:00 daily, Must | no long-term run | — | Not verified (short tests are not a substitute) |
 | NFR-03 | Least privilege, Must | role matrix + object-level 404; staff order responses omit customer identity, customer ID and delivery address; customer actors in inventory logs are anonymized | `tests/auth.integration.ts`, `tests/orders.integration.ts`, `tests/privacy.integration.ts`, `tests/address.integration.ts` | Implemented for the current simulated workflow |
 | NFR-04 | Core operations ≤3 steps, Should | customer order placement, staff confirm/ship etc. fit within ≤3 major actions per screen; no formal timed walkthrough | browser script steps | Partial (not formally accepted) |
-| NFR-05 | Code standards/contracts/CI, Must | typecheck/lint/unit/integration/build/browser all executable; root CI configuration complete | `evidence/test-logs/`, `.github/workflows/ci.yml` | All green locally; remote CI is judged by the actual run after upload |
+| NFR-05 | Code standards/contracts/CI, Must | typecheck/lint/unit/integration/build/browser all executable; root CI configuration complete | `evidence/test-logs/`, `.github/workflows/ci.yml` | All green locally; remote CI verified green on main, including current head 7fabec7 |
 
 Interfaces and error codes are in `contracts/api.md`; limitations are in `known-issues.md`.
