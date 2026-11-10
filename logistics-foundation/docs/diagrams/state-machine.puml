@@ -12,8 +12,4 @@ SHIPPED --> IN_TRANSIT : simulate pickup
 IN_TRANSIT --> DELIVERED : simulate delivery
 DELIVERED --> [*]
 CANCELLED --> [*]
-note bottom
-Rejected operations leave the state unchanged;
-they are not transitions in the legal transition table.
-end note
 @enduml
