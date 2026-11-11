@@ -1,6 +1,6 @@
 {
   "version": "v0.4.2-delivery",
-  "created_at_utc": "2026-11-11T10:04:45.892Z",
+  "created_at_utc": "2026-11-11T10:10:49.835Z",
   "derived_from": {
     "upstream_commit": "eddab17be9a29b7fb11769b60ac6afce1b3288c0",
     "upstream_source_zip_sha256": "92b1a918b99e99245079ef70e1761df55c83598f857f4760fd94c0190c545d24",
@@ -10,7 +10,7 @@
   "source_files": {
     ".gitignore": "9e1e6b4f373f7905787276c9dd20e6c047f2427e76a409e154c745c3aeef20d7",
     "AGENTS.md": "063098f6cb31bb44c6f8fbea25b3876de7ee1e5f7d00a50dbab506f6415eb7f0",
-    "BASELINE-final-report.json": "e3a57eeda4bd4d428e33754a08b5e0f348bf11a86bf85a014a1fddf7b30f1bc1",
+    "BASELINE-final-report.json": "88b380977ae8505b9655bab98b50b1b424d8a80a50ef8e43e0361e5f134370ee",
     "BASELINE-v0.3.1.json": "a8c59c1acfaf278564f85ce537a793ffd9823feabf583ac2aff405ccdb425cde",
     "BASELINE-v0.4.0.json": "64a4c89e64bfda71a9ca7be5b00dfa3768227b21bf1e91524230be52d1e711d5",
     "BASELINE-v0.4.1.json": "d8b6f6d1d56f1ef53e12f3589eb3101b75e0cdd8da09d6b6efda04b6946cf59d",
