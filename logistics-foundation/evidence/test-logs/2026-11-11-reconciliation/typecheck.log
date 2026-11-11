@@ -1,0 +1,10 @@
+START 2026-11-11T10:06:20+00:00 npm run typecheck
+
+> group42-logistics-repository@0.4.2 typecheck
+> npm --prefix logistics-foundation run typecheck
+
+
+> group42-logistics-foundation@0.4.2 typecheck
+> tsc --noEmit
+
+EXIT 0
