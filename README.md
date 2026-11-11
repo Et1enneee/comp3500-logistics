@@ -69,7 +69,7 @@ RESET_DEMO_DATA=YES npm run evidence
 
 `evidence` does not touch the original project database. Output defaults to `evidence/` one level above the application and can be redirected with `EVIDENCE_ROOT`. The lower-level `test:browser` mutates the demo database it connects to; prefer the fully isolated evidence entry point. Service startup, readiness checks, performance and browser checks, restart verification, and service teardown are managed by the evidence pipeline.
 
-The CI workflow is in `.github/workflows/ci.yml`; performance and browser checks share the same service lifecycle. The [main-branch run for commit `671c1a1`](https://github.com/Et1enneee/comp3500-logistics/actions/runs/41419103400) passed. Check GitHub Actions for results on later commits.
+The CI workflow is in `.github/workflows/ci.yml`; performance and browser checks share the same service lifecycle. The [final-repair evidence CI run](https://github.com/Et1enneee/comp3500-logistics/actions/runs/42995672230) passed; the badge links to current main-branch checks.
 
 ## Reading Entry Points
 
