@@ -1,5 +1,7 @@
 # Group 42 · Logistics Management System v0.4.2
 
+[![Logistics checks](https://github.com/Et1enneee/comp3500-logistics/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Et1enneee/comp3500-logistics/actions/workflows/ci.yml)
+
 The sole application lives in `logistics-foundation/`; the root directory forwards all run, test, and evidence commands. It keeps the v0.3.1 foundation, Next.js / React / TypeScript / Prisma 6 / SQLite, and the existing lockfile.
 
 ## Startup (Node 24; tested on 24.14.1)
@@ -73,7 +75,7 @@ The CI workflow is in `.github/workflows/ci.yml`; performance and browser checks
 
 - `logistics-foundation/README.md`: business rules and detailed run steps.
 - `logistics-foundation/docs/known-issues.md`: dependency audit, SQLite, availability, and testing boundaries.
-- `logistics-foundation/docs/contracts/` and `docs/traceability.md`: interfaces and requirements traceability.
+- [`logistics-foundation/docs/contracts/`](logistics-foundation/docs/contracts/) and [`logistics-foundation/docs/traceability.md`](logistics-foundation/docs/traceability.md): interfaces and requirements traceability.
 - `logistics-foundation/docs/reference/legacy/`: historical material, not a statement of current capabilities.
 
 The source excludes dependencies, build caches, databases, and real environment variables. `logistics-foundation/SHA256SUMS.txt` lists application files for checksum verification. Historical evidence is kept as historical material; current test evidence is supplied separately. The course report, demo materials, and official submission records remain managed separately by the team.

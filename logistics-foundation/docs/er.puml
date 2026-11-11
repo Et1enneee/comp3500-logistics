@@ -1,0 +1,27 @@
+@startuml
+left to right direction
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+entity "User" as User
+entity "Order" as Order
+entity "OrderItem" as Item
+entity "Product" as Product
+entity "Shipment" as Shipment
+entity "TrackingEvent" as Event
+entity "InventoryLog" as Log
+entity "Notification" as Notification
+User "1" -- "0..*" Order : customer
+Order "1" -- "0..*" Item : contains
+Product "1" -- "0..*" Item : referenced by
+Order "1" -- "0..1" Shipment : has
+User "0..1" -- "0..*" Shipment : assigned driver
+Shipment "1" -- "0..*" Event : records
+Product "1" -- "0..*" Log : records
+User "0..1" -- "0..*" Log : actor
+User "1" -- "0..*" Notification : receives
+Order "0..1" -- "0..*" Notification : relates to
+note bottom of Item
+The creation API requires at least one item;
+the schema itself permits zero related rows.
+end note
+@enduml

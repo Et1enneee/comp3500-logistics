@@ -1,0 +1,9 @@
+source_commit=d3a25b0089a02c24d1942208e8eeddc57f5f8709
+command=PERF_BASE_URL=http://127.0.0.1:3100 PERF_OUTPUT=/data/comp3500-latest/logistics-foundation/evidence/performance.json CHROMIUM_PATH=/usr/local/bin/chromium node scripts/perf-probe.mjs
+started_utc=2026-11-11T02:44:53Z
+API p95: orders.list=15.2ms, orders.list.filtered=3.7ms, inventory.list=12.5ms, inventory.logs=6.7ms, notifications.list=5ms, reports.overview=3.9ms
+UI p95: customer.orders=185.5ms, staff.queue=157.4ms, admin.dashboard=160.4ms
+Targets met: API=true UI=true
+
+EXIT_CODE=0
+ended_utc=2026-11-11T02:44:59Z
