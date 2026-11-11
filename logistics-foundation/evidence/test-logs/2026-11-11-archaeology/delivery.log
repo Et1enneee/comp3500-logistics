@@ -1,0 +1,24 @@
+source_commit=1e0e36c2225bf5481c9943354b65442e3865e760
+command=npm run test:delivery 
+started_utc=2026-11-11T06:29:53Z
+
+> group42-logistics-repository@0.4.2 test:delivery
+> npm --prefix logistics-foundation run test:delivery
+
+
+> group42-logistics-foundation@0.4.2 test:delivery
+> node --test tests/delivery.check.mjs
+
+✔ evidence refuses to run without explicit caller confirmation (43.382862ms)
+✔ packaged and verified source have identical digests despite local runtime files (14.816915ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 116.55923
+
+EXIT_CODE=0
+ended_utc=2026-11-11T06:29:54Z
