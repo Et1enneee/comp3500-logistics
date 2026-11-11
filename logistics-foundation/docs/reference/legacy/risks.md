@@ -23,7 +23,7 @@
 - **RK-06 dates.** The internal delivery date for Assignment 1 is 19 October and the course submission deadline is 20 October; the two are now stated separately so that neither is mistaken for the other. The test date is 24 November, as recorded in RK-03.
 - **RK-07 provenance.** The Newcomer Run Guide and the week-1 code package are described as already provided by the team. The risk is owned by Yang Ting Zhang and can be reassigned if the group prefers a single owner for tooling risks.
 - **RK-08 course basis.** The figures are not estimates. The course introduction requires a 15 to 25 minute recorded presentation (Project Presentation 2/2 slide) and a report of not more than 1000 words excluding source code (Project Report slide), both due 8 December 2026.
-- **RK-05 open point.** The mitigation states 50 seeded orders, but prisma/seed.ts currently creates 3 users and 10 products and no orders. The registered mitigation is therefore not yet met; this is recorded, not changed.
+- **RK-05 current seed reconciliation.** The historical mitigation specifies 50 orders, 10 SKUs and 3 roles. The current `prisma/seed.ts` distribution creates 56 orders, 10 products and 5 users spanning 4 roles. The historical row is preserved as recorded; the current seed is the executable source for the demo data shape. Run `RESET_DEMO_DATA=YES npm run db:seed:demo` only on a disposable database, then check the seed output or query the database.
 
 ## Course basis quoted for RK-08
 
