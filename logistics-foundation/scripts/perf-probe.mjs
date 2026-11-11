@@ -61,6 +61,12 @@ async function apiProbe(name, url, cookie) {
 
 async function uiProbe(browser, name, pathName, email, waitSelector) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  await context.addInitScript(() => {
+    globalThis.__observedLcp = null;
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) globalThis.__observedLcp = entry.startTime;
+    }).observe({ type: "largest-contentful-paint", buffered: true });
+  });
   const page = await context.newPage();
   await page.goto(BASE + "/login");
   await page.locator("#login-email").fill(email);
@@ -70,13 +76,26 @@ async function uiProbe(browser, name, pathName, email, waitSelector) {
     page.getByRole("button", { name: "Sign In", exact: true }).click(),
   ]);
   const samples = [];
+  const fcpSamples = [];
+  const lcpSamples = [];
   for (let index = 0; index < UI_SAMPLES; index++) {
     const started = performance.now();
     await page.goto(BASE + pathName, { waitUntil: "domcontentloaded" });
     await page.locator(waitSelector).first().waitFor({ state: "visible", timeout: 15000 });
     samples.push(performance.now() - started);
+    await page.waitForFunction(() => performance.getEntriesByType("paint").some(entry => entry.name === "first-contentful-paint"), null, { timeout: 10000 });
+    const paint = await page.evaluate(async () => {
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      return {
+        fcp: performance.getEntriesByType("paint").find(entry => entry.name === "first-contentful-paint")?.startTime ?? null,
+        lcp: globalThis.__observedLcp,
+      };
+    });
+    if (paint.fcp === null || !Number.isFinite(paint.fcp)) throw new Error(`FCP unavailable: ${name}`);
+    fcpSamples.push(paint.fcp);
+    lcpSamples.push(paint.lcp === null ? null : Number(paint.lcp.toFixed(1)));
   }
-  const result = { name, path: pathName, metric: "goto → first row/card visible", ...stats(samples) };
+  const result = { name, path: pathName, metric: "goto → first row/card visible", ...stats(samples), fcpMs: stats(fcpSamples), lcpMs: lcpSamples };
   await context.close();
   return result;
 }
@@ -129,7 +148,8 @@ async function main() {
     methodology: {
       api: `${SAMPLES} sequential requests per endpoint (after 3 warm-up requests), measuring the full HTTP round trip including reading the response body; same process, single-user cookie, local loopback.`,
       ui: `${UI_SAMPLES} production-build page navigations, measuring goto until the first list row / first stat card is visible; a single Chromium instance without cache clearing, not a first cold start.`,
-      targets: { apiLocalP95: "≤ 2000ms", uiFirstContentP95: "≤ 3000ms" },
+      targets: { apiLocalP95: "≤ 2000ms", uiFirstContentP95: "≤ 3000ms", fcpP95: "≤ 3000ms" },
+      paint: "Navigation timing first-contentful-paint via Paint Timing API; largest-contentful-paint is observed until shortly after the first row/card becomes visible, and may be null or change later.",
       caveat: "Local loopback measurements; not representative of public networks or high concurrency; no long-duration availability testing was performed.",
     },
     fixture,
@@ -138,6 +158,7 @@ async function main() {
     targetsMet: {
       api: api.every(entry => entry.p95Ms <= 2000),
       ui: ui.every(entry => entry.p95Ms <= 3000),
+      fcp: ui.every(entry => entry.fcpMs.p95Ms <= 3000),
     },
   };
 
@@ -145,8 +166,9 @@ async function main() {
   await fs.writeFile(OUT, JSON.stringify(report, null, 2));
   console.log(`API p95: ${api.map(entry => `${entry.name}=${entry.p95Ms}ms`).join(", ")}`);
   console.log(`UI p95: ${ui.map(entry => `${entry.name}=${entry.p95Ms}ms`).join(", ")}`);
-  console.log(`Targets met: API=${report.targetsMet.api} UI=${report.targetsMet.ui}`);
-  if (!report.targetsMet.api || !report.targetsMet.ui) process.exitCode = 1;
+  console.log(`FCP p95: ${ui.map(entry => `${entry.name}=${entry.fcpMs.p95Ms}ms`).join(", ")}`);
+  console.log(`Targets met: API=${report.targetsMet.api} UI=${report.targetsMet.ui} FCP=${report.targetsMet.fcp}`);
+  if (!report.targetsMet.api || !report.targetsMet.ui || !report.targetsMet.fcp) process.exitCode = 1;
 }
 
 main()

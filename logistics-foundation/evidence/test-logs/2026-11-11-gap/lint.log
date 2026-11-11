@@ -1,0 +1,14 @@
+source_commit=5e692b2b3126927947b67588152959d928e2f666
+command=npm run lint 
+started_utc=2026-11-11T06:05:07Z
+
+> group42-logistics-repository@0.4.2 lint
+> npm --prefix logistics-foundation run lint
+
+
+> group42-logistics-foundation@0.4.2 lint
+> eslint
+
+
+EXIT_CODE=0
+ended_utc=2026-11-11T06:05:11Z

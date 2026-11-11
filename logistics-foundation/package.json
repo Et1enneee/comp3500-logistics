@@ -50,5 +50,8 @@
     "@prisma/client@6.19.3": true,
     "unrs-resolver@1.12.2": true,
     "esbuild@0.28.2": true
+  },
+  "engines": {
+    "node": ">=24"
   }
 }

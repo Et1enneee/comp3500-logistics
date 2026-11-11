@@ -4,7 +4,7 @@
 
 The sole application lives in `logistics-foundation/`; the root directory forwards all run, test, and evidence commands. It keeps the v0.3.1 foundation, Next.js / React / TypeScript / Prisma 6 / SQLite, and the existing lockfile.
 
-## Startup (Node 24; tested on 24.14.1)
+## Startup (Node 24; tested on 24.22.1)
 
 From a fresh clone, with network access to install dependencies:
 
@@ -74,6 +74,7 @@ The CI workflow is in `.github/workflows/ci.yml`; performance and browser checks
 ## Reading Entry Points
 
 - `logistics-foundation/README.md`: business rules and detailed run steps.
+- [`logistics-foundation/docs/requirements/srs.md`](logistics-foundation/docs/requirements/srs.md): requirements specification.
 - `logistics-foundation/docs/known-issues.md`: dependency audit, SQLite, availability, and testing boundaries.
 - [`logistics-foundation/docs/contracts/`](logistics-foundation/docs/contracts/) and [`logistics-foundation/docs/traceability.md`](logistics-foundation/docs/traceability.md): interfaces and requirements traceability.
 - `logistics-foundation/docs/reference/legacy/`: historical material, not a statement of current capabilities.
