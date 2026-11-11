@@ -1,31 +1,29 @@
 @startuml
-title Sequence Diagram - Confirm Order (function-call level)
+title Confirm an order: route, transaction and outcomes
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
-actor "Staff" as s
-participant "OrdersAPI\n(route handler)" as api
-participant "OrderService" as svc
-database "SQLite\nvia Prisma" as db
-s -> api : POST /api/v1/orders/{id}/confirm
-activate api
-api -> svc : confirmOrder(orderId, session.user)
-activate svc
-svc -> db : getOrder(orderId)
-db --> svc : { state: "CREATED" }
-alt [state == CREATED]
-  svc -> db : $transaction(\n  product.updateMany(id, qty)\n  [condition: stock >= qty],\n  updateStatus(id, "CONFIRMED"),\n  inventoryLog.create(orderId, -qty),\n  notifyOrderEvent(orderId, "CONFIRMED")\n)
-  note right
-    conditional deduct:
-    0 rows updated -> rollback
-    (no double-deduct, ever)
-  end note
-  db --> svc : { count: 1 }, COMMIT
-  svc --> api : 200 { order }
-  api --> s : 200 OK
-else [state != CREATED || count == 0]
-  svc --> api : 409 Conflict (rollback)
-  api --> s : 409 { error }
+actor Staff as staff
+participant "PATCH status route" as route
+participant "Order handlers" as handler
+database "Prisma / SQLite" as db
+staff -> route : PATCH(req, {params})
+route -> handler : updateStatus(req, id)
+handler -> handler : requireSession(req)\nconfirmOrder(id, actorId)
+handler -> db : $transaction(callback, Serializable)
+activate db
+db -> db : order.updateMany(CREATED → CONFIRMED)
+db -> db : [claim succeeded] product.updateMany(stock >= quantity)
+alt eligible order and sufficient stock
+  db -> db : inventoryLog.create(-quantity)\nnotifyOrderEvent(ORDER_CONFIRMED)
+  db --> handler : commit(order)
+  deactivate db
+  handler --> route : Response.json({order})
+  route --> staff : HTTP 200
+else invalid state or insufficient stock
+  activate db
+  db --> handler : rollback(HttpError 409)
+  deactivate db
+  handler --> route : failure(error)
+  route --> staff : HTTP 409
 end
-deactivate svc
-deactivate api
 @enduml
