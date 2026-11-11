@@ -1,6 +1,6 @@
-source_commit=54969fec6a9892af77c42073c458482639ef751a
+source_commit=84a2770465519768ddd46e54f1bc4d1fe2633d00
 command=npm run build 
-started_utc=2026-11-11T06:35:24Z
+started_utc=2026-11-11T06:40:59Z
 
 > group42-logistics-repository@0.4.2 build
 > npm --prefix logistics-foundation run build
@@ -10,15 +10,15 @@ started_utc=2026-11-11T06:35:24Z
 > next build
 
 [1m[38;2;173;127;168m▲ Next.js 16.4.3[39m[22m (Turbopack)
-[32m[1m✓[22m[39m Running next.config.ts took 31ms
+[32m[1m✓[22m[39m Running next.config.ts took 25ms
 
 [37m[1m [22m[39m Creating an optimized production build ...
 [32m[1m✓[22m[39m Compiled successfully in 4.4s
 [37m[1m [22m[39m Running TypeScript ...
-[37m[1m [22m[39m Finished TypeScript in 4.3s ...
+[37m[1m [22m[39m Finished TypeScript in 4.4s ...
 [37m[1m [22m[39m Collecting page data using 1 worker ...
 [37m[1m [22m[39m Generating static pages using 1 worker (0/3) ...
-[32m[1m✓[22m[39m Generating static pages using 1 worker (3/3) in 81ms
+[32m[1m✓[22m[39m Generating static pages using 1 worker (3/3) in 82ms
 [37m[1m [22m[39m Finalizing page optimization ...
 
 [4mRoute (app)[24m
@@ -58,4 +58,4 @@ started_utc=2026-11-11T06:35:24Z
 
 
 EXIT_CODE=0
-ended_utc=2026-11-11T06:35:34Z
+ended_utc=2026-11-11T06:41:09Z

@@ -1,6 +1,6 @@
-source_commit=54969fec6a9892af77c42073c458482639ef751a
+source_commit=84a2770465519768ddd46e54f1bc4d1fe2633d00
 command=npm run db:setup 
-started_utc=2026-11-11T06:34:50Z
+started_utc=2026-11-11T06:40:25Z
 
 > group42-logistics-repository@0.4.2 db:setup
 > npm --prefix logistics-foundation run db:setup
@@ -14,7 +14,7 @@ For more information, see: https://pris.ly/prisma-config
 
 Prisma schema loaded from prisma/schema.prisma
 
-✔ Generated Prisma Client (v6.19.3) to ./node_modules/@prisma/client in 69ms
+✔ Generated Prisma Client (v6.19.3) to ./node_modules/@prisma/client in 64ms
 
 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
 
@@ -60,4 +60,4 @@ migrations/
 All migrations have been successfully applied.
 
 EXIT_CODE=0
-ended_utc=2026-11-11T06:34:52Z
+ended_utc=2026-11-11T06:40:27Z
