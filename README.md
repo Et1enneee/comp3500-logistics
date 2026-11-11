@@ -69,7 +69,7 @@ RESET_DEMO_DATA=YES npm run evidence
 
 `evidence` does not touch the original project database. Output defaults to `evidence/` one level above the application and can be redirected with `EVIDENCE_ROOT`. The lower-level `test:browser` mutates the demo database it connects to; prefer the fully isolated evidence entry point. Service startup, readiness checks, performance and browser checks, restart verification, and service teardown are managed by the evidence pipeline.
 
-The CI workflow is in `.github/workflows/ci.yml`; performance and browser checks share the same service lifecycle. The [final-repair evidence CI run](https://github.com/Et1enneee/comp3500-logistics/actions/runs/42995672230) passed; the badge links to current main-branch checks.
+The CI workflow is in `.github/workflows/ci.yml`; performance and browser checks share the same service lifecycle. The [reconciliation evidence CI run](https://github.com/Et1enneee/comp3500-logistics/actions/runs/43001010576) passed; the badge links to current main-branch checks.
 
 ## Reading Entry Points
 
@@ -81,4 +81,4 @@ The CI workflow is in `.github/workflows/ci.yml`; performance and browser checks
 - [`logistics-foundation/docs/contracts/`](logistics-foundation/docs/contracts/) and [`logistics-foundation/docs/traceability.md`](logistics-foundation/docs/traceability.md): interfaces and requirements traceability.
 - `logistics-foundation/docs/reference/legacy/`: historical material, not a statement of current capabilities.
 
-The source excludes dependencies, build caches, databases, and real environment variables. `logistics-foundation/SHA256SUMS.txt` lists application files for checksum verification. Historical evidence is kept as historical material; current test evidence is supplied separately. The course report, demo materials, and official submission records remain managed separately by the team.
+The source excludes dependencies, build caches, databases, and real environment variables. `logistics-foundation/SHA256SUMS.txt` lists application files for checksum verification. Historical evidence is kept as historical material; current test evidence is supplied separately. The canonical course report and submission source are maintained in `docs/`; demo materials and official submission records are managed separately by the team.
