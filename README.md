@@ -73,6 +73,8 @@ The CI workflow is in `.github/workflows/ci.yml`; performance and browser checks
 
 ## Reading Entry Points
 
+- [`docs/final-report.md`](docs/final-report.md): canonical final report and evidence trail.
+
 - `logistics-foundation/README.md`: business rules and detailed run steps.
 - [`logistics-foundation/docs/requirements/srs.md`](logistics-foundation/docs/requirements/srs.md): requirements specification.
 - `logistics-foundation/docs/known-issues.md`: dependency audit, SQLite, availability, and testing boundaries.

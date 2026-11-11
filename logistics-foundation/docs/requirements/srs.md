@@ -78,3 +78,7 @@ Role pages are listed in §2. The application exposes versioned HTTP routes for 
 ## 7. Document control
 
 Version 2.1; date 2026-11-11. NFR-02 now specifies point-in-time integration availability rather than daily continuous availability; NFR-04 specifies a defined set of automated operations rather than a general human-action guarantee. Consolidated from the risk register, historical register v0 and development evidence; provenance chain in [traceability](../traceability.md) and the [audit record](../audit-2026-11-10.md).
+
+| Revision | Basis and change |
+|---|---|
+| 2.0 to 2.1, 2026-11-11 | For the local deployment model, NFR-02 changed from the daily availability window to integration-point checks; NFR-04 was bounded to selected scripted operations. Basis: [integration observation archaeology](../../evidence/availability/integration-observations.json), [automated operation walkthrough](../../evidence/user-validation/automated-walkthrough.md), and [revision commit](https://github.com/Et1enneee/comp3500-logistics/commit/2da83b5). |
