@@ -382,6 +382,24 @@ try {
     assert.ok(body.includes(orderNumber));
   });
 
+  await check("admin exports selected dates without applying the filter", async () => {
+    const page = admin.page;
+    await page.goto(base + "/admin");
+    await page.getByRole("heading", { name: "Orders & Inventory Overview" }).waitFor();
+    const displayedRange = await page.getByTestId("report-range").textContent();
+    await page.locator("#from").fill("2000-01-01");
+    await page.locator("#to").fill("2000-01-03");
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      page.getByRole("button", { name: "Export Selected Dates as CSV" }).click(),
+    ]);
+    assert.equal(download.suggestedFilename(), "orders-2000-01-01_2000-01-03.csv");
+    const csv = await fs.readFile(await download.path(), "utf8");
+    assert.ok(csv.includes("orderNumber,createdAtGmt8,timezone,status,statusLabel,totalCents,totalYuan"));
+    assert.ok(!csv.includes(orderNumber), "the selected historical range excludes the current order");
+    assert.equal(await page.getByTestId("report-range").textContent(), displayedRange);
+  });
+
   await check("role boundaries: admin is read-only, customer/staff see forbidden page content", async () => {
     const adminPage = admin.page;
     await adminPage.goto(base + "/inventory");
