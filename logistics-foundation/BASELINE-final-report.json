@@ -1,13 +1,13 @@
 {
-  "purpose": "Evidence archaeology: integration points and automated operation walkthrough",
-  "created_at_utc": "2026-11-11T06:45:19.118739+00:00",
+  "purpose": "Final-repair regression: direct export and report reconciliation",
+  "created_at_utc": "2026-11-11T09:34:34.289879+00:00",
   "historical_presentation_commit": "df340dc4c6c10236040bae672f2c518f1678033d",
-  "tested_source_commit": "84a2770465519768ddd46e54f1bc4d1fe2633d00",
-  "hardened_evidence_commit": "d5ce34e8b57e9d318808d214f6ac36ceb7ea0198",
-  "relationship": "The tested source commit contains the browser action and historical CI interpretation scripts and was tested in a fresh clone. The evidence commit adds the resulting browser, test and performance logs and walkthrough; its CI passed. The baseline record and specification/report edits follow the evidence commit. No commit embeds its own hash. Integration-point observations do not establish continuous service uptime or human validation.",
-  "local_test_logs": "evidence/test-logs/2026-11-11-archaeology/",
+  "tested_source_commit": "ccc8a67f8865815618be4c2392c5e3fee7008f68",
+  "hardened_evidence_commit": "3cff8da5dd87e4413f9e74eba7c4b0759d40af37",
+  "relationship": "The tested source commit contains the selected-date export and its tests. The evidence commit records the fresh-clone regression and walkthrough. Report, baseline metadata and PDF are derived after the evidence commit and do not embed their own commit hash.",
+  "local_test_logs": "evidence/test-logs/2026-11-11-final-repair/",
   "performance_evidence": "evidence/performance.json",
-  "evidence_commit_ci": "https://github.com/Et1enneee/comp3500-logistics/actions/runs/42974282118",
+  "evidence_commit_ci": "https://github.com/Et1enneee/comp3500-logistics/actions/runs/42995672230",
   "tags": {
     "v0.3.1": {
       "commit": "0d9f400eed37dae99748752a5a09248749296b4f",
@@ -27,5 +27,10 @@
     "tested_source_commit": "5e692b2b3126927947b67588152959d928e2f666",
     "evidence_commit": "041a5cfecd28b778eecbf501143cc6997a7b2c50",
     "evidence_commit_ci": "https://github.com/Et1enneee/comp3500-logistics/actions/runs/42970463573"
+  },
+  "previous_evidence_archaeology": {
+    "tested_source_commit": "84a2770465519768ddd46e54f1bc4d1fe2633d00",
+    "evidence_commit": "d5ce34e8b57e9d318808d214f6ac36ceb7ea0198",
+    "evidence_commit_ci": "https://github.com/Et1enneee/comp3500-logistics/actions/runs/42974282118"
   }
 }

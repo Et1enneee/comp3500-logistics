@@ -41,6 +41,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             <div className="field"><label htmlFor="from">From date ({TIMEZONE_LABEL})</label><input id="from" name="from" type="date" defaultValue={range.from} /></div>
             <div className="field"><label htmlFor="to">To date ({TIMEZONE_LABEL})</label><input id="to" name="to" type="date" defaultValue={range.to} /></div>
             <button className="primary" type="submit">Apply Filters</button>
+            <button type="submit" formAction="/api/v1/reports/export.csv">Export Selected Dates as CSV</button>
           </form>
           <div className="inline-actions">
             <Link className="button" href={`/admin?from=${defaultFrom}&to=${todayGmt8()}`}>Last 7 Days</Link>
