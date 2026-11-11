@@ -279,7 +279,7 @@ The following is the complete current traceability table. Code and evidence path
 ### Baseline and reproduction
 
 - Presentation baseline: `df340dc4c6c10236040bae672f2c518f1678033d`; historical [CI run 41758556769](https://github.com/Et1enneee/comp3500-logistics/actions/runs/41758556769).
-- Hardened baseline: **`5147f279a2c69cd56d86fc943f89e41ce9d87f7f`** The [baseline record](../logistics-foundation/BASELINE-final-report.json) distinguishes the tested source commit, the evidence commit and the subsequent report commit.
+- Earlier hardening evidence: `5147f279a2c69cd56d86fc943f89e41ce9d87f7f`. The interim gap-closure baseline records tested source `5e692b2b3126927947b67588152959d928e2f666` and evidence commit `041a5cfecd28b778eecbf501143cc6997a7b2c50`; the [baseline record](../logistics-foundation/BASELINE-final-report.json) is stored in subsequent commit `bec7bb722e6d4623339bde9d72429367a968dc5e`. The report follows the evidence record, avoiding a self-referential hash.
 - Annotated tags `v0.3.1` and `v0.4.2` point to `0d9f400` and `f2693fd` respectively; both tag messages state “applied retrospectively”. Reproduce with `git for-each-ref --format='%(refname:short) %(objecttype) %(*objectname) %(contents:subject)' refs/tags`.
 - Run from repository root after `npm run setup` and `npm run db:setup`; seed only a disposable database using `RESET_DEMO_DATA=YES npm run db:seed:demo`. Commands and raw output: [dated logs](../logistics-foundation/evidence/test-logs/). The browser run requires a running local production server, `FOUNDATION_BROWSER_TEST=YES`, `FOUNDATION_BASE_URL=http://127.0.0.1:3100`, and an available Chromium; see [test plan](../logistics-foundation/docs/test-plan.md).
 
@@ -311,7 +311,7 @@ Use `find logistics-foundation/tests -maxdepth 1 -name '*integration.ts' | wc -l
 
 **Performance provenance note:** The presentation figure is recorded in the [audit](../logistics-foundation/docs/audit-2026-11-10.md); the current probe output in §10 provides the report measurement and its reproduction command.
 
-**CI:** The hardened evidence commit passed [run 42948472214](https://github.com/Et1enneee/comp3500-logistics/actions/runs/42948472214); the baseline-record commit `985f74c5395346f41881e6d7eea1eaae411ac8e0` passed [run 42948722240](https://github.com/Et1enneee/comp3500-logistics/actions/runs/42948722240). Reproduce with `gh run view 42948472214 --json headSha,status,conclusion,url` and the corresponding command for the baseline-record run. The report commit follows these commits and has its own CI result on GitHub.
+**CI:** The tested source passed [run 42969848672](https://github.com/Et1enneee/comp3500-logistics/actions/runs/42969848672), and the evidence commit passed [run 42970463573](https://github.com/Et1enneee/comp3500-logistics/actions/runs/42970463573). An earlier instrument commit failed [run 42969601705](https://github.com/Et1enneee/comp3500-logistics/actions/runs/42969601705) because its summary test was discovered by Vitest but used the Node test runner; the tested source changes that import to Vitest. The [initial local failure](../logistics-foundation/evidence/test-logs/2026-11-11-gap/initial-unit-failure.log) and subsequent passing tests are retained. The intentionally stopped-server probe records a failed request as expected. Reproduce run details with `gh run view 42970463573 --json headSha,status,conclusion,url`. Subsequent commits have their own CI results.
 
 ### Glossary
 
