@@ -1,0 +1,10 @@
+source_commit=84a2770465519768ddd46e54f1bc4d1fe2633d00
+command=bash -c cd\ logistics-foundation\ \&\&\ node\ scripts/perf-probe.mjs 
+started_utc=2026-11-11T06:41:10Z
+API p95: orders.list=4.9ms, orders.list.filtered=3.2ms, inventory.list=13.6ms, inventory.logs=5.7ms, notifications.list=3.2ms, reports.overview=3.2ms
+UI p95: customer.orders=121.3ms, staff.queue=113.8ms, admin.dashboard=90ms
+FCP p95: customer.orders=96ms, staff.queue=96ms, admin.dashboard=64ms
+Targets met: API=true UI=true FCP=true
+
+EXIT_CODE=0
+ended_utc=2026-11-11T06:41:15Z

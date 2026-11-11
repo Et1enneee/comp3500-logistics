@@ -360,6 +360,19 @@ try {
     assert.equal(statCount, orders.length);
     const deliveredText = await page.getByTestId("stat-delivered-amount").innerText();
     assert.ok(deliveredText.includes((deliveredSum / 100).toFixed(2)), deliveredText);
+    await page.locator("#from").fill(from);
+    await page.locator("#to").fill(today);
+    await Promise.all([
+      page.waitForURL(url => url.pathname === "/admin" && url.searchParams.get("from") === from && url.searchParams.get("to") === today),
+      page.getByRole("button", { name: "Apply Filters" }).click(),
+    ]);
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      page.getByRole("link", { name: "Export Current Filter as CSV" }).click(),
+    ]);
+    const downloadedCsv = await fs.readFile(await download.path(), "utf8");
+    assert.ok(downloadedCsv.includes("orderNumber,createdAtGmt8,timezone,status,statusLabel,totalCents,totalYuan"));
+    assert.ok(downloadedCsv.includes(orderNumber));
     await shot(page, "11-admin-dashboard");
 
     const csv = await page.request.get(`${base}/api/v1/reports/export.csv?from=${from}&to=${today}`);

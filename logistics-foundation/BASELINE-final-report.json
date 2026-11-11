@@ -1,13 +1,13 @@
 {
-  "purpose": "Interim Phase 1 gap-closure source and evidence baseline; human observation and final report follow",
-  "created_at_utc": "2026-11-11T06:12:07.968179+00:00",
+  "purpose": "Evidence archaeology: integration points and automated operation walkthrough",
+  "created_at_utc": "2026-11-11T06:45:19.118739+00:00",
   "historical_presentation_commit": "df340dc4c6c10236040bae672f2c518f1678033d",
-  "tested_source_commit": "5e692b2b3126927947b67588152959d928e2f666",
-  "hardened_evidence_commit": "041a5cfecd28b778eecbf501143cc6997a7b2c50",
-  "relationship": "The tested source commit contains the instruments and application code tested in a fresh clone. The evidence commit adds dated observations, refreshed performance evidence and documentation after the tested source. This baseline record and the report updates follow that evidence commit; a Git commit cannot embed its own hash. Availability and user observations require the operator-run wave.",
-  "local_test_logs": "evidence/test-logs/2026-11-11-gap/",
+  "tested_source_commit": "84a2770465519768ddd46e54f1bc4d1fe2633d00",
+  "hardened_evidence_commit": "d5ce34e8b57e9d318808d214f6ac36ceb7ea0198",
+  "relationship": "The tested source commit contains the browser action and historical CI interpretation scripts and was tested in a fresh clone. The evidence commit adds the resulting browser, test and performance logs and walkthrough; its CI passed. The baseline record and specification/report edits follow the evidence commit. No commit embeds its own hash. Integration-point observations do not establish continuous service uptime or human validation.",
+  "local_test_logs": "evidence/test-logs/2026-11-11-archaeology/",
   "performance_evidence": "evidence/performance.json",
-  "evidence_commit_ci": "https://github.com/Et1enneee/comp3500-logistics/actions/runs/42970463573",
+  "evidence_commit_ci": "https://github.com/Et1enneee/comp3500-logistics/actions/runs/42974282118",
   "tags": {
     "v0.3.1": {
       "commit": "0d9f400eed37dae99748752a5a09248749296b4f",
@@ -23,5 +23,9 @@
     "evidence_commit": "5147f279a2c69cd56d86fc943f89e41ce9d87f7f",
     "evidence_commit_ci": "https://github.com/Et1enneee/comp3500-logistics/actions/runs/42948472214"
   },
-  "tested_source_ci": "https://github.com/Et1enneee/comp3500-logistics/actions/runs/42969848672"
+  "prior_gap_closure": {
+    "tested_source_commit": "5e692b2b3126927947b67588152959d928e2f666",
+    "evidence_commit": "041a5cfecd28b778eecbf501143cc6997a7b2c50",
+    "evidence_commit_ci": "https://github.com/Et1enneee/comp3500-logistics/actions/runs/42970463573"
+  }
 }
