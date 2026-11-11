@@ -1,6 +1,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const source=await readFile(path.join(root,'scripts/browser-smoke.mjs'),'utf8');
 const log=await readFile(path.join(root,'evidence/test-logs/2026-11-11-archaeology/browser.log'),'utf8');
@@ -29,4 +30,10 @@ for(const [role,operation,check,frags] of rows){
  output+=`| ${role} | ${operation} ([${check}](../../scripts/browser-smoke.mjs#L${start+1})) | ${frags.length} | ${frags.length<=3?'Yes':'No'} |\n`;
 }
 output+='\nThe full customer creation check also tests an invalid submission before correction; the table instead selects the separate successful order-creation segment in the cancellation check. The staff confirmation regression deliberately exercises a Back action; the table uses the separate successful confirmation segment. The admin filter and export scenario comprises four interactions in total: three for filtering and one for export. The direct API export assertion is additional to the actual browser download click.\n\n[Browser execution log](../test-logs/2026-11-11-archaeology/browser.log) records the check results. [Human validation protocol](../../docs/user-validation/moderator.md) provides a separate method for assessing fitness for purpose.\n';
+const roles=['Customer / Staff / Admin','Unauthenticated / Customer','Admin / Customer','Customer','Staff / Driver','Customer','Customer','Customer','Staff','Staff','Staff','Staff','Staff / Customer','Customer','Admin','Admin / Customer / Staff','Unauthenticated','Customer / Staff','Staff','Staff','Customer / Staff','Customer','Customer / Staff / Admin','Customer','Customer'];
+const groups=['list validation','authentication','report / sign-out recovery','sign-in','assignment / delivery','order creation and error handling','order detail','ownership security','order queue','confirmation regression','picking / shipping','delivery recovery','delivery / tracking','notifications','report filter / export','role boundaries','API authentication','creation / confirmation / cancellation','inventory','inventory ledger','network recovery','stock validation','mobile layout','appearance','sign-out'];
+const expected='507d3121ac7d49d9ce66ae5370079efca73cab48e141eefe10b710020a9bc66d';
+if(createHash('sha256').update(checks.join('\n')).digest('hex')!==expected || roles.length!==checks.length || groups.length!==checks.length) throw Error('Update check-to-role mapping after a browser suite change');
+output+='\n## Complete browser-check map\n\nThese check IDs are the source-order indices in the test suite. Cross-cutting and recovery checks are shown as such; their presence does not imply an independently timed human journey.\n\n| ID | Check | Role or actor | Coverage |\n|---:|---|---|---|\n';
+for(let i=0;i<checks.length;i++){const line=lines.findIndex(l=>l.includes(`await check("${checks[i]}"`))+1;output+=`| ${i+1} | [${checks[i]}](../../scripts/browser-smoke.mjs#L${line}) | ${roles[i]} | ${groups[i]} |\n`;}
 await writeFile(path.join(root,'evidence/user-validation/automated-walkthrough.md'),output);console.log(`checks=${checks.length} passed=${passed.length} operations=${rows.length} operations_over_3=${rows.filter(r=>r[3].length>3).length}`);
