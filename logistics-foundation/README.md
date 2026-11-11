@@ -13,7 +13,7 @@ Local teaching demo, **not for production use**: logistics is simulated locally 
 - `/admin` (admin, read-only): order count, status distribution, delivered amount, non-cancelled amount, currently low-stock SKUs, GMT+8 date range, CSV export; the inventory page is read-only.
 - API: `/api/v1/auth/*`, `/api/v1/orders` (create/list/lookup by ORD), `/api/v1/orders/{id}`, `/api/v1/orders/{id}/status`, `/api/v1/orders/{id}/tracking`, `/api/v1/shipments`, `/api/v1/inventory*`, `/api/v1/notifications*`, `/api/v1/reports/overview`, `/api/v1/reports/export.csv`.
 
-## 1. Fresh-Directory Installation (Node 24; local verification on 24.14.1)
+## 1. Fresh-Directory Installation (Node 24; local verification on 24.22.1)
 
 ```bash
 npm ci
