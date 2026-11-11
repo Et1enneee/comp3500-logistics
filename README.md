@@ -4,7 +4,7 @@
 
 The sole application lives in `logistics-foundation/`; the root directory forwards all run, test, and evidence commands. It keeps the v0.3.1 foundation, Next.js / React / TypeScript / Prisma 6 / SQLite, and the existing lockfile.
 
-## Startup (Node 24; tested on 24.14.1)
+## Startup (Node 24; tested on 24.22.1)
 
 From a fresh clone, with network access to install dependencies:
 
