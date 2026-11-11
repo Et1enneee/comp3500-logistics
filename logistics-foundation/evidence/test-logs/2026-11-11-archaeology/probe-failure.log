@@ -1,7 +1,7 @@
-source_commit=1e0e36c2225bf5481c9943354b65442e3865e760
+source_commit=54969fec6a9892af77c42073c458482639ef751a
 command=bash -c cd\ logistics-foundation\ \&\&\ node\ scripts/soak-probe.mjs 
-started_utc=2026-11-11T06:30:37Z
-{"ts":"2026-11-11T06:30:37.405Z","ok":false,"latencyMs":41.5}
+started_utc=2026-11-11T06:35:57Z
+{"ts":"2026-11-11T06:35:57.136Z","ok":false,"latencyMs":37.7}
 
 EXIT_CODE=1
-ended_utc=2026-11-11T06:30:37Z
+ended_utc=2026-11-11T06:35:57Z

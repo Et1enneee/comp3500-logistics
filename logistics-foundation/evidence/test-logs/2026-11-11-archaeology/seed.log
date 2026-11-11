@@ -1,6 +1,6 @@
-source_commit=1e0e36c2225bf5481c9943354b65442e3865e760
+source_commit=54969fec6a9892af77c42073c458482639ef751a
 command=npm run db:seed:demo 
-started_utc=2026-11-11T06:29:31Z
+started_utc=2026-11-11T06:34:52Z
 
 > group42-logistics-repository@0.4.2 db:seed:demo
 > npm --prefix logistics-foundation run db:seed:demo
@@ -18,4 +18,4 @@ Demo data rebuilt (disposable database only)
     staff@demo.com (staff)  driver@demo.com (driver)  admin@demo.com (administrator, read-only reports)
 
 EXIT_CODE=0
-ended_utc=2026-11-11T06:29:32Z
+ended_utc=2026-11-11T06:34:53Z
