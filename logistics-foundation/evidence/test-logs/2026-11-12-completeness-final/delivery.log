@@ -1,10 +1,10 @@
-START 2026-11-12T07:26:04+00:00 npm run test:delivery
+START 2026-11-12T07:29:02+00:00 npm run test:delivery
 
 > group42-logistics-foundation@0.4.2 test:delivery
 > node --test tests/delivery.check.mjs
 
-✔ evidence refuses to run without explicit caller confirmation (47.37441ms)
-✔ packaged and verified source have identical digests despite local runtime files (20.86835ms)
+✔ evidence refuses to run without explicit caller confirmation (42.684359ms)
+✔ packaged and verified source have identical digests despite local runtime files (17.926261ms)
 ℹ tests 2
 ℹ suites 0
 ℹ pass 2
@@ -12,5 +12,5 @@ START 2026-11-12T07:26:04+00:00 npm run test:delivery
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 127.06853
-END 2026-11-12T07:26:04+00:00 exit=0
+ℹ duration_ms 117.993973
+END 2026-11-12T07:29:02+00:00 exit=0

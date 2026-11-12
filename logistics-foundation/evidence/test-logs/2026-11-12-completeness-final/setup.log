@@ -1,4 +1,4 @@
-START 2026-11-12T07:25:39+00:00 npm run db:setup
+START 2026-11-12T07:28:37+00:00 npm run db:setup
 
 > group42-logistics-foundation@0.4.2 db:setup
 > prisma generate && prisma migrate deploy
@@ -8,7 +8,7 @@ For more information, see: https://pris.ly/prisma-config
 
 Prisma schema loaded from prisma/schema.prisma
 
-✔ Generated Prisma Client (v6.19.3) to ./node_modules/@prisma/client in 85ms
+✔ Generated Prisma Client (v6.19.3) to ./node_modules/@prisma/client in 74ms
 
 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
 
@@ -42,4 +42,4 @@ migrations/
     └─ migration.sql
       
 All migrations have been successfully applied.
-END 2026-11-12T07:25:41+00:00 exit=0
+END 2026-11-12T07:28:39+00:00 exit=0

@@ -1,5 +1,6 @@
 Regression testing (fresh disposable local database)
-2026-11-12T07:25:39+00:00
-e82d966f66524c7580a6d9f021362bbaefcd3b6d
+2026-11-12T07:28:37+00:00
+6acd33a6003369a493d0c1d8110d7c18df2ec55a
 v24.22.1
 11.19.1
+Source manifest: sha256sum -c SHA256SUMS.txt passed
