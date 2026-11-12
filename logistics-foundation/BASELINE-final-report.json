@@ -1,13 +1,13 @@
 {
   "purpose": "Completeness-pass regression evidence",
-  "created_at_utc": "2026-11-12T07:23:35.086539+00:00",
+  "created_at_utc": "2026-11-12T07:33:01.604791+00:00",
   "historical_presentation_commit": "df340dc4c6c10236040bae672f2c518f1678033d",
-  "tested_source_commit": "02cb7a18b83d4e7637178055b28506555265ef6d",
-  "hardened_evidence_commit": "48067386ebe3b5c833fd88508090002487bcbede",
-  "relationship": "The tested source contains the report and rendering changes. The evidence commit records subsequent regression logs and corresponding long-report evidence metadata. Baseline metadata and generated PDF are derived after the evidence commit.",
-  "local_test_logs": "evidence/test-logs/2026-11-12-completeness/",
+  "tested_source_commit": "6acd33a6003369a493d0c1d8110d7c18df2ec55a",
+  "hardened_evidence_commit": "6eb01afb1798c7361205b10597d80c0c26e8fdf6",
+  "relationship": "The tested source contains the report, rendering and manifest changes. The evidence commit records subsequent regression logs and corresponding long-report evidence metadata. Baseline metadata, its manifest checksum and generated PDF are derived after the evidence commit.",
+  "local_test_logs": "evidence/test-logs/2026-11-12-completeness-final/",
   "performance_evidence": "evidence/performance.json",
-  "evidence_commit_ci": "https://github.com/Et1enneee/comp3500-logistics/actions/runs/43174500740",
+  "evidence_commit_ci": "https://github.com/Et1enneee/comp3500-logistics/actions/runs/43175733067",
   "tags": {
     "v0.3.1": {
       "commit": "0d9f400eed37dae99748752a5a09248749296b4f",
@@ -49,5 +49,11 @@
     "hardened_evidence_commit": "a360ea6bf01ca8644638ede8de2f1bedc0b30fc7",
     "local_test_logs": "evidence/test-logs/2026-11-12-diagram-regression/",
     "evidence_commit_ci": "https://github.com/Et1enneee/comp3500-logistics/actions/runs/43164499100"
+  },
+  "previous_completeness": {
+    "tested_source_commit": "02cb7a18b83d4e7637178055b28506555265ef6d",
+    "hardened_evidence_commit": "48067386ebe3b5c833fd88508090002487bcbede",
+    "local_test_logs": "evidence/test-logs/2026-11-12-completeness/",
+    "evidence_commit_ci": "https://github.com/Et1enneee/comp3500-logistics/actions/runs/43174500740"
   }
 }
