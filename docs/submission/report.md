@@ -46,7 +46,7 @@ The [specification](https://github.com/Et1enneee/comp3500-logistics/blob/main/lo
 | FR-07 | authenticate and enforce role and object access | protect data | [Test](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/tests/auth.integration.ts) |
 | FR-08 | assign shipped orders and simulate delivery | complete handoff | [Test](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/tests/driver.integration.ts) |
 
-Non-functional requirements cover NFR-01 performance; NFR-02 integration-point availability; NFR-03 least privilege; NFR-04 scripted operation effort; NFR-05 process quality. Their criteria and measurement are defined in the specification.
+Non-functional requirements cover NFR-01 performance (≤2 s and ≤3 s); NFR-02 integration-point availability (40 runs); NFR-03 least privilege; NFR-04 scripted operation effort (≤3 actions); NFR-05 process quality.
 
 **Table B. Risk coverage** ([detailed mapping](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/requirements/risk-coverage.md))
 
@@ -99,7 +99,7 @@ Each item references one product; each order has 0..1 shipment; each product has
 
 ## 5. Implementation
 
-Design rules map to implementation and tests; staff cancellation requires [CONFIRMED](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/lib/order-api.ts#L420-L435).
+Design rules map to implementation and tests; staff cancellation requires [CONFIRMED](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/lib/order-api.ts#L420-L435); customer cancellation of CREATED orders is allowed without restock, rejected after PICKING.
 
 | Design | Implementation | Verification |
 |---|---|---|
