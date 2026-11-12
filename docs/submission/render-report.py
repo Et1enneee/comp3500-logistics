@@ -84,7 +84,7 @@ with TemporaryDirectory() as td:
       raw=Path(td)/(svg.stem+'-raw.png')
       subprocess.run(['node',str(root/'docs/submission/render-svg.cjs'),str(svg),str(raw)],check=True)
       subprocess.run(['magick',str(raw),'-background','white','-alpha','remove','-colorspace','gray','-threshold','80%','-type','bilevel',str(png)],check=True)
-      im=Image(str(png)); maxw=A4[0]-90; maxh=570 if 'state-machine' in suffix else (635 if 'usecase' in suffix else 205)
+      im=Image(str(png)); maxw=A4[0]-90; maxh=570 if 'state-machine' in suffix else (635 if 'usecase' in suffix else (340 if 'sequence-diagram' in suffix else (350 if 'architecture' in suffix else 205)))
       scale=min(maxw/im.imageWidth,maxh/im.imageHeight)
       im.drawWidth=im.imageWidth*scale;im.drawHeight=im.imageHeight*scale; im.hAlign='CENTER';story.append(im);i+=1;continue
     j=i

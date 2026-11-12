@@ -1,0 +1,16 @@
+@startuml
+title Layered architecture — supports FR-02/04/07; mapping in Table 5.1
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam componentBackgroundColor transparent
+skinparam componentBorderColor #222222
+skinparam componentFontColor #222222
+top to bottom direction
+component "Role-specific pages" as P <<layer>>
+component "HTTP routes and authentication" as H <<layer>>
+component "Order, inventory and driver business handlers" as B <<layer>>
+component "Prisma and SQLite persistence" as D <<layer>>
+P -down-> H : HTTP requests
+H -down-> B : service calls
+B -down-> D : Prisma client / transaction
+@enduml
