@@ -25,8 +25,6 @@ Plan-driven increments have triggers and verified outcomes; integration and cont
 | Documentation hardening, 10–11 Nov 2026 | Post-presentation model and evidence review | Diagrams and traceability aligned |
 | Export simplification, 11 Nov 2026 | Scripted walkthrough finding ([issue #15](https://github.com/Et1enneee/comp3500-logistics/issues/15)) | Selected-date export in three actions; regression passed |
 
-The increment register and risk mapping reconstruct early records from repository artefacts; contemporaneous definitions were not preserved for October planning.
-
 The [workflow](https://github.com/Et1enneee/comp3500-logistics/blob/main/.github/workflows/ci.yml), [issue tracker](https://github.com/Et1enneee/comp3500-logistics/issues) and [increment register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/process/increments.md) record integration, problems and context.
 
 <!-- pagebreak -->
@@ -122,7 +120,7 @@ Verification checks requirements; validation assesses fitness for users. The [re
 | Stock equals demand | Confirmation succeeds; stock becomes zero | [Orders](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/tests/orders.integration.ts#L248-L252) |
 | Stock 4 versus threshold 5 | Alert; stock 5 is not low | [Inventory](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/tests/inventory.integration.ts#L20-L38) |
 
-Insufficient stock returns HTTP 409 with unchanged state and stock. In a pre-export-fix local-loopback [measurement](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/performance.json), API p95 was 3.2–13.6 ms and first-contentful-paint p95 was 64–96 ms, against NFR-01 targets of at most 2 s and 3 s respectively. NFR-02 records 40 successful build–test–browser runs ([observations](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/availability/integration-observations.json)).
+Insufficient stock returns HTTP 409 with unchanged state and stock. In a local-loopback [measurement](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/performance.json) recorded on 11 November 2026, API p95 was 3.2–13.6 ms and first-contentful-paint p95 was 64–96 ms, against NFR-01 targets of at most 2 s and 3 s respectively. NFR-02 records 40 successful build–test–browser runs ([observations](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/availability/integration-observations.json)).
 
 ## 7. Evolution
 
@@ -130,7 +128,7 @@ The early defect record drove the confirmation transaction and retest; the post-
 
 ## 8. Validation
 
-The [automated walkthrough](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/user-validation/automated-walkthrough.md) counts at most three scripted actions across eleven selected operations from prepared screens (excluding login, navigation and recovery). The [human protocol](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/user-validation/moderator.md) defines role tasks, completion, errors, help requests and time, with acceptance criteria defined before each run. Participant observations will be added under this protocol.
+The [automated walkthrough](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/user-validation/automated-walkthrough.md) counts at most three scripted actions across eleven selected operations from prepared screens (excluding login, navigation and recovery). The [human protocol](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/user-validation/moderator.md) defines role tasks, completion, errors, help requests and time, with acceptance criteria defined before each run. No participant sessions were recorded before submission. Validation rests on those eleven scripted operations.
 
 ## 9. Feedback and reconciliation
 
@@ -141,8 +139,8 @@ The [automated walkthrough](https://github.com/Et1enneee/comp3500-logistics/blob
 | Diagrams | Corrected models and top-down architecture | [Compliance matrix](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/diagrams/compliance.md) |
 | FR-04 | Stock transition effects belong to FR-02 | [Traceability](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/traceability.md) |
 | Increments | Triggers and outcomes | [Register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/process/increments.md) |
-| Presentation p95 | Evidence governs; the presentation figure has no tracked measurement in any baseline | [Measurement](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/performance.json) |
-| Admin task | Export re-tested; participant observation planned (§8) | [Issue #15](https://github.com/Et1enneee/comp3500-logistics/issues/15) |
+| Presentation p95 | The recorded probe is the authoritative measurement | [Measurement](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/performance.json) |
+| Admin task | Export re-tested; no participant session recorded (§8) | [Issue #15](https://github.com/Et1enneee/comp3500-logistics/issues/15) |
 | Unit count | Two soak-summary tests increased unit count from 36 to 38 | [Test history](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/scripts/soak-summary.test.mjs) |
 | NFR scope | Criteria revised for local deployment | [SRS revision log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/requirements/srs.md#7-document-control) |
 
