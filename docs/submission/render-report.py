@@ -55,6 +55,9 @@ def table(lines):
     rows=[[c.strip() for c in line.strip().strip('|').split('|')] for line in lines]
     rows=[rows[0]]+rows[2:]
     n=len(rows[0]); weights=[.30,.33,.37] if n==3 else [1/n]*n
+    if rows[0][0]=='FR': weights=[.11,.44,.28,.17]
+    if rows[0][0]=='Design': weights=[.40,.39,.21]
+    if rows[0][0]=='Boundary case': weights=[.31,.48,.21]
     if rows[0][0]=='Risk': weights=[.18,.51,.31]
     if rows[0][0]=='Feedback': weights=[.26,.48,.26]
     data=[[Paragraph(inline(c),styles['head' if i==0 else 'cell']) for c in row] for i,row in enumerate(rows)]
@@ -84,7 +87,7 @@ with TemporaryDirectory() as td:
       raw=Path(td)/(svg.stem+'-raw.png')
       subprocess.run(['node',str(root/'docs/submission/render-svg.cjs'),str(svg),str(raw)],check=True)
       subprocess.run(['magick',str(raw),'-background','white','-alpha','remove','-colorspace','gray','-threshold','80%','-type','bilevel',str(png)],check=True)
-      im=Image(str(png)); maxw=A4[0]-90; maxh=570 if 'state-machine' in suffix else (635 if 'usecase' in suffix else (340 if 'sequence-diagram' in suffix else (350 if 'architecture' in suffix else 205)))
+      im=Image(str(png)); maxw=A4[0]-90; maxh=570 if 'state-machine' in suffix else (610 if 'usecase' in suffix else (400 if 'sequence-diagram' in suffix else (350 if 'architecture' in suffix else 230)))
       scale=min(maxw/im.imageWidth,maxh/im.imageHeight)
       im.drawWidth=im.imageWidth*scale;im.drawHeight=im.imageHeight*scale; im.hAlign='CENTER';story.append(im);i+=1;continue
     j=i
