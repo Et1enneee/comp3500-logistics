@@ -2,10 +2,10 @@
 left to right direction
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
-actor Customer as C
-actor Staff as S
-actor Driver as D
-actor Admin as A
+rectangle "Customer" as C <<actor>>
+rectangle "Staff" as S <<actor>>
+rectangle "Driver" as D <<actor>>
+rectangle "Admin" as A <<actor>>
 rectangle "Warehouse logistics application" {
   usecase "Sign in" as LOGIN
   usecase "Create order" as CREATE
