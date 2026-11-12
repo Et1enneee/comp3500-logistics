@@ -22,7 +22,7 @@ Plan-driven increments have triggers and verified outcomes; integration and cont
 | Confirmation, 26–28 Oct 2026 | Failed endpoint and missing ledger | Transaction verified |
 | Integrated application, 1 Nov 2026 | Integrate foundation | Customer, staff and admin workflows |
 | Driver and privacy, 2 Nov 2026 | Delivery and data minimisation | Assigned tasks and privacy checks |
-| Documentation hardening, 10–11 Nov 2026 | Model and evidence review | Diagrams and traceability aligned |
+| Documentation hardening, 10–11 Nov 2026 | Post-presentation model and evidence review | Diagrams and traceability aligned |
 | Export simplification, 11 Nov 2026 | Scripted walkthrough finding ([issue #15](https://github.com/Et1enneee/comp3500-logistics/issues/15)) | Selected-date export in three actions; regression passed |
 
 The increment register and risk mapping reconstruct early records from repository artefacts; contemporaneous definitions were not preserved for October planning.
@@ -48,7 +48,7 @@ The [specification](https://github.com/Et1enneee/comp3500-logistics/blob/main/lo
 | FR-07 | authenticate and enforce role and object access | protect data | [Test](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/tests/auth.integration.ts) |
 | FR-08 | assign shipped orders and simulate delivery | complete handoff | [Test](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/tests/driver.integration.ts) |
 
-Non-functional requirements cover NFR-01 performance; NFR-02 integration-point availability; NFR-03 least privilege; NFR-04 scripted operation effort; NFR-05 process quality.
+Non-functional requirements cover NFR-01 performance; NFR-02 integration-point availability; NFR-03 least privilege; NFR-04 scripted operation effort; NFR-05 process quality. Their criteria and measurement are defined in the specification.
 
 **Table B. Risk coverage** ([detailed mapping](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/requirements/risk-coverage.md))
 
@@ -114,7 +114,7 @@ Design rules map to implementation and tests; staff cancellation requires [CONFI
 
 ## 6. Verification and validation
 
-Verification checks requirements; validation assesses fitness for users. The [regression log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/test-logs/2026-11-12-completeness-final/unit.log) and [CI](https://github.com/Et1enneee/comp3500-logistics/actions/runs/43175733067) show 38 unit, 140 integration, 2 delivery and 26 browser checks.
+Verification checks requirements; validation assesses fitness for users. The [regression log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/test-logs/2026-11-12-completeness-final/unit.log) and [CI](https://github.com/Et1enneee/comp3500-logistics/actions/runs/43175733067) show 38 unit, 140 integration, 2 delivery (driver simulation) and 26 browser checks.
 
 | Boundary case | Observed | Test |
 |---|---|---|
@@ -126,7 +126,7 @@ Insufficient stock returns HTTP 409 with unchanged state and stock. In a pre-exp
 
 ## 7. Evolution
 
-The early defect record drove the confirmation transaction and retest; the post-presentation audit corrected models and renewed tests. A four-action administrator task became three actions including date entry, or one click from a prepared screen ([regression](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/test-logs/2026-11-12-completeness-final/browser.log)).
+The early defect record drove the confirmation transaction and retest; the post-presentation audit corrected models and renewed tests. A four-action administrator task became three actions including date entry ([regression](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/test-logs/2026-11-12-completeness-final/browser.log)), or one click from a prepared screen (not scripted).
 
 ## 8. Validation
 
