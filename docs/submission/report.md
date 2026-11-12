@@ -112,7 +112,7 @@ Design rules map to implementation and tests; staff cancellation requires [CONFI
 
 ## 6. Verification and validation
 
-Verification checks requirements; validation assesses fitness for users. The [regression log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/test-logs/2026-11-12-completeness/unit.log) and [CI](https://github.com/Et1enneee/comp3500-logistics/actions/runs/43164499100) show 38 unit, 140 integration, 2 delivery and 26 browser checks.
+Verification checks requirements; validation assesses fitness for users. The [regression log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/test-logs/2026-11-12-completeness/unit.log) and [CI](https://github.com/Et1enneee/comp3500-logistics/actions/runs/43174500740) show 38 unit, 140 integration, 2 delivery and 26 browser checks.
 
 | Boundary case | Observed | Test |
 |---|---|---|
@@ -152,4 +152,4 @@ Both goals connect order decisions and role-separated workflows to evidence.
 
 [Traceability](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/traceability.md) · [Specification](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/requirements/srs.md) · [Evidence directory](https://github.com/Et1enneee/comp3500-logistics/tree/main/logistics-foundation/evidence) · [Baseline record](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/BASELINE-final-report.json).
 
-Full evidence trail: [docs/final-report.md](https://github.com/Et1enneee/comp3500-logistics/blob/main/docs/final-report.md) in the repository (evidence baseline `a360ea6bf01ca8644638ede8de2f1bedc0b30fc7`).
+Full evidence trail: [docs/final-report.md](https://github.com/Et1enneee/comp3500-logistics/blob/main/docs/final-report.md) in the repository (evidence baseline `48067386ebe3b5c833fd88508090002487bcbede`).

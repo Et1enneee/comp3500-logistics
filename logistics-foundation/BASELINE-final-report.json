@@ -1,13 +1,13 @@
 {
-  "purpose": "Diagram compliance regression evidence",
-  "created_at_utc": "2026-11-12T05:58:19.874848+00:00",
+  "purpose": "Completeness-pass regression evidence",
+  "created_at_utc": "2026-11-12T07:23:35.086539+00:00",
   "historical_presentation_commit": "df340dc4c6c10236040bae672f2c518f1678033d",
-  "tested_source_commit": "852614c82390eaeea0327b4ce0e0bbd2a47823be",
-  "hardened_evidence_commit": "a360ea6bf01ca8644638ede8de2f1bedc0b30fc7",
-  "relationship": "The tested source contains the diagram and report-source changes. The evidence commit records the subsequent full regression. Baseline metadata and the generated PDF are derived after the evidence commit.",
-  "local_test_logs": "evidence/test-logs/2026-11-12-diagram-regression/",
+  "tested_source_commit": "02cb7a18b83d4e7637178055b28506555265ef6d",
+  "hardened_evidence_commit": "48067386ebe3b5c833fd88508090002487bcbede",
+  "relationship": "The tested source contains the report and rendering changes. The evidence commit records subsequent regression logs and corresponding long-report evidence metadata. Baseline metadata and generated PDF are derived after the evidence commit.",
+  "local_test_logs": "evidence/test-logs/2026-11-12-completeness/",
   "performance_evidence": "evidence/performance.json",
-  "evidence_commit_ci": "https://github.com/Et1enneee/comp3500-logistics/actions/runs/43164499100",
+  "evidence_commit_ci": "https://github.com/Et1enneee/comp3500-logistics/actions/runs/43174500740",
   "tags": {
     "v0.3.1": {
       "commit": "0d9f400eed37dae99748752a5a09248749296b4f",
@@ -43,5 +43,11 @@
     "hardened_evidence_commit": "7f161031313ffa0cf43efb1fdedf71c220ef220f",
     "local_test_logs": "evidence/test-logs/2026-11-11-reconciliation/",
     "evidence_commit_ci": "https://github.com/Et1enneee/comp3500-logistics/actions/runs/43001010576"
+  },
+  "previous_diagram_compliance": {
+    "tested_source_commit": "852614c82390eaeea0327b4ce0e0bbd2a47823be",
+    "hardened_evidence_commit": "a360ea6bf01ca8644638ede8de2f1bedc0b30fc7",
+    "local_test_logs": "evidence/test-logs/2026-11-12-diagram-regression/",
+    "evidence_commit_ci": "https://github.com/Et1enneee/comp3500-logistics/actions/runs/43164499100"
   }
 }
