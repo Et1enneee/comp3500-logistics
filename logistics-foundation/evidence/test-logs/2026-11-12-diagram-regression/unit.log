@@ -1,0 +1,26 @@
+START 2026-11-12T05:52:46+00:00 npm test
+
+> group42-logistics-repository@0.4.2 test
+> npm --prefix logistics-foundation test
+
+
+> group42-logistics-foundation@0.4.2 test
+> vitest run
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv5.0.4 [39m[90m/data/diagram-repair/logistics-foundation[39m
+
+ [32m✓[39m lib/auth.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 499[2mms[22m[39m
+ [32m✓[39m lib/time.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m scripts/soak-summary.test.mjs [2m([22m[2m2 tests[22m[2m)[22m[32m 185[2mms[22m[39m
+ [32m✓[39m lib/constants.test.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m4 passed[39m[22m[90m (4)[39m
+[2m      Tests [22m [1m[32m38 passed[39m[22m[90m (38)[39m
+[2m   Start at [22m 05:52:46
+[2m   Duration [22m 1.41s[2m (tests 81%, transform 10%, import 7%, worker 2%)[22m
+
+[2m    Isolate [22m [33m4 workers spawned[39m[2m · ~121ms startup each (spawn + environment, per file)[22m
+[2m            [22m [2mat least ~363ms faster with [22m[33misolate: false[39m[2m — reuses workers across files instead of one per file[22m
+
+EXIT 0
