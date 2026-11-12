@@ -7,11 +7,11 @@ https://github.com/Et1enneee/comp3500-logistics
 
 ## 1. Scope
 
-The goals are traceable order decisions and a role-separated workflow. Customers order and track; staff confirm, pick, ship and assign; drivers simulate assigned deliveries; administrators report. The local application serves one warehouse using Next.js, TypeScript, Prisma and SQLite. Real GPS, barcode scanning, recipient telephone collection, payment and carrier integration are outside scope. Operational constraints address deployment and data integrity. Requirements and models link to repository evidence; §10 collects the trail.
+The goals are traceable order decisions and a role-separated workflow. Customers order and track; staff confirm, pick, ship and assign; drivers simulate assigned deliveries; administrators report. The local application serves one warehouse using Next.js, TypeScript, Prisma and SQLite. Real GPS, barcode scanning, recipient telephone collection, payment and carrier integration are outside scope. Operational constraints address deployment and data integrity. Requirements and models link to evidence; §10 collects the trail.
 
 ## 2. Development process
 
-Plan-driven incremental development defines each increment by its trigger and verified outcome; integration and continuous integration provide feedback. Product or specification changes form increments; evidence production belongs to hardening. The records establish development, not external delivery.
+Plan-driven increments have triggers and verified outcomes; integration and continuous integration provide feedback. Product or specification changes form increments; evidence production belongs to hardening. Records establish development, not external delivery.
 
 **Table A. Increment, trigger and outcome**
 
@@ -25,13 +25,13 @@ Plan-driven incremental development defines each increment by its trigger and ve
 | Documentation hardening, 10–11 Nov 2026 | Model and evidence review | Diagrams and traceability aligned |
 | Export simplification, 11 Nov 2026 | Scripted walkthrough finding ([issue #15](https://github.com/Et1enneee/comp3500-logistics/issues/15)) | Selected-date export in three actions; regression passed |
 
-Git manages versions, the [workflow](https://github.com/Et1enneee/comp3500-logistics/blob/main/.github/workflows/ci.yml) integrates changes, and the [issue tracker](https://github.com/Et1enneee/comp3500-logistics/issues) records problems; the [increment register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/process/increments.md) records their development context.
+The [workflow](https://github.com/Et1enneee/comp3500-logistics/blob/main/.github/workflows/ci.yml), [issue tracker](https://github.com/Et1enneee/comp3500-logistics/issues) and [increment register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/process/increments.md) record integration, problems and context.
 
 <!-- pagebreak -->
 
 ## 3. Requirements
 
-The [software requirements specification](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/requirements/srs.md) defines obligations and rationale.
+The [specification](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/requirements/srs.md) defines obligations and rationale.
 
 **Functional requirements and verification**
 
@@ -67,7 +67,7 @@ Mitigated records a mitigation; managed records a mechanism while the historical
 
 ## 4. System models
 
-Five views connect role goals, order lifecycle, data, confirmation transaction and layers. Transactions preserve consistency in this local warehouse without splitting services; state and stock guards enforce rules.
+Five views link roles, lifecycle, data, transaction, layers. Local transactions preserve consistency without splitting services; state and stock guards enforce rules.
 
 ![Use cases](https://raw.githubusercontent.com/Et1enneee/comp3500-logistics/main/logistics-foundation/docs/closure/usecase.svg)
 
@@ -81,11 +81,11 @@ Five views connect role goals, order lifecycle, data, confirmation transaction a
 
 <!-- pagebreak -->
 
-An order has 0..* items in the schema, while creation requires at least one; an item references one product. An order has 0..1 shipment; a product has 0..* inventory logs.
+Each item references one product; each order has 0..1 shipment; each product has 0..* inventory logs.
 
 ![Entity relationships](https://raw.githubusercontent.com/Et1enneee/comp3500-logistics/main/logistics-foundation/docs/er.svg)
 
-*Figure 3. How is data related? The schema permits zero items; the creation API requires at least one.* [Source](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/er.puml).
+*Figure 3. Data relationships: the schema permits zero items; the creation API requires at least one.* [Source](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/er.puml).
 
 ![Confirmation sequence](https://raw.githubusercontent.com/Et1enneee/comp3500-logistics/main/logistics-foundation/docs/diagrams/sequence-diagram.svg)
 
@@ -112,7 +112,7 @@ Design rules map to implementation and tests; staff cancellation requires [CONFI
 
 ## 6. Verification and validation
 
-Verification checks the specification; validation assesses fitness for real users. The recorded [regression logs](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/test-logs/2026-11-12-completeness/) and [CI](https://github.com/Et1enneee/comp3500-logistics/actions/runs/43164499100) show 38 unit, 140 integration, 2 delivery and 26 browser checks.
+Verification checks requirements; validation assesses fitness for users. The [regression log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/test-logs/2026-11-12-completeness/unit.log) and [CI](https://github.com/Et1enneee/comp3500-logistics/actions/runs/43164499100) show 38 unit, 140 integration, 2 delivery and 26 browser checks.
 
 | Boundary case | Observed | Test |
 |---|---|---|
@@ -126,11 +126,11 @@ Insufficient stock returns HTTP 409 with unchanged state and stock. In a pre-exp
 
 ## 7. Evolution
 
-The early defect record led to the confirmation transaction and its retest. The post-presentation audit led to corrected models and renewed tests. The walkthrough exposed a four-action administrator task; direct export now takes three actions including date entry, or one click from a prepared screen ([regression](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/test-logs/2026-11-12-completeness/browser.log)).
+The early defect record drove the confirmation transaction and retest; the post-presentation audit corrected models and renewed tests. A four-action administrator task became three actions including date entry, or one click from a prepared screen ([regression](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/test-logs/2026-11-12-completeness/browser.log)).
 
 ## 8. Validation
 
-The [automated walkthrough](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/user-validation/automated-walkthrough.md) counts at most three scripted actions for each of eleven selected operations from prepared screens (excluding login, navigation and recovery). The [human protocol](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/user-validation/moderator.md) defines role tasks, completion, errors, help requests and time, with acceptance criteria defined before each run. Participant observations will be added under this protocol.
+The [automated walkthrough](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/user-validation/automated-walkthrough.md) counts at most three scripted actions across eleven selected operations from prepared screens (excluding login, navigation and recovery). The [human protocol](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/user-validation/moderator.md) defines role tasks, completion, errors, help requests and time, with acceptance criteria defined before each run. Participant observations will be added under this protocol.
 
 ## 9. Feedback and reconciliation
 
@@ -140,13 +140,13 @@ The [automated walkthrough](https://github.com/Et1enneee/comp3500-logistics/blob
 |---|---|---|
 | Diagrams | Corrected models and top-down architecture | [Compliance matrix](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/diagrams/compliance.md) |
 | FR-04 | Stock transition effects belong to FR-02 | [Traceability](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/traceability.md) |
-| Increments | Defined triggers and outcomes | [Register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/process/increments.md) |
-| Presentation p95 | Evidence file governs; the presentation figure has no tracked measurement in any baseline | [Measurement](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/performance.json) |
-| Admin task | Direct export re-tested; participant observation planned (§8) | [Issue #15](https://github.com/Et1enneee/comp3500-logistics/issues/15) |
-| Unit count | Two soak-summary tests increased the count from 36 to 38 | [Test history](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/scripts/soak-summary.test.mjs) |
+| Increments | Triggers and outcomes | [Register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/process/increments.md) |
+| Presentation p95 | Evidence governs; the presentation figure has no tracked measurement in any baseline | [Measurement](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/performance.json) |
+| Admin task | Export re-tested; participant observation planned (§8) | [Issue #15](https://github.com/Et1enneee/comp3500-logistics/issues/15) |
+| Unit count | Two soak-summary tests increased unit count from 36 to 38 | [Test history](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/scripts/soak-summary.test.mjs) |
 | NFR scope | Criteria revised for local deployment | [SRS revision log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/requirements/srs.md#7-document-control) |
 
-Both scope goals connect order decisions and role-separated workflows to implementation and evidence.
+Both goals connect order decisions and role-separated workflows to evidence.
 
 ## 10. Evidence
 
