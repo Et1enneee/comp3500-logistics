@@ -71,7 +71,7 @@ Must and Should priorities in the historical register express the project's scop
 
 **Table 3.1 — Risk-to-requirement coverage**
 
-The complete five-column register, including severity and historical status, is [risk-coverage.md](../logistics-foundation/docs/requirements/risk-coverage.md). Its relationships are reconstructed from the [risk register](../logistics-foundation/docs/reference/legacy/risks.md).
+The complete five-column risk-to-requirement mapping, including severity and historical status, is [risk-coverage.md](../logistics-foundation/docs/requirements/risk-coverage.md). Its relationships are reconstructed from the [risk register](../logistics-foundation/docs/reference/legacy/risks.md).
 
 | Risk and severity (probability/impact) | Addressed by | Mitigation | Verification | Status |
 |---|---|---|---|---|
