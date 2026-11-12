@@ -1,4 +1,4 @@
-START 2026-11-12T07:26:09+00:00 env FOUNDATION_BROWSER_TEST=YES FOUNDATION_BASE_URL=http://127.0.0.1:3118 CHROMIUM_PATH=/usr/local/bin/chromium EVIDENCE_DIR=/data/h-browser-shots-final npm run test:browser
+START 2026-11-12T07:29:07+00:00 env FOUNDATION_BROWSER_TEST=YES FOUNDATION_BASE_URL=http://127.0.0.1:3118 CHROMIUM_PATH=/usr/local/bin/chromium EVIDENCE_DIR=/data/h-browser-shots-final npm run test:browser
 
 > group42-logistics-foundation@0.4.2 test:browser
 > node scripts/browser-smoke.mjs
@@ -30,4 +30,4 @@ PASS mobile 390: customer, staff and admin pages have no horizontal overflow
 PASS dark scheme remains usable
 PASS logout kills the session immediately
 Browser acceptance passed: 26 checks
-END 2026-11-12T07:26:29+00:00 exit=0
+END 2026-11-12T07:29:25+00:00 exit=0

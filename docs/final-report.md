@@ -302,14 +302,14 @@ The following is the complete current traceability table. Code and evidence path
 
 **Previous diagram regression:** On 2026-11-12 the tested source was `852614c82390eaeea0327b4ce0e0bbd2a47823be`. The environment log records Node v24.22.1 and npm 11.19.1; the browser command records system Chromium. From `logistics-foundation/`, `npm test` passed 38 unit tests; `npm run test:integration` passed 140 cases across 14 files; `npm run test:delivery` passed 2 checks; `npm run build` succeeded; and `npm run test:browser` passed 26 checks. The [dated logs](../logistics-foundation/evidence/test-logs/2026-11-12-diagram-regression/) record commands, exit codes and timestamps. The evidence commit adds those logs and documentation after the tested source commit; its CI result is recorded in the baseline record.
 
-**Completeness-pass regression:** On 2026-11-12 the tested source was `e82d966f66524c7580a6d9f021362bbaefcd3b6d`. In a fresh disposable database, `npm test` passed 38 unit tests, `npm run test:integration` passed 140 cases across 14 files, `npm run test:delivery` passed 2 checks, `npm run build` succeeded, and `npm run test:browser` passed 26 checks. The [dated logs](../logistics-foundation/evidence/test-logs/2026-11-12-completeness-final/) record commands, exit codes and timestamps. The [baseline record](../logistics-foundation/BASELINE-final-report.json) identifies the subsequent evidence commit and its CI run; the submission PDF and baseline metadata are derived afterward.
+**Completeness-pass regression:** On 2026-11-12 the tested source was `6acd33a6003369a493d0c1d8110d7c18df2ec55a`. In a fresh disposable database, `npm test` passed 38 unit tests, `npm run test:integration` passed 140 cases across 14 files, `npm run test:delivery` passed 2 checks, `npm run build` succeeded, and `npm run test:browser` passed 26 checks. The [dated logs](../logistics-foundation/evidence/test-logs/2026-11-12-completeness-final/) record commands, exit codes and timestamps. The [baseline record](../logistics-foundation/BASELINE-final-report.json) identifies the subsequent evidence commit and its CI run; the submission PDF and baseline metadata are derived afterward.
 
 For reproduction, use a fresh clone and a disposable SQLite database; the seed resets demo data. The following runs the application and tests from the repository root. The fresh clone uses `logistics-foundation/prisma/dev.db`; choose an available port and do not run the seed against a database containing data to keep:
 
 ```sh
 git clone https://github.com/Et1enneee/comp3500-logistics.git
 cd comp3500-logistics
-git checkout e82d966f66524c7580a6d9f021362bbaefcd3b6d
+git checkout 6acd33a6003369a493d0c1d8110d7c18df2ec55a
 export DEMO_PASSWORD='Demo1234!'
 npm run setup
 npm run db:setup
