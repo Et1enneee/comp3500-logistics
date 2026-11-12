@@ -1,7 +1,5 @@
 # Increment definitions
 
-An increment is a defined body of development work assessed against an exit criterion; inclusion in a repository or CI run records integration, not external user delivery. Product or specification changes form increments; evidence production belongs to hardening. The rows reconstruct scope and criteria from repository artefacts where no contemporaneous definition is preserved. Dates are those recorded by the cited artefacts or commits; a claimed earlier planning date is not established by these sources.
-
 | Increment | Date | Trigger | Scope | Exit criteria | Evidence |
 |---|---|---|---|---|---|
 | Project planning | 9–11 Oct 2026 | Selection of the logistics project | Define project responsibilities, contracts and the initial order-management scope. | Contracts and initial requirement IDs are recorded. | [`repo-init/CHANGELOG.md`](../../../repo-init/CHANGELOG.md); [`repo-init/README.md`](../../../repo-init/README.md) |
