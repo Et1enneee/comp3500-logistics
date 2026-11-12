@@ -112,7 +112,7 @@ Design rules map to implementation and tests; staff cancellation requires [CONFI
 
 ## 6. Verification and validation
 
-Verification checks requirements; validation assesses fitness for users. The [regression log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/test-logs/2026-11-12-completeness/unit.log) and [CI](https://github.com/Et1enneee/comp3500-logistics/actions/runs/43174500740) show 38 unit, 140 integration, 2 delivery and 26 browser checks.
+Verification checks requirements; validation assesses fitness for users. The [regression log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/test-logs/2026-11-12-completeness-final/unit.log) and [CI](https://github.com/Et1enneee/comp3500-logistics/actions/runs/43174500740) show 38 unit, 140 integration, 2 delivery and 26 browser checks.
 
 | Boundary case | Observed | Test |
 |---|---|---|
@@ -122,11 +122,9 @@ Verification checks requirements; validation assesses fitness for users. The [re
 
 Insufficient stock returns HTTP 409 with unchanged state and stock. In a pre-export-fix local-loopback [measurement](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/performance.json), API p95 was 3.2–13.6 ms and first-contentful-paint p95 was 64–96 ms, against NFR-01 targets of at most 2 s and 3 s respectively. NFR-02 records 40 successful build–test–browser integration points ([observations](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/availability/integration-observations.json)).
 
-<!-- pagebreak -->
-
 ## 7. Evolution
 
-The early defect record drove the confirmation transaction and retest; the post-presentation audit corrected models and renewed tests. A four-action administrator task became three actions including date entry, or one click from a prepared screen ([regression](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/test-logs/2026-11-12-completeness/browser.log)).
+The early defect record drove the confirmation transaction and retest; the post-presentation audit corrected models and renewed tests. A four-action administrator task became three actions including date entry, or one click from a prepared screen ([regression](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/test-logs/2026-11-12-completeness-final/browser.log)).
 
 ## 8. Validation
 
