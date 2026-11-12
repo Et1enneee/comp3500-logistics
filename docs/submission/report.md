@@ -25,11 +25,11 @@ Plan-driven incremental development defines each increment by its trigger and ve
 | Documentation hardening, 10–11 Nov 2026 | Model and evidence review | Diagrams and traceability aligned |
 | Export simplification, 11 Nov 2026 | Scripted walkthrough finding ([issue #15](https://github.com/Et1enneee/comp3500-logistics/issues/15)) | Selected-date export in three actions; regression passed |
 
-Git manages versions, the [workflow](https://github.com/Et1enneee/comp3500-logistics/blob/main/.github/workflows/ci.yml) integrates changes, and the [issue tracker](https://github.com/Et1enneee/comp3500-logistics/issues) records problems. [Increment evidence](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/process/increments.md).
+Git manages versions, the [workflow](https://github.com/Et1enneee/comp3500-logistics/blob/main/.github/workflows/ci.yml) integrates changes, and the [issue tracker](https://github.com/Et1enneee/comp3500-logistics/issues) records problems; the [increment register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/process/increments.md) records their development context.
 
 ## 3. Requirements
 
-The [software requirements specification](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/requirements/srs.md) is the specification. Functional requirements cover FR-01 order creation; FR-02 state changes; FR-03 numbering and tracking; FR-04 inventory and alerts; FR-05 notifications; FR-06 reports; FR-07 access control; FR-08 simulated delivery. Non-functional requirements cover NFR-01 performance; NFR-02 integration-point availability; NFR-03 least privilege; NFR-04 scripted operation effort; NFR-05 process quality.
+The [software requirements specification](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/requirements/srs.md) defines the requirements. Functional requirements cover FR-01 order creation; FR-02 state changes; FR-03 numbering and tracking; FR-04 inventory and alerts; FR-05 notifications; FR-06 reports; FR-07 access control; FR-08 simulated delivery. Non-functional requirements cover NFR-01 performance; NFR-02 integration-point availability; NFR-03 least privilege; NFR-04 scripted operation effort; NFR-05 process quality.
 
 **Table B. Risk coverage** ([risk matrix](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/requirements/risk-coverage.md))
 
@@ -52,23 +52,35 @@ Mitigated records a mitigation; managed records a mechanism while the historical
 
 Layered architecture separates pages, routes and authentication, business handlers, and persistence. Transactions preserve consistency without splitting this local warehouse into separate services. State and stock guards and transaction atomicity enforce hard rules.
 
-![Figure 1. Order lifecycle: valid transitions and effects.](https://raw.githubusercontent.com/Et1enneee/comp3500-logistics/main/logistics-foundation/docs/diagrams/state-machine.svg)
+![Layered architecture](https://raw.githubusercontent.com/Et1enneee/comp3500-logistics/main/logistics-foundation/docs/diagrams/architecture.svg)
 
-*Figure 1. Order lifecycle: valid transitions and effects.* [Source](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/diagrams/state-machine.puml).
+*Figure 1. Interfaces connect four layers.* [Source](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/diagrams/architecture.puml).
 
 <!-- pagebreak -->
 
-![Figure 2. Use cases associate external roles with application functions.](https://raw.githubusercontent.com/Et1enneee/comp3500-logistics/main/logistics-foundation/docs/closure/usecase.svg)
+![Figure 2. Order lifecycle: valid transitions and effects.](https://raw.githubusercontent.com/Et1enneee/comp3500-logistics/main/logistics-foundation/docs/diagrams/state-machine.svg)
 
-*Figure 2. Use cases associate external roles with application functions.* [Source](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/closure/usecase.puml).
+*Figure 2. Order lifecycle: valid transitions and effects.* [Source](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/diagrams/state-machine.puml).
+
+<!-- pagebreak -->
+
+![Figure 3. Use cases associate external roles with application functions.](https://raw.githubusercontent.com/Et1enneee/comp3500-logistics/main/logistics-foundation/docs/closure/usecase.svg)
+
+*Figure 3. Use cases associate external roles with application functions.* [Source](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/closure/usecase.puml).
 
 <!-- pagebreak -->
 
 An order has 0..* items in the schema, while creation requires at least one; an item references one product. An order has 0..1 shipment; a product has 0..* inventory logs.
 
-![Figure 3. Entity relationships and multiplicities.](https://raw.githubusercontent.com/Et1enneee/comp3500-logistics/main/logistics-foundation/docs/er.svg)
+![Figure 4. Entity relationships and multiplicities.](https://raw.githubusercontent.com/Et1enneee/comp3500-logistics/main/logistics-foundation/docs/er.svg)
 
-*Figure 3. Entity relationships and multiplicities.* [Source](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/er.puml).
+*Figure 4. Entity relationships and multiplicities.* [Source](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/er.puml).
+
+<!-- pagebreak -->
+
+![Confirmation sequence](https://raw.githubusercontent.com/Et1enneee/comp3500-logistics/main/logistics-foundation/docs/diagrams/sequence-diagram.svg)
+
+*Figure 5. A confirmation transaction commits or rolls back.* [Source](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/diagrams/sequence-diagram.puml).
 
 ## 5. Implementation
 
@@ -86,7 +98,7 @@ The early defect record led to the confirmation transaction and its retest. The 
 
 ## 8. Validation
 
-The [automated walkthrough](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/user-validation/automated-walkthrough.md) counts at most three scripted actions for each of eleven selected operations from prepared screens (excluding login, navigation and recovery). The [human protocol](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/user-validation/moderator.md) defines role tasks, completion, errors, help requests and time, with acceptance criteria defined before each run. Participant observation is planned for 17–24 November.
+The [automated walkthrough](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/user-validation/automated-walkthrough.md) counts at most three scripted actions for each of eleven selected operations from prepared screens (excluding login, navigation and recovery). The [human protocol](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/user-validation/moderator.md) defines role tasks, completion, errors, help requests and time, with acceptance criteria defined before each run. Participant observations will be added under this protocol.
 
 ## 9. Feedback and reconciliation
 
@@ -94,7 +106,7 @@ The [automated walkthrough](https://github.com/Et1enneee/comp3500-logistics/blob
 
 | Feedback | Disposition | Evidence |
 |---|---|---|
-| Diagrams | Corrected state and use-case models | [Audit](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/audit-2026-11-10.md) |
+| Diagrams | Corrected models and top-down architecture | [Compliance matrix](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/diagrams/compliance.md) |
 | FR-04 | Stock transition effects belong to FR-02 | [Traceability](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/traceability.md) |
 | Increments | Defined triggers and outcomes | [Register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/process/increments.md) |
 | Presentation p95 | Evidence file governs; the presentation figure has no tracked measurement in any baseline | [Measurement](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/performance.json) |
@@ -102,7 +114,7 @@ The [automated walkthrough](https://github.com/Et1enneee/comp3500-logistics/blob
 | Unit count | Two soak-summary tests increased the count from 36 to 38 | [Test history](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/scripts/soak-summary.test.mjs) |
 | NFR scope | Criteria revised for local deployment | [SRS revision log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/requirements/srs.md#7-document-control) |
 
-The matrices and increment records connect decisions to implementation and evidence.
+Both scope goals connect order decisions and role-separated workflows to implementation and evidence.
 
 ## 10. Evidence
 
