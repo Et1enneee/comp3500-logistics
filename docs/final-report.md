@@ -128,7 +128,7 @@ The [state-machine source](../logistics-foundation/docs/diagrams/state-machine.p
 | SHIPPED → IN_TRANSIT | Staff or assigned driver simulates pickup. | Update order and shipment, tracking event and notification. |
 | IN_TRANSIT → DELIVERED | Staff or assigned driver simulates delivery. | Update order and shipment, tracking event and notification. |
 
-Cancellation from PICKING or a later state returns HTTP 409; a customer attempting to cancel another customer's order receives HTTP 404. Staff cancellation is restricted to CONFIRMED. Assignment is allowed while the order is SHIPPED. The assigned `driverId` remains on delivery as historical assignment; the schema's `onDelete: SetNull` applies if the related user is deleted. A report date range can be exported directly from the administrator page. The legal transition table has no self-loop. See `lib/order-api.ts:217–239,302–435`, `lib/driver-api.ts:31–51` and `prisma/schema.prisma:99–110`.
+Cancellation from PICKING or a later state returns HTTP 409; a customer attempting to cancel another customer's order receives HTTP 404. A customer may cancel a CREATED order without restock; staff cancellation is restricted to CONFIRMED. Assignment is allowed while the order is SHIPPED. The assigned `driverId` remains on delivery as historical assignment; the schema's `onDelete: SetNull` applies if the related user is deleted. A report date range can be exported directly from the administrator page. The legal transition table has no self-loop. See `lib/order-api.ts:217–239,302–435`, `lib/driver-api.ts:31–51` and `prisma/schema.prisma:99–110`.
 
 ### Rules and data
 
