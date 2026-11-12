@@ -144,17 +144,11 @@ The [confirmation sequence source](../logistics-foundation/docs/diagrams/sequenc
 
 ### Architecture
 
-**Layered architecture** organises responsibilities into layers with interfaces: role-specific pages → HTTP routes and authentication → order, inventory and driver business handlers → Prisma and SQLite persistence. The layer relationships are:
+**Layered architecture** organises responsibilities into layers with interfaces: Role-specific pages → HTTP routes and authentication → Order, inventory and driver business handlers → Prisma and SQLite persistence. The layer relationships are shown below.
 
-```text
-Role-specific pages and components
-        ↓ HTTP requests
-Route handlers and authentication
-        ↓ service calls
-Order, inventory and driver business handlers
-        ↓ Prisma client / transaction
-SQLite persistence
-```
+![Layered architecture](../logistics-foundation/docs/diagrams/architecture.svg)
+
+[Architecture source](../logistics-foundation/docs/diagrams/architecture.puml); implementation mapping in Table 5.1.
 
 Layer boundaries permit focused testing, while transactions keep state and inventory changes together. MVC emphasises coordinating models and views, and Repository emphasises a persistence abstraction; the selected layering makes workflow and transactional responsibilities explicit. A separate client–server service deployment adds no necessary boundary for this local single-warehouse scope. See [driver architecture](../logistics-foundation/docs/driver-module.md) and the code mapping below.
 
@@ -255,6 +249,7 @@ The [moderator protocol](../logistics-foundation/docs/user-validation/moderator.
 | Review or presentation statement | Meaning | Disposition | Evidence |
 |---|---|---|---|
 | “Some of diagrams are incorrect. Role-based design is clear.” | Review calls for correct models while retaining distinct roles. | State and use-case sources corrected and exported; test results tied to the hardened baseline. | §4; [audit](../logistics-foundation/docs/audit-2026-11-10.md); §10. |
+| Presentation architecture diagram: horizontal layer stacking. | Layers and responsibilities need an explicit reading order. | Layers read top-down; names follow §4 and trade-offs are retained. | [Architecture source](../logistics-foundation/docs/diagrams/architecture.puml); [compliance matrix](../logistics-foundation/docs/diagrams/compliance.md); §4. |
 | Increment definition unclear (oral feedback) | Readers need trigger, scope, exit criteria and evidence. | Defined each increment in full sentences. | Table 2.1; [increment register](../logistics-foundation/docs/process/increments.md). |
 | Presentation FR-04 describes confirmation deduction and cancellation release. | Inventory effects accompany state changes. | FR-02 governs state transitions and their effects; FR-04 governs inventory management and low-stock alerts. Must priority is shared by several IDs. | §3; [traceability](../logistics-foundation/docs/traceability.md). |
 | Presentation p95 18.2 ms. | The presentation figure needs a traceable measurement. | The presentation figure has no corresponding identified tracked measurement in the baseline history; the current probe output (§10) is the authoritative measurement for this report. | [Audit](../logistics-foundation/docs/audit-2026-11-10.md); [measurement](../logistics-foundation/evidence/performance.json). |
@@ -272,7 +267,7 @@ The [moderator protocol](../logistics-foundation/docs/user-validation/moderator.
 | Earlier availability and usability targets. | The previous availability criterion covered 08:00–24:00; the previous action criterion covered core operations generally. | Revise availability to an integration-point criterion and bound the action criterion to listed scripted operations from prepared screens; the sampling and human-validation protocols define supplementary measurements. | [SRS revision](../logistics-foundation/docs/requirements/srs.md); §§6 and 8. |
 | Workflow path and Node version. | CI is a repository-root workflow and specifies Node 24. | Use root-relative paths and record the local Node version in §10. | [Workflow](../.github/workflows/ci.yml); `node -v`. |
 
-The risk matrix, increment table and reconciliation table make the development process visible from a defined need through design, implementation and evidence.
+Both scope goals are anchored end-to-end: order decisions trace from the risk register to CI runs; the role-separated workflow is exercised by the suites and the walkthrough.
 
 ## 10. Evidence appendix
 
