@@ -1,6 +1,6 @@
 # Risk-to-requirement coverage
 
-Source: [historical risk register](../reference/legacy/risks.md). Each relationship below is **reconstructed from risk register** and current project artefacts; it is an analytical mapping, not a record of a historical decision. Severity is reported as the register's probability/impact pair. Process-control artifacts identify risks without a direct functional or non-functional requirement mapping. Status distinguishes a repository observation from the register's historical status.
+Source: [historical risk register](../reference/legacy/risks.md). Each relationship below links the risk register to current project artefacts. Severity is reported as the register's probability/impact pair. Process-control artifacts identify risks without a direct functional or non-functional requirement mapping. Status distinguishes a repository observation from the register's historical status.
 
 | Risk (ID, summary, severity) | Addressed by (FR/NFR or process control) | Mitigation (design/code) | Verification (test file / evidence) | Status |
 |---|---|---|---|---|

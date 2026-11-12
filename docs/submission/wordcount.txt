@@ -1,4 +1,4 @@
 Command: sed image lines | pandoc --to=plain | sed first URL line | wc -w
-Words (headings, captions and tables included; figures and first URL excluded): 991
+Words (headings, captions and tables included; figures and first URL excluded): 994
 Limit: 1000
 Result: PASS
