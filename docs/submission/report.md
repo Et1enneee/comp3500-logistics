@@ -48,7 +48,7 @@ The [specification](https://github.com/Et1enneee/comp3500-logistics/blob/main/lo
 
 Non-functional requirements cover NFR-01 performance; NFR-02 integration-point availability; NFR-03 least privilege; NFR-04 scripted operation effort; NFR-05 process quality.
 
-**Table B. Risk coverage** ([risk matrix](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/requirements/risk-coverage.md))
+**Table B. Risk coverage** ([detailed mapping](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/requirements/risk-coverage.md))
 
 | Risk | Addressed by | Treatment status |
 |---|---|---|
