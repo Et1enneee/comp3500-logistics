@@ -1,6 +1,4 @@
-Command: docs/submission/wordcount.sh (pandoc --to=plain | sed | wc -w; SVG text | wc -w)
-Pandoc body, excluding first URL line: 850
-SVG figure labels added: 124
-Conservative total (includes image alt text and figure labels): 974
+Command: sed image lines | pandoc --to=plain | sed first URL line | wc -w
+Words (headings, captions and tables included; figures and first URL excluded): 852
 Limit: 1000
 Result: PASS
