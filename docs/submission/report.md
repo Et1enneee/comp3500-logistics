@@ -7,7 +7,7 @@ https://github.com/Et1enneee/comp3500-logistics
 
 ## 1. Scope
 
-The goals are traceable order decisions and a role-separated workflow. Customers order and track; staff confirm, pick, ship and assign; drivers simulate assigned deliveries; administrators report. The local application serves one warehouse using Next.js, TypeScript, Prisma and SQLite. Real GPS, barcode scanning, recipient telephone collection, payment and carrier integration are outside scope. Operational constraints address deployment and data integrity.
+The goals are traceable order decisions and a role-separated workflow. Customers order and track; staff confirm, pick, ship and assign; drivers simulate assigned deliveries; administrators report. The local application serves one warehouse using Next.js, TypeScript, Prisma and SQLite. Real GPS, barcode scanning, recipient telephone collection, payment and carrier integration are outside scope. Operational constraints address deployment and data integrity. Requirements and models link to repository evidence; §10 collects the trail.
 
 ## 2. Development process
 
@@ -27,9 +27,26 @@ Plan-driven incremental development defines each increment by its trigger and ve
 
 Git manages versions, the [workflow](https://github.com/Et1enneee/comp3500-logistics/blob/main/.github/workflows/ci.yml) integrates changes, and the [issue tracker](https://github.com/Et1enneee/comp3500-logistics/issues) records problems; the [increment register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/process/increments.md) records their development context.
 
+<!-- pagebreak -->
+
 ## 3. Requirements
 
-The [software requirements specification](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/requirements/srs.md) defines the requirements. Functional requirements cover FR-01 order creation; FR-02 state changes; FR-03 numbering and tracking; FR-04 inventory and alerts; FR-05 notifications; FR-06 reports; FR-07 access control; FR-08 simulated delivery. Non-functional requirements cover NFR-01 performance; NFR-02 integration-point availability; NFR-03 least privilege; NFR-04 scripted operation effort; NFR-05 process quality.
+The [software requirements specification](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/requirements/srs.md) defines obligations and rationale.
+
+**Functional requirements and verification**
+
+| FR | The system shall | Rationale | Verification |
+|---|---|---|---|
+| FR-01 | create orders with product lines and totals | start fulfilment | [Test](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/tests/foundation.integration.ts) |
+| FR-02 | enforce lifecycle and stock reservation or release | protect invariants | [Test](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/tests/orders.integration.ts) |
+| FR-03 | number orders and shipments and show owner tracking | retrieve progress | [Test](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/tests/logistics-chain.integration.ts) |
+| FR-04 | show inventory, replenishment, ledger and low-stock alerts | support replenishment | [Test](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/tests/inventory.integration.ts) |
+| FR-05 | record event notifications and allow reading | communicate progress | [Test](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/tests/notifications.integration.ts) |
+| FR-06 | provide admin aggregates and CSV export | support review | [Test](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/tests/reports.integration.ts) |
+| FR-07 | authenticate and enforce role and object access | protect data | [Test](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/tests/auth.integration.ts) |
+| FR-08 | assign shipped orders and simulate delivery | complete handoff | [Test](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/tests/driver.integration.ts) |
+
+Non-functional requirements cover NFR-01 performance; NFR-02 integration-point availability; NFR-03 least privilege; NFR-04 scripted operation effort; NFR-05 process quality.
 
 **Table B. Risk coverage** ([risk matrix](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/requirements/risk-coverage.md))
 
@@ -50,51 +67,66 @@ Mitigated records a mitigation; managed records a mechanism while the historical
 
 ## 4. System models
 
-Layered architecture separates pages, routes and authentication, business handlers, and persistence. Transactions preserve consistency without splitting this local warehouse into separate services. State and stock guards and transaction atomicity enforce hard rules.
+Five views connect role goals, order lifecycle, data, confirmation transaction and layers. Transactions preserve consistency in this local warehouse without splitting services; state and stock guards enforce rules.
 
-![Layered architecture](https://raw.githubusercontent.com/Et1enneee/comp3500-logistics/main/logistics-foundation/docs/diagrams/architecture.svg)
+![Use cases](https://raw.githubusercontent.com/Et1enneee/comp3500-logistics/main/logistics-foundation/docs/closure/usecase.svg)
 
-*Figure 1. Interfaces connect four layers.* [Source](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/diagrams/architecture.puml).
-
-<!-- pagebreak -->
-
-![Figure 2. Order lifecycle: valid transitions and effects.](https://raw.githubusercontent.com/Et1enneee/comp3500-logistics/main/logistics-foundation/docs/diagrams/state-machine.svg)
-
-*Figure 2. Order lifecycle: valid transitions and effects.* [Source](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/diagrams/state-machine.puml).
+*Figure 1. Which roles perform each function? Rebuilt from the reviewed draft; §9.* [Source](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/closure/usecase.puml).
 
 <!-- pagebreak -->
 
-![Figure 3. Use cases associate external roles with application functions.](https://raw.githubusercontent.com/Et1enneee/comp3500-logistics/main/logistics-foundation/docs/closure/usecase.svg)
+![Order lifecycle](https://raw.githubusercontent.com/Et1enneee/comp3500-logistics/main/logistics-foundation/docs/diagrams/state-machine.svg)
 
-*Figure 3. Use cases associate external roles with application functions.* [Source](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/closure/usecase.puml).
+*Figure 2. Which order transitions and stock effects are valid?* [Source](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/diagrams/state-machine.puml).
 
 <!-- pagebreak -->
 
 An order has 0..* items in the schema, while creation requires at least one; an item references one product. An order has 0..1 shipment; a product has 0..* inventory logs.
 
-![Figure 4. Entity relationships and multiplicities.](https://raw.githubusercontent.com/Et1enneee/comp3500-logistics/main/logistics-foundation/docs/er.svg)
+![Entity relationships](https://raw.githubusercontent.com/Et1enneee/comp3500-logistics/main/logistics-foundation/docs/er.svg)
 
-*Figure 4. Entity relationships and multiplicities.* [Source](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/er.puml).
-
-<!-- pagebreak -->
+*Figure 3. How is data related? The schema permits zero items; the creation API requires at least one.* [Source](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/er.puml).
 
 ![Confirmation sequence](https://raw.githubusercontent.com/Et1enneee/comp3500-logistics/main/logistics-foundation/docs/diagrams/sequence-diagram.svg)
 
-*Figure 5. A confirmation transaction commits or rolls back.* [Source](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/diagrams/sequence-diagram.puml).
+*Figure 4. How does confirmation commit or roll back?* [Source](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/diagrams/sequence-diagram.puml).
+
+<!-- pagebreak -->
+
+![Layered architecture](https://raw.githubusercontent.com/Et1enneee/comp3500-logistics/main/logistics-foundation/docs/diagrams/architecture.svg)
+
+*Figure 5. How do four layers connect?* [Source](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/diagrams/architecture.puml).
 
 ## 5. Implementation
 
-The confirmation guard ([order-api.ts:250–253](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/lib/order-api.ts#L250-L253)) requires CREATED; the stock guard ([order-api.ts:276–280](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/lib/order-api.ts#L276-L280)) requires sufficient quantity. The [serializable transaction](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/lib/order-api.ts#L245-L293) groups state, stock, ledger and notification writes. [Staff cancellation](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/lib/order-api.ts#L420-L435) requires CONFIRMED. A driver is [assigned only to SHIPPED orders](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/lib/driver-api.ts#L44-L51); the [assignment remains after delivery](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/lib/order-api.ts#L321-L330).
+Design rules map to implementation and tests; staff cancellation requires [CONFIRMED](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/lib/order-api.ts#L420-L435).
+
+| Design | Implementation | Verification |
+|---|---|---|
+| Guards: CREATED and sufficient stock | [order-api.ts:250–253](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/lib/order-api.ts#L250-L253), [276–280](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/lib/order-api.ts#L276-L280) | [Orders](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/tests/orders.integration.ts) |
+| Serializable state, stock, ledger and notification writes | [order-api.ts:245–293](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/lib/order-api.ts#L245-L293) | [Orders](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/tests/orders.integration.ts) |
+| driverId: assign only SHIPPED; retained after delivery | [driver-api.ts:44–51](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/lib/driver-api.ts#L44-L51); [transition](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/lib/order-api.ts#L321-L330) | [Driver](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/tests/driver.integration.ts) |
+| Selected-date export | [admin/page.tsx:24–48](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/app/admin/page.tsx#L24-L48) | [Browser](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/scripts/browser-smoke.mjs#L385-L399) |
+
+<!-- pagebreak -->
 
 ## 6. Verification and validation
 
-Verification checks the specification; validation assesses fitness for real users. The recorded run passed 38 unit, 140 integration, 2 delivery and 26 browser checks; [logs](https://github.com/Et1enneee/comp3500-logistics/tree/main/logistics-foundation/evidence/test-logs/2026-11-12-diagram-regression) and [CI](https://github.com/Et1enneee/comp3500-logistics/actions/runs/43164499100) provide evidence. Repeated confirmation and insufficient stock return HTTP 409 with unchanged state and stock. In a pre-export-fix local-loopback measurement, API p95 was 3.2–13.6 ms and first-contentful-paint p95 was 64–96 ms, against NFR-01 targets of at most 2 s and 3 s respectively ([measurement](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/performance.json)). The revised availability criterion records 40 successful build–test–browser integration points ([observations](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/availability/integration-observations.json)).
+Verification checks the specification; validation assesses fitness for real users. The recorded [regression logs](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/test-logs/2026-11-12-completeness/) and [CI](https://github.com/Et1enneee/comp3500-logistics/actions/runs/43164499100) show 38 unit, 140 integration, 2 delivery and 26 browser checks.
+
+| Boundary case | Observed | Test |
+|---|---|---|
+| Repeat confirmation | HTTP 409; state and stock unchanged | [Orders](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/tests/orders.integration.ts#L141-L156) |
+| Stock equals demand | Confirmation succeeds; stock becomes zero | [Orders](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/tests/orders.integration.ts#L248-L252) |
+| Stock 4 versus threshold 5 | Alert; stock 5 is not low | [Inventory](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/tests/inventory.integration.ts#L20-L38) |
+
+Insufficient stock returns HTTP 409 with unchanged state and stock. In a pre-export-fix local-loopback [measurement](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/performance.json), API p95 was 3.2–13.6 ms and first-contentful-paint p95 was 64–96 ms, against NFR-01 targets of at most 2 s and 3 s respectively. NFR-02 records 40 successful build–test–browser integration points ([observations](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/availability/integration-observations.json)).
 
 <!-- pagebreak -->
 
 ## 7. Evolution
 
-The early defect record led to the confirmation transaction and its retest. The post-presentation audit led to corrected models and renewed tests. The walkthrough exposed a four-action administrator task; direct export now takes three actions including date entry, or one click from a prepared screen ([regression](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/test-logs/2026-11-12-diagram-regression/browser.log)).
+The early defect record led to the confirmation transaction and its retest. The post-presentation audit led to corrected models and renewed tests. The walkthrough exposed a four-action administrator task; direct export now takes three actions including date entry, or one click from a prepared screen ([regression](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/test-logs/2026-11-12-completeness/browser.log)).
 
 ## 8. Validation
 
