@@ -4,7 +4,7 @@ Operator-owned procedure. Only actual observations are added. All commands below
 
 ## WALKTHROUGH — 17–24 November participant observations
 
-Use the existing [moderator protocol](../../logistics/docs/user-validation/moderator.md), [role task cards](../../logistics/docs/user-validation/), and [record template](../../logistics/docs/user-validation/record-template.md). For each actual participant and task, copy the template to an operator-chosen evidence file and record the anonymous code, role, task and revision, date/time, application commit and environment, and the four outcomes below:
+Use the existing [moderator protocol](../../logistics/docs/walkthrough/moderator.md), [role task cards](../../logistics/docs/walkthrough/), and [record template](../../logistics/docs/walkthrough/record-template.md). For each actual participant and task, copy the template to an operator-chosen evidence file and record the anonymous code, role, task and revision, date/time, application commit and environment, and the four outcomes below:
 
 ```text
 Completed (yes / no / stopped and observed outcome): {{actual outcome}}
