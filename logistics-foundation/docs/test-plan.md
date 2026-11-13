@@ -23,7 +23,7 @@ Integration tests use temporary SQLite, separate from the project demo database.
 
 ## CI
 The repository-root .github/workflows/ci.yml runs file checks, install, a one-off database init, types, unit, integration, lint, build, and browser in the logistics-foundation working directory. Actual Actions results are keyed to the corresponding commit; failed runs keep logs, and CI must not be marked passing based on local results.
-Historical branch-specific test cases and defect records remain in reference/legacy/Jaden-*; the original attributions/results represent only the old environment.
+Historical branch-specific test cases and defect records remain in docs/process/Jaden-*; the original attributions/results represent only the old environment.
 
 
 ---

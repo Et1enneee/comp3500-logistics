@@ -79,6 +79,6 @@ The CI workflow is in `.github/workflows/ci.yml`; performance and browser checks
 - [`logistics-foundation/docs/requirements/srs.md`](logistics-foundation/docs/requirements/srs.md): requirements specification.
 - `logistics-foundation/docs/known-issues.md`: dependency audit, SQLite, availability, and testing boundaries.
 - [`logistics-foundation/docs/contracts/`](logistics-foundation/docs/contracts/) and [`logistics-foundation/docs/traceability.md`](logistics-foundation/docs/traceability.md): interfaces and requirements traceability.
-- `logistics-foundation/docs/reference/legacy/`: historical material, not a statement of current capabilities.
+- `logistics-foundation/docs/process/` and the retained `logistics-foundation/docs/reference/legacy/traceability-v0.md`: historical material, not a statement of current capabilities.
 
 The source excludes dependencies, build caches, databases, and real environment variables. `logistics-foundation/SHA256SUMS.txt` lists application files for checksum verification. Historical evidence is kept as historical material; current test evidence is supplied separately. The canonical course report and submission source are maintained in `docs/`; demo materials and official submission records are managed separately by the team.

@@ -8,7 +8,7 @@
 | repo-init旧运行代码 | 保留历史，不纳入当前运行/精简导出；不移植旧schema/路由/无鉴权逻辑 |
 | 原traceability FR01～07/NFR01～05 | 原文参考保留，新根docs/traceability.md按实际能力重建状态 |
 | main更新的acceptance/usability/risks | 不用旧分支模板覆盖；有效场景转换为当前acceptance，历史走查和风险原文保留 |
-| Jaden独有defects/test-plan | 原文保留docs/reference/legacy/Jaden-*，不丢原署名与记录，不将10/17旧失败当作当前结果 |
+| Jaden独有defects/test-plan | 原文保留docs/process/Jaden-*，不丢原署名与记录，不将10/17旧失败当作当前结果 |
 | Jaden acceptance | 是较早占位稿；不覆盖main较完整材料，不按“发货再扣stock”解释 |
 | 旧/当前截图 | 当前项目截图保留；过时evidence-history从精简导出排除，CI重新生成本轮截图artifact |
 | 旧process/templates | 原文仍在repo-init/docs历史目录；不是当前功能实现声明 |
