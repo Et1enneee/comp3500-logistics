@@ -1,0 +1,14 @@
+source_commit=5e692b2b3126927947b67588152959d928e2f666
+command=npm run typecheck 
+started_utc=2026-11-11T06:05:03Z
+
+> group42-logistics-repository@0.4.2 typecheck
+> npm --prefix logistics run typecheck
+
+
+> group42-logistics@0.4.2 typecheck
+> tsc --noEmit
+
+
+EXIT_CODE=0
+ended_utc=2026-11-11T06:05:07Z

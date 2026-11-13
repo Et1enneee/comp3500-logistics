@@ -25,7 +25,7 @@ For each line, check its caption is complete, no content is clipped, all text is
 ## Hover samples
 
 - [ ] L01 — Page 1, “issue #15”: repository issue 15.
-- [ ] L02 — Page 2, FR-01 “Test”: `logistics-foundation/tests/foundation.integration.ts`.
-- [ ] L03 — Page 3, Figure 1 “Source”: `logistics-foundation/docs/closure/usecase.puml`.
-- [ ] L04 — Page 6, “driver-api.ts:44–51”: `logistics-foundation/lib/driver-api.ts`, lines 44–51.
-- [ ] L05 — Page 7, “measurement”: `logistics-foundation/evidence/performance.json`.
+- [ ] L02 — Page 2, FR-01 “Test”: `logistics/tests/foundation.integration.ts`.
+- [ ] L03 — Page 3, Figure 1 “Source”: `logistics/docs/closure/usecase.puml`.
+- [ ] L04 — Page 6, “driver-api.ts:44–51”: `logistics/lib/driver-api.ts`, lines 44–51.
+- [ ] L05 — Page 7, “measurement”: `logistics/evidence/performance.json`.

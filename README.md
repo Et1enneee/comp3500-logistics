@@ -2,7 +2,7 @@
 
 [![Logistics checks](https://github.com/Et1enneee/comp3500-logistics/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Et1enneee/comp3500-logistics/actions/workflows/ci.yml)
 
-The sole application lives in `logistics-foundation/`; the root directory forwards all run, test, and evidence commands. It keeps the v0.3.1 foundation, Next.js / React / TypeScript / Prisma 6 / SQLite, and the existing lockfile.
+The sole application lives in `logistics/`; the root directory forwards all run, test, and evidence commands. It keeps the v0.3.1 foundation, Next.js / React / TypeScript / Prisma 6 / SQLite, and the existing lockfile.
 
 ## Startup (Node 24; tested on 24.22.1)
 
@@ -45,11 +45,11 @@ Use fictional addresses only; the local SQLite database stores addresses as plai
 3. **Driver:** open My Deliveries to see the assigned order and its address; simulate pickup and delivery in order.
 4. **Customer A:** open the order to review its delivery status and tracking events.
 
-Orders created before the address migration keep an empty address and are marked as not provided; they can still be processed for simulation, but do not represent a real delivery. Staff can also simulate pickup and delivery without a driver assignment for backward compatibility. No GPS, recipient phone or real carrier service is connected. For details and limitations see `logistics-foundation/docs/driver-module.md`.
+Orders created before the address migration keep an empty address and are marked as not provided; they can still be processed for simulation, but do not represent a real delivery. Staff can also simulate pickup and delivery without a driver assignment for backward compatibility. No GPS, recipient phone or real carrier service is connected. For details and limitations see `logistics/docs/driver-module.md`.
 
 ## Current Capabilities
 
-Real login/logout with persistent sessions and per-customer object isolation; customer catalog, order placement, my orders, shipment tracking, and cancellation; staff confirmation, picking, shipping and driver assignment; drivers update assigned simulated deliveries; a single cancellation after confirmation releases reserved stock; inventory alerts, replenishment, and stock ledger; in-app notifications; ADMIN read-only reports with CSV export. Logistics is simulated locally; there is no real GPS, scanner, payment or carrier integration; the delivery-address field is stored in the local database and is for fictional demo data only. See `logistics-foundation/docs/driver-module.md`.
+Real login/logout with persistent sessions and per-customer object isolation; customer catalog, order placement, my orders, shipment tracking, and cancellation; staff confirmation, picking, shipping and driver assignment; drivers update assigned simulated deliveries; a single cancellation after confirmation releases reserved stock; inventory alerts, replenishment, and stock ledger; in-app notifications; ADMIN read-only reports with CSV export. Logistics is simulated locally; there is no real GPS, scanner, payment or carrier integration; the delivery-address field is stored in the local database and is for fictional demo data only. See `logistics/docs/driver-module.md`.
 
 ## Checks and Isolated Evidence
 
@@ -75,10 +75,10 @@ The CI workflow is in `.github/workflows/ci.yml`; performance and browser checks
 
 - [`docs/final-report.md`](docs/final-report.md): canonical final report and evidence trail.
 
-- `logistics-foundation/README.md`: business rules and detailed run steps.
-- [`logistics-foundation/docs/requirements/srs.md`](logistics-foundation/docs/requirements/srs.md): requirements specification.
-- `logistics-foundation/docs/known-issues.md`: dependency audit, SQLite, availability, and testing boundaries.
-- [`logistics-foundation/docs/contracts/`](logistics-foundation/docs/contracts/) and [`logistics-foundation/docs/traceability.md`](logistics-foundation/docs/traceability.md): interfaces and requirements traceability.
-- `logistics-foundation/docs/process/` and the retained `logistics-foundation/docs/reference/legacy/traceability-v0.md`: historical material, not a statement of current capabilities.
+- `logistics/README.md`: business rules and detailed run steps.
+- [`logistics/docs/requirements/srs.md`](logistics/docs/requirements/srs.md): requirements specification.
+- `logistics/docs/known-issues.md`: dependency audit, SQLite, availability, and testing boundaries.
+- [`logistics/docs/contracts/`](logistics/docs/contracts/) and [`logistics/docs/traceability.md`](logistics/docs/traceability.md): interfaces and requirements traceability.
+- `logistics/docs/process/` and the retained `logistics/docs/reference/legacy/traceability-v0.md`: historical material, not a statement of current capabilities.
 
-The source excludes dependencies, build caches, databases, and real environment variables. `logistics-foundation/SHA256SUMS.txt` lists application files for checksum verification. Historical evidence is kept as historical material; current test evidence is supplied separately. The canonical course report and submission source are maintained in `docs/`; demo materials and official submission records are managed separately by the team.
+The source excludes dependencies, build caches, databases, and real environment variables. `logistics/SHA256SUMS.txt` lists application files for checksum verification. Historical evidence is kept as historical material; current test evidence is supplied separately. The canonical course report and submission source are maintained in `docs/`; demo materials and official submission records are managed separately by the team.

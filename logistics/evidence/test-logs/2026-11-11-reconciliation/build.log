@@ -1,0 +1,57 @@
+START 2026-11-11T10:06:55+00:00 npm run build
+
+> group42-logistics-repository@0.4.2 build
+> npm --prefix logistics run build
+
+
+> group42-logistics@0.4.2 build
+> next build
+
+▲ Next.js 16.4.3 (Turbopack)
+✓ Running next.config.ts took 24ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 1142ms
+  Running TypeScript ...
+  Finished TypeScript in 1669ms ...
+  Collecting page data using 1 worker ...
+  Generating static pages using 1 worker (0/3) ...
+✓ Generating static pages using 1 worker (3/3) in 85ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ƒ /_not-found
+├ ƒ /admin
+├ ƒ /api/v1/auth/login
+├ ƒ /api/v1/auth/logout
+├ ƒ /api/v1/auth/me
+├ ƒ /api/v1/driver/tasks
+├ ƒ /api/v1/inventory
+├ ƒ /api/v1/inventory/[productId]/replenish
+├ ƒ /api/v1/inventory/logs
+├ ƒ /api/v1/inventory/low-stock
+├ ƒ /api/v1/notifications
+├ ƒ /api/v1/notifications/[id]/read
+├ ƒ /api/v1/notifications/unread-count
+├ ƒ /api/v1/orders
+├ ƒ /api/v1/orders/[id]
+├ ƒ /api/v1/orders/[id]/driver
+├ ƒ /api/v1/orders/[id]/status
+├ ƒ /api/v1/orders/[id]/tracking
+├ ƒ /api/v1/reports/export.csv
+├ ƒ /api/v1/reports/overview
+├ ƒ /api/v1/shipments
+├ ƒ /driver
+├ ƒ /inventory
+├ ƒ /login
+├ ƒ /notifications
+├ ƒ /orders
+├ ƒ /orders/[id]
+├ ƒ /staff
+└ ƒ /staff/orders/[id]
+
+
+ƒ  (Dynamic)  server-rendered on demand
+
+EXIT 0
