@@ -21,7 +21,7 @@
     "baseline": "npm --prefix logistics run baseline",
     "verify:migration": "npm --prefix logistics run verify:migration",
     "db:reset-passwords": "npm --prefix logistics run db:reset-passwords",
-    "test:delivery": "npm --prefix logistics run test:delivery",
+    "test:integrity": "npm --prefix logistics run test:integrity",
     "db:driver-demo": "npm --prefix logistics run db:driver-demo"
   },
   "engines": {

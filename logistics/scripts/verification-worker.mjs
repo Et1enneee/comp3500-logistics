@@ -57,7 +57,7 @@ function run(name, command, args, options = {}) {
       if (options.stdoutFile) await fs.writeFile(options.stdoutFile, stdout);
       const result = {
         name,
-        ...(["unit", "integration", "delivery"].includes(name) ? {
+        ...(["unit", "integration", "integrity"].includes(name) ? {
           testCount: Number((output.replace(/\x1b\[[0-9;]*m/g, "").match(name === "unit" ? /Tests\s+(\d+)\s+passed/ : /tests\s+(\d+)/) ?? [])[1]) || null,
         } : {}),
         command: [command, ...args].join(" "),
@@ -189,7 +189,7 @@ try {
     const result = await run(name, "npm", args);
     if (result.exitCode !== 0) throw new Error(`${name} failed; stopping isolated verification`);
   }
-  await run("delivery", "npm", ["run", "test:delivery"]);
+  await run("integrity", "npm", ["run", "test:integrity"]);
   await run("typecheck", "npm", ["run", "typecheck"]);
   await run("unit", "npm", ["test"]);
   await run("integration", "npm", ["run", "test:integration"]);
@@ -262,7 +262,7 @@ try {
       totalSteps: steps.length,
       unitTests: steps.find(step => step.name === "unit")?.testCount ?? null,
       integrationTests: steps.find(step => step.name === "integration")?.testCount ?? null,
-      deliveryTests: steps.find(step => step.name === "delivery")?.testCount ?? null,
+      integrityTests: steps.find(step => step.name === "integrity")?.testCount ?? null,
       failedSteps: failed.map(step => step.name),
       browserChecks: browserSummary?.passedCount ?? null,
       browserConsoleErrors: browserSummary?.consoleErrors ?? null,

@@ -73,7 +73,7 @@ Use fictional delivery addresses only: addresses are stored as plain text in the
 npm run typecheck
 npm test
 npm run test:integration
-npm run test:delivery
+npm run test:integrity
 npm run lint
 npm run build
 # browser acceptance (build + start + fresh seed first):
