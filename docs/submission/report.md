@@ -7,7 +7,7 @@ https://github.com/Et1enneee/comp3500-logistics
 
 ## 1. Scope
 
-The goals are traceable order decisions and a role-separated workflow. Customers order and track; staff confirm, pick, ship and assign; drivers simulate assigned deliveries; administrators report. The local application serves one warehouse using Next.js, TypeScript, Prisma and SQLite. Real GPS, barcode scanning, recipient telephone collection, payment and carrier integration are outside scope. Deployment is local-only; data integrity is enforced by transactional guards (§5). Requirements and models link to evidence; §10 collects the trail.
+The goals are traceable order decisions and a role-separated workflow. Customers order and track; staff confirm, pick, ship and assign; drivers simulate assigned deliveries; administrators report. The local application serves one warehouse using Next.js, TypeScript, Prisma and SQLite. Real GPS, barcode scanning, recipient telephone collection, payment and carrier integration are outside scope. Deployment is local-only; data integrity is enforced by transactional guards (§5).
 
 ## 2. Development process
 
@@ -18,14 +18,14 @@ Plan-driven increments have triggers and verified outcomes; integration and cont
 | Increment and date | Trigger | Outcome |
 |---|---|---|
 | Planning, 9 and 11 Oct 2026 | Project selection | Responsibilities and contracts recorded |
-| Test-led review, 17 Oct 2026 | Assess order and stock functions | Defects recorded; led to the confirmation transaction (§5) |
-| Confirmation, 26–28 Oct 2026 | Failed endpoint and missing ledger | Transaction verified |
+| Test-led review, 17 Oct 2026 | Assess order and stock functions | Defects recorded in the [register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/process/increments.md); led to the confirmation transaction (§5) |
+| Confirmation, 26–28 Oct 2026 | Failed endpoint and missing ledger ([register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/process/increments.md)) | Transaction verified |
 | Integrated application, 1 Nov 2026 | Integrate foundation | Customer, staff and admin workflows |
-| Driver and privacy, 2 Nov 2026 | Delivery and data minimisation | Assigned tasks and data-minimisation checks |
+| Driver and privacy, 2 Nov 2026 | Delivery and data minimisation | Assigned tasks and data-minimisation checks ([tests](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/tests/privacy.integration.ts)) |
 | Documentation hardening, 10–11 Nov 2026 | Model and evidence review | Diagrams and traceability aligned |
 | Export simplification, 11 Nov 2026 | Scripted walkthrough finding ([issue #15](https://github.com/Et1enneee/comp3500-logistics/issues/15)) | Selected-date export in three actions; regression passed |
 
-The [workflow](https://github.com/Et1enneee/comp3500-logistics/blob/main/.github/workflows/ci.yml), [issue tracker](https://github.com/Et1enneee/comp3500-logistics/issues) and [increment register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/process/increments.md) record integration.
+The [workflow](https://github.com/Et1enneee/comp3500-logistics/blob/main/.github/workflows/ci.yml) and [issue tracker](https://github.com/Et1enneee/comp3500-logistics/issues) record integration.
 
 <!-- pagebreak -->
 
@@ -52,14 +52,14 @@ NFR-01 performance (API p95 ≤2 s, first contentful paint ≤3 s); NFR-02 integ
 
 | Risk | Addressed by | Evidence |
 |---|---|---|
-| RK-01 scheduling slip | [Increment register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/process/increments.md) | [scheduling plan](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/reference/legacy/risks.md) |
+| RK-01 scheduling slip | [Increment register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/process/increments.md) | [scheduling plan](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/process/risks.md) |
 | RK-02 contract rework | FR-02, NFR-05 | [transition tests](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/lib/constants.test.ts) |
-| RK-03 test-week capacity | [Priority register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/reference/legacy/traceability-v0.md) | [scope priorities](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/reference/legacy/risks.md) |
+| RK-03 test-week capacity | [Priority register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/reference/legacy/traceability-v0.md) | [scope priorities](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/process/risks.md) |
 | RK-04 setup delay | NFR-05 | [CI workflow](https://github.com/Et1enneee/comp3500-logistics/blob/main/.github/workflows/ci.yml) |
 | RK-05 demo data | FR-01/04/06, NFR-05 | [seed regression test](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/tests/seed.integration.ts) |
-| RK-06 assignments and test squeeze | [Risk plan](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/reference/legacy/risks.md) | [assessment schedule](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/reference/legacy/risks.md) |
+| RK-06 assignments and test squeeze | [Risk plan](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/process/risks.md) | [assessment schedule](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/process/risks.md) |
 | RK-07 stack unfamiliarity | NFR-05 support | [setup guide](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/README.md) |
-| RK-08 report and video compete for time | [Risk plan](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/reference/legacy/risks.md) | [report and video plan](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/reference/legacy/risks.md) |
+| RK-08 report and video compete for time | [Risk plan](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/process/risks.md) | [report and video plan](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/process/risks.md) |
 
 <!-- pagebreak -->
 
@@ -110,7 +110,7 @@ Lifecycle: CREATED → CONFIRMED → PICKING → SHIPPED, then IN_TRANSIT and DE
 
 ## 6. Verification and validation
 
-Verification checks requirements against the implementation; validation exercises the delivered workflows through the interface. The [regression log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/test-logs/2026-11-12-completeness-final/unit.log) and [CI](https://github.com/Et1enneee/comp3500-logistics/actions/runs/43175733067) show 38 unit, 140 integration, 2 delivery (driver simulation) and 26 browser checks.
+Verification checks requirements against the implementation; validation exercises the delivered workflows through the interface. The [regression log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/test-logs/2026-11-12-completeness-final/unit.log) and [CI](https://github.com/Et1enneee/comp3500-logistics/actions/runs/43175733067) show 38 unit, 140 integration, 2 delivery checks (assignment and delivery simulation) and 26 browser checks.
 
 | Boundary case | Observed | Test |
 |---|---|---|
@@ -118,31 +118,31 @@ Verification checks requirements against the implementation; validation exercise
 | Stock equals demand | Confirmation succeeds; stock becomes zero | [Orders](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/tests/orders.integration.ts#L248-L252) |
 | Stock 4 versus threshold 5 | Alert; stock 5 is not low | [Inventory](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/tests/inventory.integration.ts#L20-L38) |
 
-Insufficient stock returns HTTP 409 with unchanged state and stock. In a local-loopback [measurement](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/performance.json) recorded on 11 November 2026, API p95 was 3.2–13.6 ms and first-contentful-paint p95 was 64–96 ms, against NFR-01 targets of at most 2 s and 3 s respectively. NFR-02 is evidenced by the recorded green build–test–browser runs ([observations](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/availability/integration-observations.json)).
+Insufficient stock returns HTTP 409 with unchanged state. In a local-loopback [measurement](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/performance.json) recorded on 11 November 2026, API p95 was 3.2–13.6 ms and first-contentful-paint p95 was 64–96 ms, against NFR-01 targets of at most 2 s and 3 s respectively. Targets are end-to-end budgets; loopback bounds server-side processing. NFR-02 is evidenced by the recorded green build–test–browser runs ([observations](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/availability/integration-observations.json)).
 
 ## 7. Evolution
 
-The early defect record drove confirmation and retest; the documentation hardening review corrected models and renewed tests. An administrator export task became three actions ([regression](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/test-logs/2026-11-12-completeness-final/browser.log)).
+The 17 Oct defect record drove the confirmation transaction and retest; the 10–11 Nov documentation review corrected models and renewed tests.
 
 ## 8. Validation
 
-The [automated walkthrough](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/user-validation/automated-walkthrough.md) exercises eleven core operations through the interface as each of the four roles, at most three actions each, with expected outcomes asserted in the walkthrough script; results are logged with the run.
+The [automated walkthrough](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/user-validation/automated-walkthrough.md) exercises eleven core operations through the interface as each of the four roles, at most three actions each, with expected outcomes asserted in the walkthrough script; results are logged with the [walkthrough record](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/user-validation/automated-walkthrough.md).
 
 ## 9. Feedback and reconciliation
 
 **Table C. Feedback to evidence**
 
-| Feedback | Disposition | Evidence |
-|---|---|---|
-| Diagrams | Corrected models and architecture | [Compliance matrix](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/diagrams/compliance.md) |
-| FR-04 | Stock transition effects belong to FR-02 | [Traceability](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/traceability.md) |
-| Increments | Triggers and outcomes | [Register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/process/increments.md) |
-| Admin task | Export re-tested; scripted walkthrough records the task (§8) | [Issue #15](https://github.com/Et1enneee/comp3500-logistics/issues/15) |
-| Unit count | Two availability-summary regression tests added, bringing the suite to 38 | [Test history](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/test-logs/2026-11-12-completeness-final/unit.log) |
-| NFR scope | Performance and availability criteria set for local single-warehouse deployment | [SRS revision log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/requirements/srs.md#7-document-control) |
+| Feedback | Disposition | Source | Evidence |
+|---|---|---|---|
+| Diagrams | Corrected models and architecture | test-led review | [Compliance matrix](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/diagrams/compliance.md) |
+| FR-04 | Stock transition effects belong to FR-02 | test-led review | [Traceability](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/traceability.md) |
+| Increments | Triggers and outcomes | test-led review | [Register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/process/increments.md) |
+| Admin task | Export re-tested; walkthrough records the task (§8) | scripted walkthrough | [Issue #15](https://github.com/Et1enneee/comp3500-logistics/issues/15) |
+| Unit count | Two availability regression tests added, bringing the suite to 38 | regression runs | [Test history](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/evidence/test-logs/2026-11-12-completeness-final/unit.log) |
+| NFR scope | Performance and availability criteria set for local single-warehouse deployment | regression runs | [SRS revision log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/requirements/srs.md#7-document-control) |
 
 ## 10. Evidence
 
 [Traceability](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/traceability.md) · [Specification](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/docs/requirements/srs.md) · [Evidence directory](https://github.com/Et1enneee/comp3500-logistics/tree/main/logistics-foundation/evidence) · [Baseline record](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics-foundation/BASELINE-final-report.json).
 
-Full evidence trail: [docs/final-report.md](https://github.com/Et1enneee/comp3500-logistics/blob/main/docs/final-report.md); baseline `6eb01afb1798c7361205b10597d80c0c26e8fdf6` (code, evidence and test logs).
+Evidence trail: [docs/final-report.md](https://github.com/Et1enneee/comp3500-logistics/blob/main/docs/final-report.md); baseline `6eb01afb1798c7361205b10597d80c0c26e8fdf6`.
