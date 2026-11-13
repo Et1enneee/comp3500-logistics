@@ -72,7 +72,7 @@ with TemporaryDirectory() as td:
     line=lines[i]
     if not line.strip(): i+=1; continue
     if line=='<!-- pagebreak -->': story.append(PageBreak()); i+=1; continue
-    if i==0:
+    if i==0 and line.startswith('http'):
       story.append(Paragraph('<link href="%s">%s</link>'%(escape(line),escape(line)),styles['url'])); i+=1; continue
     if line.startswith('# '): story.append(Paragraph(inline(line[2:]),styles['title'])); i+=1; continue
     if line.startswith('## '): story.append(Paragraph(inline(line[3:]),styles['h2'])); i+=1; continue

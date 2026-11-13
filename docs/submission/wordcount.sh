@@ -5,9 +5,9 @@ set -eu
 PANDOC=${PANDOC:-pandoc}
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
-sed '/^!\[/d' docs/submission/report.md | "$PANDOC" --from=markdown --to=plain --wrap=none | sed '1d' | sed '/^https\?:\/\//d' > "$tmp/body"
+sed '/^!\[/d' docs/submission/report.md | "$PANDOC" --from=markdown --to=plain --wrap=none | sed '/^https\?:\/\//d' > "$tmp/body"
 count=$(wc -w < "$tmp/body" | tr -d ' ')
-printf 'Command: sed image lines | pandoc --to=plain | sed first URL line | wc -w\n'
+printf 'Command: sed image lines | pandoc --to=plain | sed URL lines | wc -w\n'
 printf 'Words (headings, captions and tables included; figures and first URL excluded): %s\n' "$count"
 printf 'Limit: 1000\n'
 [ "$count" -le 1000 ] && echo 'Result: PASS' || { echo 'Result: FAIL'; exit 1; }
