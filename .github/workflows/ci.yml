@@ -52,7 +52,7 @@ jobs:
       - name: Integration tests (real isolated SQLite)
         run: npm run test:integration
 
-      - name: Integrity checks: evidence confirmation and source digest
+      - name: Integrity checks (evidence confirmation and source digest)
         run: npm run test:integrity
 
       - name: Migration preserves existing data
