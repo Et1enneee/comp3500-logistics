@@ -82,3 +82,4 @@ Version 2.1; date 2026-11-11. NFR-02 now specifies point-in-time integration ava
 | Revision | Basis and change |
 |---|---|
 | 2.0 to 2.1, 2026-11-11 | For the local deployment model, NFR-02 changed from the daily availability window to integration-point checks; NFR-04 was bounded to selected scripted operations. Basis: [integration observation archaeology](../../evidence/availability/integration-observations.json), [automated operation walkthrough](../../evidence/walkthrough/automated-walkthrough.md), and [revision commit](https://github.com/Et1enneee/comp3500-logistics/commit/2da83b5). |
+| 10–11 Nov 2026 | NFR-02 daily availability window replaced by CI-run checks; NFR budgets restated for local deployment |
