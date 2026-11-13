@@ -13,7 +13,7 @@ Changes not clearly covered by the rendering or baseline-neutral tiers use the f
 ## Full evidence pipeline
 
 1. Commit the application, test, or substantive evidence changes and any related report-source changes.
-2. Run the full regression suite: `npm test`, `npm run test:integration`, `npm run test:delivery`, `npm run build`, and `npm run test:browser`. Commit the resulting evidence logs and supporting evidence.
+2. Run the full regression suite: `npm test`, `npm run test:integration`, `npm run test:integrity`, `npm run build`, and `npm run test:browser`. Commit the resulting evidence logs and supporting evidence.
 3. Verify successful CI for the evidence commit. Pin `hardened_evidence_commit` in `logistics/BASELINE-final-report.json` to the latest commit containing test logs or substantive evidence, and record the actual CI run. Complete the pin in the same PR as the evidence change.
 4. Run the rendering pipeline below, generating the PDF last with §10 referencing that evidence commit. Verify the PDF §10 value, baseline JSON and evidence commit on main after merge.
 

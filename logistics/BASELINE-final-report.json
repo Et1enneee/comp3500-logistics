@@ -5,5 +5,5 @@
     "evidence/test-logs/2026-11-12-regression/unit.log",
     "evidence/test-logs/2026-11-11-browser/browser.log"
   ],
-  "suite": "38 unit / 140 integration / 2 delivery / 26 browser checks"
+  "suite": "38 unit / 140 integration / 2 integrity / 26 browser checks"
 }

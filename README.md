@@ -57,7 +57,7 @@ Real login/logout with persistent sessions and per-customer object isolation; cu
 npm run typecheck
 npm test
 npm run test:integration
-npm run test:delivery
+npm run test:integrity
 npm run verify:migration
 npm run lint
 npm run build
