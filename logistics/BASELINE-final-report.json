@@ -1,5 +1,9 @@
 {
   "recorded": "2026-11-12",
-  "suite": "38 unit / 140 integration / 2 delivery / 26 browser checks",
-  "repository": "https://github.com/Et1enneee/comp3500-logistics"
+  "ci_run": "https://github.com/Et1enneee/comp3500-logistics/actions/runs/43175733067",
+  "logs": [
+    "evidence/test-logs/2026-11-12-regression/unit.log",
+    "evidence/test-logs/2026-11-11-browser/browser.log"
+  ],
+  "suite": "38 unit / 140 integration / 2 delivery / 26 browser checks"
 }

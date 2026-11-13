@@ -22,7 +22,7 @@ The full customer creation check also tests an invalid submission before correct
 
 ## Complete browser-check map
 
-These check IDs are the source-order indices in the test suite. Cross-cutting and recovery checks are shown as such; their presence does not imply an independently timed human journey.
+These check IDs are the source-order indices in the test suite; cross-cutting, recovery, error and interface checks are marked as such.
 
 | ID | Check | Role or actor | Coverage |
 |---:|---|---|---|
