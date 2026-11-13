@@ -1,6 +1,6 @@
 # Current Acceptance Scenarios
 
-This table reflects the current implementation (v0.4.2); old-branch and old-main records remain in reference/legacy and Git history and are not claimed as this round's execution.
+This table reflects the current implementation (v0.4.2); old-branch and old-main records remain in docs/process and the retained legacy traceability file, and in Git history and are not claimed as this round's execution.
 
 | Linked | Given | When | Then | Verification Entry |
 |---|---|---|---|---|

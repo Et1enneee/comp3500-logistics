@@ -2,7 +2,7 @@
 
 ## 单一入口
 仓库根README/package.json负责统一命令；唯一应用与依赖在logistics-foundation/。不再复制整套运行代码到根目录，也不把repo-init当作待合并的运行宿主。
-repo-init原资产保留Git历史与目录，但从精简导出排除。旧Jaden分支独有测试和缺陷记录原文保留docs/reference/legacy；旧模板不覆盖新版契约，不删除分支。
+repo-init原资产保留Git历史与目录，但从精简导出排除。旧Jaden分支独有测试和缺陷记录原文保留docs/process；旧模板不覆盖新版契约，不删除分支。
 
 ## 现行规则
 ORD用于查询，order.id用于PATCH和tracking；Product.stock表示可用库存；创建不占用，确认原子扣占并写ORDER_CONFIRM，发货不二次扣减。后续揽收/签收是STAFF模拟；真实认证未实现。
