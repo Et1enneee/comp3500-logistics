@@ -1,6 +1,6 @@
 # Automated operation walkthrough
 
-Generated from the browser script and its dated execution log. Reproduce from the repository root with `node logistics-foundation/scripts/generate-automated-walkthrough.mjs`. One action is one scripted fill, selection or click on a relevant control. Each operation starts on the target screen with an authenticated role and a prepared fixture; login, navigation, waits, assertions, errors, and setup are outside the per-operation count. The 26 checks cover the eleven operations at one to three checks each, including error and security cases. The listed successful operations are a selected subset; automated actions do not measure human completion, errors, assistance or time.
+Generated from the browser script and its dated execution log. Reproduce from the repository root with `node logistics-foundation/scripts/generate-automated-walkthrough.mjs`. One action is one scripted fill, selection or click on a relevant control. Each operation starts on the target screen with an authenticated role and a prepared fixture; login, navigation, waits, assertions, errors, and setup are outside the per-operation count. The 26 checks cover the eleven operations at one to three checks each, including error and security cases.
 
 | Role | Operation (browser check) | Actions | ≤3? |
 |---|---|---:|---|
