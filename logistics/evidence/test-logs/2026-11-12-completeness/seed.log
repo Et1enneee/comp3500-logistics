@@ -1,0 +1,13 @@
+START 2026-11-12T07:18:19+00:00 env RESET_DEMO_DATA=YES npm run db:seed:demo
+
+> group42-logistics@0.4.2 db:seed:demo
+> tsx prisma/seed.ts
+
+Demo data rebuilt (disposable database only)
+  Orders: 56 — CANCELLED=4  CONFIRMED=8  CREATED=6  DELIVERED=20  IN_TRANSIT=6  PICKING=4  SHIPPED=8
+  Shipments: 34; inventory ledger entries: 65; notifications: 132
+  Low stock: SKU007(4/5)
+  Demo accounts (password from DEMO_PASSWORD, or Demo1234! when unset):
+    customer.a@demo.com / customer.b@demo.com (customers)
+    staff@demo.com (staff)  driver@demo.com (driver)  admin@demo.com (administrator, read-only reports)
+END 2026-11-12T07:18:20+00:00 exit=0

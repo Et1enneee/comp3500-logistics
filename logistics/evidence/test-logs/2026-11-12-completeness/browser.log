@@ -1,0 +1,33 @@
+START 2026-11-12T07:18:46+00:00 env FOUNDATION_BROWSER_TEST=YES FOUNDATION_BASE_URL=http://127.0.0.1:3118 CHROMIUM_PATH=/usr/local/bin/chromium EVIDENCE_DIR=/data/h-browser-shots npm run test:browser
+
+> group42-logistics@0.4.2 test:browser
+> node scripts/browser-smoke.mjs
+
+PASS closeout: invalid page parameters are recoverable across all list pages
+PASS closeout: malformed Cookie is expired for HTTP APIs and page navigation
+PASS review regressions: invalid dates and logout failures recover
+PASS customer A login lands on catalog with DB stock and role chip
+PASS staff assigns a shipped order and driver completes simulated delivery
+PASS customer A creates an order: CREATED, stock unchanged, no ledger row
+PASS customer order detail shows empty-shipment state (no stack trace)
+PASS customer B cannot read A's order by direct URL or by ORD
+PASS staff queue lists >50 orders with status filter and pagination
+PASS staff confirm reserves stock once and shows server-read state
+PASS staff pick → ship generates unique LG waybill, stock not touched again
+PASS tracking read failure after a successful transit does not report a false failure
+PASS staff delivers; customer A sees delivered status + 3 ordered events
+PASS customer notification center shows unread count and marks one read
+PASS admin dashboard matches database aggregates and exports CSV
+PASS admin exports selected dates without applying the filter
+PASS role boundaries: admin is read-only, customer/staff see forbidden page content
+PASS unauthorised direct API calls return 401/403 with stable error shape
+PASS cancel chain: confirm SKU007 order then cancel restores stock exactly once
+PASS low stock warning disappears after staff replenishes 4→5, ledger records operator
+PASS replenishment ledger page shows delta/reason/order/operator
+PASS network unknown on a write shows unknown state and recovers after refresh
+PASS out-of-stock create shows readable error and writes nothing
+PASS mobile 390: customer, staff and admin pages have no horizontal overflow
+PASS dark scheme remains usable
+PASS logout kills the session immediately
+Browser acceptance passed: 26 checks
+END 2026-11-12T07:19:04+00:00 exit=0

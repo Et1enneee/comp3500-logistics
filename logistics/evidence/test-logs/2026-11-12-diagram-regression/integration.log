@@ -1,0 +1,176 @@
+START 2026-11-12T05:52:48+00:00 npm run test:integration
+
+> group42-logistics-repository@0.4.2 test:integration
+> npm --prefix logistics run test:integration
+
+
+> group42-logistics@0.4.2 test:integration
+> tsx --test tests/*.integration.ts
+
+▶ Delivery address: validation, ownership and driver visibility
+  ✔ missing, blank, oversized and control-character addresses are rejected without writes (87.485882ms)
+  ✔ valid address is trimmed, stored and visible to the order owner (15.123371ms)
+  ✔ staff order APIs and admin exports never return the destination (9.568807ms)
+  ✔ real order-to-delivery chain restricts address to the assigned driver (106.618191ms)
+✔ Delivery address: validation, ownership and driver visibility (1623.7812ms)
+▶ Authentication & session / real isolated SQLite
+  ✔ password hashing: scrypt format, per-user salt, plaintext never stored (139.663621ms)
+  ✔ login success sets HttpOnly SameSite cookie and returns no secrets (101.778007ms)
+  ✔ wrong password / unknown user => same 401 message; no session created (50.308099ms)
+  ✔ missing fields => 400; wrong content type => 400 (2.139299ms)
+  ✔ cross-origin login is rejected (0.677056ms)
+  ✔ me returns identity + CSRF; unauthenticated 401 (2.95142ms)
+  ✔ expired session is rejected and deleted (5.166169ms)
+  ✔ forged token / tampered cookie => 401 (1.981105ms)
+  ✔ malformed session Cookie yields 401 for reads/writes and safe logout (6.106708ms)
+  ✔ logout deletes server session; cookie reused afterwards => 401 (5.607082ms)
+Logout unexpected failure PrismaClientKnownRequestError
+  ✔ logout storage failure is reported and retry invalidates the session (52.65819ms)
+  ✔ logout without CSRF token => 403 and session survives (4.307644ms)
+  ✔ role matrix: ADMIN cannot write orders or stock; STAFF cannot read reports (2.971169ms)
+  ✔ login rate limit blocks after 5 failures for the same account (299.600639ms)
+  ✔ rotating forwarded headers cannot evade the account limit (265.478216ms)
+  ✔ cookie parsing tolerates multiple cookies (0.44689ms)
+✔ Authentication & session / real isolated SQLite (2315.670172ms)
+▶ Cancellation semantics / real isolated SQLite
+  ✔ CREATED cancel: status only, stock and ledger unchanged (67.436164ms)
+  ✔ CONFIRMED cancel: stock restored once + one positive release log per product (43.755136ms)
+  ✔ repeated cancellation => 409 and never releases twice (38.909142ms)
+  ✔ concurrent duplicate cancel: one success, one 409, single release (24.417726ms)
+  ✔ cancel vs picking race: exactly one wins, stock never contradicts status (24.28183ms)
+  ✔ after PICKING / SHIPPED cancellation is rejected with no stock change (37.077583ms)
+  ✔ cross-customer cancellation is 404 and leaves the order intact (7.602408ms)
+  ✔ STAFF can only cancel CONFIRMED, not CREATED (7.1754ms)
+  ✔ ADMIN cannot cancel at all (7.028044ms)
+Order status unexpected failure Error
+  ✔ multi-product release failure rolls back status, stock and all logs (26.062803ms)
+✔ Cancellation semantics / real isolated SQLite (1780.697768ms)
+✔ Demo driver creation is opt-in and never resets existing accounts or orders (2732.564259ms)
+▶ Driver assignment and simulated delivery / isolated SQLite
+  ✔ assignment enforces role, CSRF, valid driver and state (112.117388ms)
+  ✔ driver sees only assigned operational data and cannot access general order queries (9.93587ms)
+  ✔ only assigned driver can advance; invalid actions and CSRF do not mutate (13.449499ms)
+  ✔ concurrent pickup claims the transition at most once (17.250202ms)
+  ✔ pickup and delivery update order, shipment, events and customer notifications once (27.015225ms)
+✔ Driver assignment and simulated delivery / isolated SQLite (1791.29538ms)
+▶ Foundation creation / real isolated SQLite
+  ✔ create stores snapshot / leaves inventory and logs unchanged (88.071798ms)
+  ✔ duplicate SKUs aggregate before stock precheck (7.335191ms)
+  ✔ single SKU shortage preserves its established code and writes nothing (7.304389ms)
+  ✔ valid duplicate SKUs become one order line (6.755766ms)
+  ✔ reject empty / negative / fractional / malformed lines without writing (30.522828ms)
+  ✔ malformed JSON / non-object body return structured 400 (4.623511ms)
+  ✔ unknown SKU is rejected with readable message (5.493163ms)
+  ✔ unauthenticated create is 401; non-CUSTOMER roles are 403 (2.932621ms)
+  ✔ body identity tampering is rejected (cannot order for someone else) (10.496475ms)
+  ✔ write without CSRF token is rejected (3.544807ms)
+  ✔ end-to-end create / lookup / confirm / repeat preserves snapshot (23.494873ms)
+  ✔ stock changed after creation: confirmation fails without side effects (18.638229ms)
+✔ Foundation creation / real isolated SQLite (1920.463583ms)
+▶ Inventory, replenishment & alerts / real isolated SQLite
+  ✔ strict comparison: 4<5 warns, 5=5 does not (90.791703ms)
+  ✔ STAFF sees inventory fields; ADMIN read-only list allowed (6.24373ms)
+  ✔ CUSTOMER cannot read inventory or replenish (403) (7.744494ms)
+  ✔ ADMIN cannot replenish (403) (3.983905ms)
+  ✔ replenish 1 turns 4 into 5 and the warning disappears; ledger row recorded (10.628339ms)
+  ✔ invalid quantities are rejected without changing stock or ledger (13.168344ms)
+  ✔ replenish without CSRF is rejected (2.856067ms)
+  ✔ confirm 2 of 6/5 makes it 4 -> warning; then replenish 1 -> 5 no warning (36.582885ms)
+  ✔ logs list shows delta/reason/order/operator and supports filters + pagination (17.153392ms)
+  ✔ no delete/overwrite endpoint exists: stock only increases via replenish (5.255556ms)
+✔ Inventory, replenishment & alerts / real isolated SQLite (1597.817139ms)
+▶ Logistics chain / real isolated SQLite
+  ✔ create -> confirm -> pick: stock reserved once, PICKING no further change (96.351464ms)
+  ✔ PICKING from CREATED is rejected 409 with no change (12.324988ms)
+  ✔ shipment from PICKING: LG waybill + initial event, stock unchanged (11.59314ms)
+  ✔ shipment from CONFIRMED is rejected; no waybill or event residue (17.178211ms)
+  ✔ sequential duplicate shipment: 409 and still one waybill (4.920367ms)
+  ✔ concurrent duplicate shipment: exactly one waybill (32.594483ms)
+  ✔ missing identity / non-STAFF cannot update status or ship (16.54127ms)
+  ✔ IN_TRANSIT -> DELIVERED: shipment, ordered events, notifications, stock unchanged (17.009654ms)
+  ✔ tracking: association, ordering, ownership and empty state (15.678444ms)
+  ✔ PATCH to SHIPPED stays 400; CANCELLED no longer 400 (22.073699ms)
+✔ Logistics chain / real isolated SQLite (1725.277715ms)
+▶ In-app notifications / real isolated SQLite
+  ✔ confirmation creates exactly one notification with ORD + type + time (73.072268ms)
+  ✔ list is scoped to the owner and exposes unread count (22.876473ms)
+  ✔ mark read only affects own notification; others => 404 (17.000554ms)
+  ✔ unread-only filter and unread-count endpoint agree (4.416488ms)
+  ✔ duplicate/concurrent operations do not multiply notifications (15.691289ms)
+  ✔ cancel / ship / transit / deliver each produce one notification (39.31782ms)
+  ✔ failed transaction produces no success notification (5.792967ms)
+  ✔ STAFF/ADMIN cannot use customer notification APIs (2.820945ms)
+  ✔ pagination keeps totals independent of page size (5.547089ms)
+✔ In-app notifications / real isolated SQLite (1593.407559ms)
+▶ Order confirmation and status / real isolated SQLite
+  ✔ GET: missing/empty/blank orderNumber => 400 (35.640785ms)
+  ✔ GET: unauthenticated => 401; nonexistent order => 404 (5.672112ms)
+  ✔ GET: customer reading another customer's order => 404 (no existence leak) (7.374649ms)
+  ✔ GET: detail includes SKU/name and never leaks secrets (4.585078ms)
+  ✔ PATCH: invalid/empty/malformed body => 400, no mutation (27.155877ms)
+  ✔ PATCH: missing identity => 401; role spoof / wrong role => 403; CSRF => 403 (8.214566ms)
+  ✔ PATCH: unknown internal ID and ORD-number-as-ID => 404 (8.263603ms)
+  ✔ PATCH: successful confirmation + repeated call has no effects (14.847758ms)
+  ✔ PATCH: every other non-CREATED status is rejected (39.494207ms)
+  ✔ PATCH: multi-product success writes one log per product (26.979142ms)
+  ✔ PATCH: later stock shortage rolls back earlier decrement/log/status (12.714005ms)
+Order status unexpected failure Error
+  ✔ PATCH: unexpected ledger failure rolls back entire transaction (10.013433ms)
+  ✔ PATCH: duplicate lines aggregate to one reservation/log (13.193305ms)
+  ✔ PATCH: individually sufficient duplicate lines can fail aggregate check (9.337727ms)
+  ✔ PATCH: stock exactly equal to demand reaches zero, never negative (11.857049ms)
+  ✔ PATCH: concurrent duplicate confirmation reserves only once (19.049686ms)
+  ✔ PATCH: two orders compete for limited stock, no overselling (21.120959ms)
+  ✔ PATCH: invalid historical quantity or empty lines => no mutation (23.580604ms)
+✔ Order confirmation and status / real isolated SQLite (1709.772165ms)
+▶ Staff order and inventory responses minimize customer identity
+  ✔ staff list and both detail lookups omit identity but retain operational fields (71.29098ms)
+  ✔ customer can read own identity; other customer and admin remain blocked (8.951467ms)
+  ✔ customer cancellation keeps internal audit identity but redacts staff and admin ledger responses (26.108694ms)
+✔ Staff order and inventory responses minimize customer identity (1587.996707ms)
+▶ Shared pagination parameters
+  ✔ defaults and valid integers keep the established semantics (2.146021ms)
+  ✔ rejects invalid or out-of-range page 1.5 (0.431178ms)
+  ✔ rejects invalid or out-of-range page 1.0 (0.167955ms)
+  ✔ rejects invalid or out-of-range page 1e2 (0.15863ms)
+  ✔ rejects invalid or out-of-range page 0x10 (0.148648ms)
+  ✔ rejects invalid or out-of-range page Infinity (0.137863ms)
+  ✔ rejects invalid or out-of-range page 0 (0.145291ms)
+  ✔ rejects invalid or out-of-range page -1 (0.143417ms)
+  ✔ rejects invalid or out-of-range page  (0.159206ms)
+  ✔ rejects invalid or out-of-range page 9007199254740992 (0.221736ms)
+  ✔ rejects invalid or out-of-range page 2147483648 (0.186834ms)
+  ✔ rejects duplicate pagination parameters and fractional page sizes (0.231142ms)
+✔ Shared pagination parameters (6.212911ms)
+▶ Shared page/API parameter parsing
+  ✔ invalid status, fractions and duplicates return recoverable page errors (1.022558ms)
+  ✔ valid filter results match direct API parsing; inventory and logs keep separate parameters (0.471363ms)
+  ✔ only user parameter errors become feedback; unexpected errors still throw (0.529564ms)
+✔ Shared page/API parameter parsing (2.29368ms)
+✔ invalid query parameters consistently produce API 400, preserving role checks (1659.713509ms)
+▶ ADMIN reports & CSV / real isolated SQLite
+  ✔ range parses to GMT+8 day boundaries (start inclusive, next-day exclusive) (1.490566ms)
+  ✔ exact aggregation: cancelled excluded from amount but counted in status (3.594304ms)
+  ✔ orders before first boundary or at next-day 00:00 are excluded (5.521349ms)
+  ✔ zero-data day returns zeros, not errors (2.630483ms)
+  ✔ multi-day range fills zero days and sums per day (1.618579ms)
+  ✔ long range includes its final day and daily counts reconcile with totals (5.409115ms)
+  ✔ amount snapshot: later price changes do not alter report (4.669913ms)
+  ✔ inventory metric is current snapshot, independent of date filter (3.623196ms)
+  ✔ pagination of order lists does not change report totals (50.970301ms)
+  ✔ range validation: bad format and inverted range => 400 (36.331098ms)
+  ✔ CUSTOMER and STAFF cannot access reports or CSV (403) (6.090549ms)
+  ✔ CSV matches filter, has explicit columns and no personal data (5.884438ms)
+  ✔ CSV formula injection is neutralised (0.367281ms)
+  ✔ default range is the last 7 GMT+8 natural days including today (4.547123ms)
+✔ ADMIN reports & CSV / real isolated SQLite (1604.944271ms)
+✔ demo seed timestamps are ordered and never in the future (2423.685061ms)
+ℹ tests 140
+ℹ suites 2
+ℹ pass 140
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 30389.173228
+EXIT 0

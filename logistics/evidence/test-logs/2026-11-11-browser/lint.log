@@ -1,0 +1,10 @@
+START 2026-11-11T09:27:51+00:00 npm run lint
+
+> group42-logistics-repository@0.4.2 lint
+> npm --prefix logistics run lint
+
+
+> group42-logistics@0.4.2 lint
+> eslint
+
+EXIT_CODE=0

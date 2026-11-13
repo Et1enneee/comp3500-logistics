@@ -1,10 +1,10 @@
 # Evidence intake runbook
 
-Operator-owned procedure. Only actual observations are added. All commands below run from the repository root unless a working directory is shown. New evidence artifacts and their report changes use the full evidence pipeline in [`report-baseline-procedure.md`](../../logistics-foundation/docs/process/report-baseline-procedure.md); mixed changes use the highest tier. Keep the original records and their limitations.
+Operator-owned procedure. Only actual observations are added. All commands below run from the repository root unless a working directory is shown. New evidence artifacts and their report changes use the full evidence pipeline in [`report-baseline-procedure.md`](../../logistics/docs/process/report-baseline-procedure.md); mixed changes use the highest tier. Keep the original records and their limitations.
 
 ## WALKTHROUGH — 17–24 November participant observations
 
-Use the existing [moderator protocol](../../logistics-foundation/docs/user-validation/moderator.md), [role task cards](../../logistics-foundation/docs/user-validation/), and [record template](../../logistics-foundation/docs/user-validation/record-template.md). For each actual participant and task, copy the template to an operator-chosen evidence file and record the anonymous code, role, task and revision, date/time, application commit and environment, and the four outcomes below:
+Use the existing [moderator protocol](../../logistics/docs/user-validation/moderator.md), [role task cards](../../logistics/docs/user-validation/), and [record template](../../logistics/docs/user-validation/record-template.md). For each actual participant and task, copy the template to an operator-chosen evidence file and record the anonymous code, role, task and revision, date/time, application commit and environment, and the four outcomes below:
 
 ```text
 Completed (yes / no / stopped and observed outcome): {{actual outcome}}
@@ -17,10 +17,10 @@ Retain consent, criteria, actual major actions and observations as specified in 
 
 ## RE-PROBE — 25 November post-fix measurement
 
-Use the existing [`perf-probe.mjs`](../../logistics-foundation/scripts/perf-probe.mjs) against a production build on loopback, with the disposable demo database and application server running as in the [application setup](../../logistics-foundation/README.md). From `logistics-foundation/`:
+Use the existing [`perf-probe.mjs`](../../logistics/scripts/perf-probe.mjs) against a production build on loopback, with the disposable demo database and application server running as in the [application setup](../../logistics/README.md). From `logistics/`:
 
 ```sh
-cd logistics-foundation
+cd logistics
 PERF_BASE_URL=http://127.0.0.1:3100 PERF_OUTPUT="$PWD/evidence/performance-post-fix.json" node scripts/perf-probe.mjs
 jq '{measuredAt,baseUrl,buildMode,environment,methodology,api,ui}' evidence/performance-post-fix.json
 ```

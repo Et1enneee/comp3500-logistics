@@ -1,0 +1,61 @@
+source_commit=84a2770465519768ddd46e54f1bc4d1fe2633d00
+command=npm run build 
+started_utc=2026-11-11T06:40:59Z
+
+> group42-logistics-repository@0.4.2 build
+> npm --prefix logistics run build
+
+
+> group42-logistics@0.4.2 build
+> next build
+
+[1m[38;2;173;127;168m▲ Next.js 16.4.3[39m[22m (Turbopack)
+[32m[1m✓[22m[39m Running next.config.ts took 25ms
+
+[37m[1m [22m[39m Creating an optimized production build ...
+[32m[1m✓[22m[39m Compiled successfully in 4.4s
+[37m[1m [22m[39m Running TypeScript ...
+[37m[1m [22m[39m Finished TypeScript in 4.4s ...
+[37m[1m [22m[39m Collecting page data using 1 worker ...
+[37m[1m [22m[39m Generating static pages using 1 worker (0/3) ...
+[32m[1m✓[22m[39m Generating static pages using 1 worker (3/3) in 82ms
+[37m[1m [22m[39m Finalizing page optimization ...
+
+[4mRoute (app)[24m
+┌ ƒ /
+├ ƒ /_not-found
+├ ƒ /admin
+├ ƒ /api/v1/auth/login
+├ ƒ /api/v1/auth/logout
+├ ƒ /api/v1/auth/me
+├ ƒ /api/v1/driver/tasks
+├ ƒ /api/v1/inventory
+├ ƒ /api/v1/inventory/[productId]/replenish
+├ ƒ /api/v1/inventory/logs
+├ ƒ /api/v1/inventory/low-stock
+├ ƒ /api/v1/notifications
+├ ƒ /api/v1/notifications/[id]/read
+├ ƒ /api/v1/notifications/unread-count
+├ ƒ /api/v1/orders
+├ ƒ /api/v1/orders/[id]
+├ ƒ /api/v1/orders/[id]/driver
+├ ƒ /api/v1/orders/[id]/status
+├ ƒ /api/v1/orders/[id]/tracking
+├ ƒ /api/v1/reports/export.csv
+├ ƒ /api/v1/reports/overview
+├ ƒ /api/v1/shipments
+├ ƒ /driver
+├ ƒ /inventory
+├ ƒ /login
+├ ƒ /notifications
+├ ƒ /orders
+├ ƒ /orders/[id]
+├ ƒ /staff
+└ ƒ /staff/orders/[id]
+
+
+ƒ  (Dynamic)  server-rendered on demand
+
+
+EXIT_CODE=0
+ended_utc=2026-11-11T06:41:09Z

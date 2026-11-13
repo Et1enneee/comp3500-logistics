@@ -19,7 +19,7 @@ jobs:
     timeout-minutes: 35
     defaults:
       run:
-        working-directory: logistics-foundation
+        working-directory: logistics
     env:
       # Fixed non-production demo password for tests; CI does not use real secrets.
       DEMO_PASSWORD: Demo1234!
@@ -30,7 +30,7 @@ jobs:
         with:
           node-version: '24'
           cache: npm
-          cache-dependency-path: logistics-foundation/package-lock.json
+          cache-dependency-path: logistics/package-lock.json
 
       - name: Verify current source manifest
         run: sha256sum -c SHA256SUMS.txt
@@ -109,5 +109,5 @@ jobs:
           name: logistics-source-and-evidence
           path: |
             artifacts/
-            logistics-foundation/artifacts/
+            logistics/artifacts/
           if-no-files-found: ignore
