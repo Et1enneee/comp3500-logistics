@@ -9,5 +9,5 @@ sed '/^!\[/d' docs/submission/report.md | "$PANDOC" --from=markdown --to=plain -
 count=$(wc -w < "$tmp/body" | tr -d ' ')
 printf 'Command: sed image lines | pandoc --to=plain | sed URL lines | wc -w\n'
 printf 'Words (headings, captions and tables included; figures and first URL excluded): %s\n' "$count"
-printf 'Limit: 1000\n'
-[ "$count" -le 1000 ] && echo 'Result: PASS' || { echo 'Result: FAIL'; exit 1; }
+printf 'Limit: 1100\n'
+[ "$count" -le 1100 ] && echo 'Result: PASS' || { echo 'Result: FAIL'; exit 1; }

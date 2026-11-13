@@ -9,4 +9,4 @@
 | Driver and privacy, 2 Nov 2026 | Delivery and data minimisation | Assigned delivery tasks and data-minimisation checks integrated and tested |
 | Documentation hardening, 10–11 Nov 2026 | Model and evidence review | Diagrams and traceability aligned; verification evidence regenerated |
 | Export simplification, 11 Nov 2026 | 11 Nov scripted walkthrough ([issue #15](https://github.com/Et1enneee/comp3500-logistics/issues/15)) | Direct selected-date export takes three interactions; regression passes |
-| Availability tests, 11 Nov 2026 | Regression gap in availability checks | Suite increased to 38 |
+| Availability tests, 11 Nov 2026 | Regression gap in integration-health checks | Suite increased to 38 ([unit.log](../../evidence/test-logs/2026-11-12-completeness-final/unit.log)) |
