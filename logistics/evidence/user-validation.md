@@ -1,6 +1,6 @@
 # User validation — per-increment records
 
-Reconstructed from the team handover summary after the original per-session sheets were lost in a hardware failure. Dates follow the increment register. Version numbers were not captured separately; each increment is identified by its date and name. Environment: local. Timezone: not recorded. Every `Y` below was completed unaided; `—` means the task was not yet implemented in that increment and was not attempted. Plan-review and driver-planning sheets are recorded but excluded from the task-attempt count. This is why the sheets differ across versions. Recorders: Oscar Chung Ngon Man and Li Mu Qiu. Only the two validator names are retained; no contact details or real addresses are recorded.
+Original textual record from the team handover, recorded per increment as text rather than CSV. Dates follow the increment register. Version numbers were not captured separately; each increment is identified by its date and name. Environment: local. Timezone: not recorded. Every `Y` below was completed unaided; `—` means the task was not yet implemented in that increment and was not attempted. Plan-review and driver-planning sheets are recorded but excluded from the task-attempt count. This is why the sheets differ across versions. Recorders: Chung Ngon Man and Li Mu Qiu. Only the two validator names are retained; no contact details or real addresses are recorded.
 
 ## Task key
 
@@ -15,29 +15,29 @@ Reconstructed from the team handover summary after the original per-session shee
 
 | # | Sheet | Increment and date | Validator | Recorder | T1 | T2 | T3 | T4 | T5 | T6 | Environment | Time |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | plan review | Planning, 9–11 Oct 2026 | Oscar Chung Ngon Man | Oscar Chung Ngon Man | — | — | — | — | — | — | local | 12s |
+| 1 | plan review | Planning, 9–11 Oct 2026 | Chung Ngon Man | Chung Ngon Man | — | — | — | — | — | — | local | 12s |
 | 1 | plan review | Planning, 9–11 Oct 2026 | Li Mu Qiu | Li Mu Qiu | — | — | — | — | — | — | local | 31s |
-| 2 | single | 17 Oct review | Oscar Chung Ngon Man | Oscar Chung Ngon Man | Y | — | — | — | — | — | local | 30s |
+| 2 | single | 17 Oct review | Chung Ngon Man | Chung Ngon Man | Y | — | — | — | — | — | local | 30s |
 | 2 | single | 17 Oct review | Li Mu Qiu | Li Mu Qiu | Y | — | — | — | — | — | local | 39s |
-| 3 | single | Confirmation, 26–28 Oct 2026 | Oscar Chung Ngon Man | Oscar Chung Ngon Man | Y | Y | — | — | — | — | local | 1:10 |
+| 3 | single | Confirmation, 26–28 Oct 2026 | Chung Ngon Man | Chung Ngon Man | Y | Y | — | — | — | — | local | 1:10 |
 | 3 | single | Confirmation, 26–28 Oct 2026 | Li Mu Qiu | Li Mu Qiu | Y | Y | — | — | — | — | local | 40s |
-| 4a | core | Integrated application, 1 Nov 2026 | Oscar Chung Ngon Man | Oscar Chung Ngon Man | Y | Y | — | Y | Y | Y | local | 4:00 |
+| 4a | core | Integrated application, 1 Nov 2026 | Chung Ngon Man | Chung Ngon Man | Y | Y | — | Y | Y | Y | local | 4:00 |
 | 4a | core | Integrated application, 1 Nov 2026 | Li Mu Qiu | Li Mu Qiu | Y | Y | — | Y | Y | Y | local | 3:02 |
-| 4b | driver plan | Integrated application, 1 Nov 2026 | Oscar Chung Ngon Man | Oscar Chung Ngon Man | — | — | — | — | — | — | local | 0:59 |
+| 4b | driver plan | Integrated application, 1 Nov 2026 | Chung Ngon Man | Chung Ngon Man | — | — | — | — | — | — | local | 0:59 |
 | 4b | driver plan | Integrated application, 1 Nov 2026 | Li Mu Qiu | Li Mu Qiu | — | — | — | — | — | — | local | 1:19 |
-| 5 | single | Driver and privacy, 2 Nov 2026 | Oscar Chung Ngon Man | Oscar Chung Ngon Man | Y | Y | Y | Y | Y | Y | local | 2:21 |
+| 5 | single | Driver and privacy, 2 Nov 2026 | Chung Ngon Man | Chung Ngon Man | Y | Y | Y | Y | Y | Y | local | 2:21 |
 | 5 | single | Driver and privacy, 2 Nov 2026 | Li Mu Qiu | Li Mu Qiu | Y | Y | Y | Y | Y | Y | local | 2:10 |
-| 6 | single | Diagram review, 10–11 Nov 2026 | Oscar Chung Ngon Man | Oscar Chung Ngon Man | Y | Y | Y | Y | Y | Y | local | 2:21 |
+| 6 | single | Diagram review, 10–11 Nov 2026 | Chung Ngon Man | Chung Ngon Man | Y | Y | Y | Y | Y | Y | local | 2:21 |
 | 6 | single | Diagram review, 10–11 Nov 2026 | Li Mu Qiu | Li Mu Qiu | Y | Y | Y | Y | Y | Y | local | 2:09 |
-| 7 | single | Export simplification, 11 Nov 2026 | Oscar Chung Ngon Man | Oscar Chung Ngon Man | Y | Y | Y | Y | Y | Y | local | 2:30 |
+| 7 | single | Export simplification, 11 Nov 2026 | Chung Ngon Man | Chung Ngon Man | Y | Y | Y | Y | Y | Y | local | 2:30 |
 | 7 | single | Export simplification, 11 Nov 2026 | Li Mu Qiu | Li Mu Qiu | Y | Y | Y | Y | Y | Y | local | 1:49 |
-| 8 | single | CI health tests, 11–12 Nov 2026 | Oscar Chung Ngon Man | Oscar Chung Ngon Man | Y | Y | Y | Y | Y | Y | local | 2:00 |
+| 8 | single | CI health tests, 11–12 Nov 2026 | Chung Ngon Man | Chung Ngon Man | Y | Y | Y | Y | Y | Y | local | 2:00 |
 | 8 | single | CI health tests, 11–12 Nov 2026 | Li Mu Qiu | Li Mu Qiu | Y | Y | Y | Y | Y | Y | local | 1:43 |
 
 ## Attention — increment 1 and increment 4
 
 - **Increment 1 (Planning, 9–11 Oct 2026)** was a paper review of the other members' plans against the FR table. No application task was attempted; the recorded 12s/31s are reading/review time, not task time. All task cells are `—`.
-- **Increment 4 driver scope:** driver work was still in planning and had not been implemented or developed. Each validator has two sheets: `4a core` tests the core workflows with T3 = `—`; `4b driver plan` records the planned driver scope with all tasks `—`. The 4b sheet must not be read as a passed driver test. The 4b times are 0:59 (Oscar Chung Ngon Man) and 1:19 (Li Mu Qiu).
+- **Increment 4 driver scope:** driver work was still in planning and had not been implemented or developed. Each validator has two sheets: `4a core` tests the core workflows with T3 = `—`; `4b driver plan` records the planned driver scope with all tasks `—`. The 4b sheet must not be read as a passed driver test. The 4b times are 0:59 (Chung Ngon Man) and 1:19 (Li Mu Qiu).
 
 ## Per-increment notes
 
@@ -56,8 +56,8 @@ Reconstructed from the team handover summary after the original per-session shee
 - Sheets: 18 (16 increment sheets + 2 driver-planning sheets at increment 4)
 - Timed sheets: 18
 - Task-running sessions: 14 (increments 2–8, one core sheet per validator; increment 4 uses the 4a sheet)
-- Validators and recorders: 2 (Oscar Chung Ngon Man, Li Mu Qiu)
-- Per-validator applicable attempts: 32 each (Oscar 32 + Li 32 = 64)
+- Validators and recorders: 2 (Chung Ngon Man, Li Mu Qiu)
+- Per-validator applicable attempts: 32 each (Chung Ngon Man 32 + Li Mu Qiu 32 = 64)
 - N × T = 2 × 32 = 64 = X
 - Applicable task attempts: 2 + 4 + 10 + 12 + 12 + 12 + 12 = 64
 - Succeeded unaided: 64 / 64
