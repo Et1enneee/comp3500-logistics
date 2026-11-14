@@ -23,3 +23,6 @@ Interfaces and error codes are in `contracts/api.md`; limitations are in `known-
 ## Revision log
 
 NFR definitions and statuses aligned with recorded evidence.
+
+17 Oct — stock effects moved FR-04 to FR-02
+10–11 Nov — NFR-01/02 restated for local deployment; NFR-04 renamed interaction budget
