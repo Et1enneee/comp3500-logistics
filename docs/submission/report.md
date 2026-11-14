@@ -5,17 +5,17 @@
 
 ## 1. Scope
 
-The goals are traceable order decisions and a role-separated workflow. Customers order and track; staff fulfil; drivers deliver; administrators report. Deployment is local-only: one host, all four roles in the same app (§8). Stock checks, confirmation transaction (§5) and role gates (FR-07) guard integrity. All stored data is course demo seed data; no real personal data is processed.
+The goals are traceable order decisions — each order's full history is auditable through ledger entries and notifications — and a role-separated workflow. Customers order; staff fulfil; drivers deliver; administrators report. Deployment is local-only: one host, all roles in one app (§4). Stock checks, confirmation transaction and role gates guard integrity. All stored data is course demo seed data; no real personal data is processed.
 
 ## 2. Development process
 
-An increment is a unit of work closed by a review or a recorded test run; triggers may name the state that demanded the work (checks outstanding, review readiness); a date range spans multi-day work.
+An increment is a unit of work closed by a review or a recorded test run.
 
 **Table A. Increments**
 
 | Increment and date | Trigger | Outcome |
 |---|---|---|
-| Planning, 9 and 11 Oct 2026 | Coursework kickoff | Scope, responsibilities and contracts — agreed endpoint and data shapes — recorded ([increment register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/process/increments.md)) |
+| Planning, 9–11 Oct 2026 | Coursework kickoff | Scope, responsibilities and contracts — agreed endpoint and data shapes — recorded ([increment register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/process/increments.md)) |
 | 17 Oct 2026 review | Order and stock functions ready for review | Defects recorded in the [increment register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/process/increments.md); led to the confirmation transaction (§5) |
 | Confirmation, 26–28 Oct 2026 | Review found a confirmation endpoint that accepted repeat submits and a missing ledger | Transaction verified ([orders tests](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/orders.integration.ts)) |
 | Integrated application, 1 Nov 2026 | Order, stock, driver and admin functions complete | Application integrated; all four role workflows runnable end to end |
@@ -35,36 +35,37 @@ An increment is a unit of work closed by a review or a recorded test run; trigge
 | FR-01 | create orders with product lines and totals | [Test](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/foundation.integration.ts) |
 | FR-02 | enforce lifecycle and stock reservation/release | [Test](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/orders.integration.ts) ([cancel tests](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/cancel.integration.ts)) |
 | FR-03 | number orders and shipments and show owner tracking | [Test](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/logistics-chain.integration.ts) |
-| FR-04 | show inventory, stock-movement ledger and low-stock alerts; replenishment is recorded as a stock addition by staff | [Test](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/inventory.integration.ts) |
-| FR-05 | record notifications for order events and allow reading | [Test](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/notifications.integration.ts) |
+| FR-04 | show inventory, stock-movement ledger and low-stock alerts | [Test](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/inventory.integration.ts) |
+| FR-05 | record order-event notifications and allow reading | [Test](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/notifications.integration.ts) |
 | FR-06 | provide admin aggregates and CSV export | [Test](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/reports.integration.ts) |
 | FR-07 | authenticate and enforce role/object access | [Test](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/auth.integration.ts) |
 | FR-08 | assign shipped orders and record delivery | [Test](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/driver.integration.ts) |
 
-- NFR-01 performance — API p95 ≤2 s, first contentful paint p95 ≤3 s (budgets set in the srs before measurement, unchanged) ([measurement](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/performance.json), §6).
-- NFR-02 CI health — green build, test and browser runs, recorded per CI run ([observations](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/availability/integration-observations.json)).
-- NFR-03 least privilege — role gates on mutating endpoints; the delivery address is released only to the assigned driver ([privacy tests](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/privacy.integration.ts)).
-- NFR-04 interaction budget — at most three in-app interface interactions per core operation (the eleven listed in §8); one interaction is a fill, selection or click; login/navigation are setup ([walkthrough](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/walkthrough/automated-walkthrough.md)).
-- NFR-05 process quality — green CI per increment ([observations](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/availability/integration-observations.json)).
+- NFR-01 performance — API p95 (95th percentile) ≤2 s, first contentful paint p95 ≤3 s ([measurement](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/performance.json), §6).
+- NFR-02 CI health — green build, test and browser runs per CI run ([observations](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/availability/integration-observations.json)).
+- NFR-03 least privilege — role gates; the delivery address is released only to the assigned driver ([privacy tests](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/privacy.integration.ts)).
+- NFR-04 interaction budget — every core operation (eleven, listed in §8) is reachable in at most three in-app interface interactions; one interaction is a fill, selection or click, and login and navigation are session setup ([walkthrough](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/walkthrough/automated-walkthrough.md)).
+- NFR-05 process quality — green CI ([observations](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/availability/integration-observations.json)).
 
 **Table B. Risk coverage** ([detailed mapping](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/requirements/risk-coverage.md))
 
 | Risk | Addressed by | Evidence |
 |---|---|---|
-| RK-01 scheduling slip | [scheduling plan](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/process/risks.md) | [register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/process/increments.md) |
+| RK-01 schedules | [scheduling plan](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/process/risks.md) | [register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/process/increments.md) |
 | RK-02 contract rework | Constant tests | [transition tests](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/constants.test.ts) |
-| RK-03 test-week capacity | [Traceability](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/traceability.md) | [scope priorities](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/process/risks.md) |
-| RK-04 setup delay | NFR-05 | [CI workflow](https://github.com/Et1enneee/comp3500-logistics/blob/main/.github/workflows/ci.yml) |
+| RK-03 test week | [Traceability](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/traceability.md) | [scope priorities](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/process/risks.md) |
+| RK-04 setup | NFR-05 | [CI workflow](https://github.com/Et1enneee/comp3500-logistics/blob/main/.github/workflows/ci.yml) |
 | RK-05 demo data | Seed tests | [seed regression test](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/seed.integration.ts) |
-| RK-06 coursework assignments and test-week squeeze | Weekly re-planning | [risk plan](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/process/risks.md) |
-| RK-07 stack unfamiliarity | Setup guide | [setup guide](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/README.md) |
-| RK-08 report and presentation-video deadlines | Weekly re-planning | [risk plan](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/process/risks.md) |
+| RK-06 coursework squeeze | Weekly re-planning | [risk plan](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/process/risks.md) |
+| RK-07 stack | Setup guide | [setup guide](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/README.md) |
+| RK-08 video deadlines | Weekly re-planning | [risk plan](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/process/risks.md) |
+| RK-09 multi-warehouse or hosted access beyond the course demo | Accepted: out of course scope (§1) | [risk plan](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/process/risks.md) |
 
 <!-- pagebreak -->
 
 ## 4. System models
 
-The four layers — pages, routes, handlers, Prisma/SQLite persistence (ORM over the SQLite database) — separate interface, application and data concerns. Figures 1–5 answer, in order: what each role can do; how orders transition and stock changes; how entities relate; how the confirmation transaction proceeds; how the layers connect.
+The four layers — pages, routes, handlers, Prisma/SQLite persistence (ORM over the SQLite database) — separate concerns. Figures 1–5 answer, in order: what each role can do; how orders transition and stock changes; how entities relate; how the confirmation transaction proceeds; how the layers connect. Each figure links its PlantUML source.
 
 Each item references one product; each order has one or more items; each order has at most one shipment; products accumulate ledger entries; notifications relate to at most one order.
 
@@ -80,9 +81,9 @@ Each item references one product; each order has one or more items; each order h
 
 <!-- pagebreak -->
 
-![Entity relationships](https://raw.githubusercontent.com/Et1enneee/comp3500-logistics/main/logistics/docs/er.svg)
+![Entity relationships](https://raw.githubusercontent.com/Et1enneee/comp3500-logistics/main/logistics/docs/diagrams/er.svg)
 
-*Figure 3. Data relationships: the multiplicities above, drawn as an ER model.* [Source](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/er.puml).
+*Figure 3. Data relationships: User, Order, OrderItem, Product, Shipment, TrackingEvent, InventoryLog and Notification with their multiplicities, drawn as an ER model.* [Source](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/diagrams/er.puml).
 
 ![Confirmation sequence](https://raw.githubusercontent.com/Et1enneee/comp3500-logistics/main/logistics/docs/diagrams/sequence-diagram.svg)
 
@@ -96,7 +97,9 @@ Each item references one product; each order has one or more items; each order h
 
 ## 5. Implementation
 
-The confirmation transaction (order-api.ts:245–293) reserves stock. Lifecycle: CREATED → CONFIRMED → PICKING → SHIPPED → IN_TRANSIT → DELIVERED; CANCELLED from CREATED or CONFIRMED. Cancellations restock unless the order was CREATED. Staff cancellation is restricted to CONFIRMED.
+The confirmation transaction reserves stock. Lifecycle: CREATED → CONFIRMED → PICKING → SHIPPED → IN_TRANSIT → DELIVERED; CANCELLED from CREATED or CONFIRMED. Cancellations restock unless CREATED. Staff cancellation is restricted to CONFIRMED.
+
+Cancellation permissions:
 
 | Role | State | Effect |
 |---|---|---|
@@ -106,33 +109,37 @@ The confirmation transaction (order-api.ts:245–293) reserves stock. Lifecycle:
 | Staff | CONFIRMED | cancel, restock |
 | Customer, staff | PICKING onwards | rejected |
 
+A CREATED order has not yet been accepted by staff, so staff cannot cancel it.
+
+Key designs and their verification:
+
 | Design | Implementation | Verification |
 |---|---|---|
-| Guards: CREATED, sufficient stock | [order-api.ts:250–253](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/order-api.ts#L250-L253), [276–280](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/order-api.ts#L276-L280) | [Orders](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/orders.integration.ts) |
-| Confirmation transaction: atomic writes; rollback on insufficient stock; repeats rejected (409) | [order-api.ts:245–293](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/order-api.ts#L245-L293) | [Orders](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/orders.integration.ts) |
-| driverId: assign only SHIPPED; kept after delivery | [driver-api.ts:44–51](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/driver-api.ts#L44-L51); [transition](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/order-api.ts#L321-L330) | [Driver](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/driver.integration.ts) |
+| Guards: CREATED, stock | [order-api.ts:250–253](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/order-api.ts#L250-L253), [276–280](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/order-api.ts#L276-L280) | [Orders](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/orders.integration.ts) |
+| Confirmation: atomic; rollback on short stock; repeats rejected (409) | [order-api.ts:245–293](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/order-api.ts#L245-L293) | [Orders](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/orders.integration.ts) |
+| driverId: SHIPPED only; kept after delivery | [driver-api.ts:44–51](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/driver-api.ts#L44-L51); [transition](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/order-api.ts#L321-L330) | [Driver](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/driver.integration.ts) |
 | FR-03 numbering and tracking | [create-order.ts:91](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/create-order.ts#L91), [shipment-api.ts:62](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/shipment-api.ts#L62) | [Logistics chain](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/logistics-chain.integration.ts) |
-| FR-04 | [order-api.ts:281](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/order-api.ts#L281), [398](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/order-api.ts#L398) | [Inventory](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/inventory.integration.ts) |
-| FR-05/06/07 handlers | [notify.ts:19](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/notify.ts#L19), [reports-api.ts:105](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/reports-api.ts#L105), [http.ts:58](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/http.ts#L58) — follow the same handler pattern (separate modules) | [Notifications](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/notifications.integration.ts), [Reports](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/reports.integration.ts), [Auth](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/auth.integration.ts) |
+| FR-04 inventory, ledger, low-stock alerts; staff replenishment adds stock | [order-api.ts:281](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/order-api.ts#L281), [398](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/order-api.ts#L398), [inventory-api.ts:142](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/inventory-api.ts#L142) | [Inventory](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/inventory.integration.ts) |
+| FR-05/06/07 handlers | [notify.ts:19](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/notify.ts#L19), [reports-api.ts:105](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/reports-api.ts#L105), [http.ts:58](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/http.ts#L58)  | [Notifications](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/notifications.integration.ts), [Reports](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/reports.integration.ts), [Auth](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/auth.integration.ts) |
 
 
 <!-- pagebreak -->
 
 ## 6. Verification
 
-[CI](https://github.com/Et1enneee/comp3500-logistics/actions/runs/43175733067) records 38 unit and 140 integration checks; 2 integrity checks — evidence-chain checks, not product behaviour: the pipeline refuses to run without an explicit confirmation flag (`RESET_DEMO_DATA=YES`), and the packaged bundle must match the verified source (`SHA256SUMS.txt`) ([integrity checks](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/integrity.check.mjs)); the [integration log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/test-logs/2026-11-12-regression/integration.log) "tests 140 / pass 140", the [unit.log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/test-logs/2026-11-12-regression/unit.log) "Tests 38 passed (38)".
+[CI](https://github.com/Et1enneee/comp3500-logistics/actions/runs/43175733067) records 38 unit, 140 integration checks; 2 integrity checks guard the evidence chain, not product behaviour ([integrity checks](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/integrity.check.mjs)). The pipeline refuses the reset step unless RESET_DEMO_DATA=YES, and the packaged bundle must match the verified source digest (SHA256SUMS.txt). The [integration log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/test-logs/2026-11-12-regression/integration.log) "tests 140 / pass 140", the [unit.log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/test-logs/2026-11-12-regression/unit.log) "Tests 38 passed (38)" and the [walkthrough record](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/test-logs/2026-11-11-browser/browser.log) "Browser acceptance passed: 26 checks".
 
-Loopback [measurement](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/performance.json) (11 Nov; 30 requests per endpoint across 6 endpoints: orders.list, orders.list.filtered, inventory.list, inventory.logs, notifications.list, reports.overview) gave API p95 3.2–13.6 ms and FCP p95 64–96 ms against 2 s and 3 s targets — loopback only, not representative of public networks or high concurrency.
+Loopback [measurement](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/performance.json) (11 Nov; 6 endpoints: orders.list, orders.list.filtered, inventory.list, inventory.logs, notifications.list, reports.overview) gave API p95 3.2–13.6 ms and FCP p95 64–96 ms against 2 s and 3 s targets — loopback only, not representative of public networks or high concurrency.
 
-The reviews also served as static verification ([Table A](§2)).
+The reviews (Table A rows 2, 6 and 7) also served as static verification of requirements, models and code.
 
 ## 7. Evolution
 
-Three reviews drove the changes: the 17 Oct review found the confirmation defect, fixed by the §5 transaction; the 10–11 Nov review aligned diagrams and traceability with the implementation and replaced the NFR-02 availability window with CI-run checks and scoped NFR-01 measurement to the local loopback; the 11 Nov review added the direct export path ([issue #15](https://github.com/Et1enneee/comp3500-logistics/issues/15)) and two CI-health regression tests (suite 36 → 38). All four fixes remain covered by the recorded suites (§6, §8).
+Three reviews drove the changes: the 17 Oct review found the confirmation defect, fixed by §5; the 10–11 Nov review aligned diagrams and traceability and replaced the NFR-02 availability window with CI-run checks and scoped NFR-01 measurement to the local loopback; the export review of 11 Nov (Table A row 7) added the direct export path ([issue #15](https://github.com/Et1enneee/comp3500-logistics/issues/15)) and two CI-health regression tests (suite 36 → 38).
 
 ## 8. Validation
 
-The [automated walkthrough](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/walkthrough/automated-walkthrough.md) exercises eleven core operations, each at most three in-app interface interactions. "Browser acceptance passed: 26 checks" — 20 operation checks (5 operations once, 6 twice or thrice), plus 6 cross-cutting checks (mobile viewport, dark scheme, sign-out among them).
+The [automated walkthrough](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/walkthrough/automated-walkthrough.md) exercises eleven core operations (subset of the thirteen use cases, Figure 1) — Create an order; Open order details; Confirm order; Start picking; Ship order; Assign driver; Simulate pickup; Simulate delivery; Apply report date filter; Export current report; Export selected dates without applying filter — at most three in-app interface interactions each. "Browser acceptance passed: 26 checks" — 20 operation checks (5 once, 3 twice, 3 thrice), plus 6 cross-cutting checks (two each for input validation, session handling and interface). The walkthrough, its 26 browser checks and the browser.log above are one and the same 11 Nov automated run.
 
 ## 9. Feedback and reconciliation
 
@@ -140,16 +147,16 @@ The [automated walkthrough](https://github.com/Et1enneee/comp3500-logistics/blob
 
 | Feedback | Disposition | Source | Evidence |
 |---|---|---|---|
-| Diagrams diverged from the schema | Models corrected | 10–11 Nov | [Corrections](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/diagrams/compliance.md) |
-| Stock effects were recorded under FR-04 | Moved to FR-02 | 17 Oct | [Traceability](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/traceability.md) |
-| Early register rows had thin triggers and outcomes | Register rewritten 10–11 Nov; earlier rows in git history | 10–11 Nov | [Register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/process/increments.md) · [history](https://github.com/Et1enneee/comp3500-logistics/commits/main/logistics/docs/process/increments.md) |
+| Diagrams diverged | Models corrected | 10–11 Nov | [Corrections](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/diagrams/compliance.md) |
+| Stock effects were recorded under FR-04 | Moved stock effects to FR-02; replenishment recording stayed in FR-04 | 17 Oct | [Traceability](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/traceability.md) |
+| Register rows had thin triggers and outcomes | Register rewritten 10–11 Nov; history in git | 10–11 Nov | [Register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/process/increments.md) · [history](https://github.com/Et1enneee/comp3500-logistics/commits/main/logistics/docs/process/increments.md) |
 | The filter-then-export path took four interactions | Combined path not adopted; a direct selected-date export was added (three in-app interface interactions); issue closed | 11 Nov review | [Issue #15](https://github.com/Et1enneee/comp3500-logistics/issues/15) |
-| No regression test for CI health | Reached 38 tests | 11 Nov | [Log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/test-logs/2026-11-12-regression/unit.log) |
-| NFR-02 originally set 08:00–24:00 daily availability | Replaced by CI-run checks (§3) — with local-only deployment (§1) there is no hosted environment to measure a daily window; each green run verifies the integration points per commit | 10–11 Nov | [Requirements revision log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/requirements/srs.md#7-document-control) |
+| No CI-health regression test | Reached 38 tests | 11 Nov | [Log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/test-logs/2026-11-12-regression/unit.log) |
+| NFR-02 daily window | Replaced by CI-run checks (§3) — there is no hosted environment to measure a daily window; each green run verifies the integration points | 10–11 Nov | [Requirements revision log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/requirements/srs.md#7-document-control) |
 | NFR-01 assumed a hosted measurement model | Scoped to loopback measurement; budgets unchanged (§6) | 10–11 Nov review | [measurement](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/performance.json) |
 
 ## 10. Evidence
 
-Baseline record — 38 unit, 140 integration, 2 integrity from the 12 Nov regression run; 26 browser checks ([baseline](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/BASELINE-final-report.json)).
+38 unit, 140 integration, 2 integrity (12 Nov); 26 browser checks ([baseline](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/BASELINE-final-report.json)).
 
 [Traceability](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/traceability.md).
