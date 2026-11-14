@@ -2,7 +2,6 @@
 
 **Warehouse Logistics Management System**  
 **Group 42:** Tang Yi Jie, Yin Pei Xu, Tang Chao, Yang Ting Zhang, Wu Peng Bo, Chung Ngon Man, Li Mu Qiu.  
-**Testing:** Oscar, Li Mu Qiu.
 
 ## 1. Scope
 
