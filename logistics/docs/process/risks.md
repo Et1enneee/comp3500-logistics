@@ -16,6 +16,7 @@
 | RK-07 | Slow ramp-up on Next.js: most of the seven are new to Next.js 14, Prisma and TypeScript, so the app-router and API-route conventions have to be learned from scratch and week 1 may produce only a skeleton | High | Medium | The Newcomer Run Guide and the week-1 code package give each member a working starting point; week 1 only asks each member to run and read the existing code and take one small card; pair programming, with the first person to finish leaving a three-line note in the group | Yang Ting Zhang | Open |
 | RK-08 | report and presentation-video deadlines — the December video may not fit: the course requires a 15 to 25 minute recorded presentation and a report of at most 1000 words, both due 8 December 2026, alongside the final logbook and the examination period, and members' departure plans are not yet fixed | Medium | High | Freeze the demo script and storyboard by 17 November; record a full rehearsal around 24 November, recording first and polishing afterwards; lock the final cut by 1 December; run the report and the logbook in parallel under Wu Peng Bo so that neither is pushed into the last week | Lead and Wu Peng Bo | Open |
 | RK-09 | multi-warehouse or hosted access beyond the course demo | Low | Low | Out of course scope: the application is a single-warehouse local demo | Lead | Accepted |
+| RK-10 | personal data beyond demo seed | Low | Low | Accepted: seed data only, no real subjects | Lead | Accepted |
 
 ## Notes for the group lead
 
