@@ -134,9 +134,9 @@ Cancellation from PICKING or a later state returns HTTP 409; a customer attempti
 
 Hard rules include state and stock guards and transactional atomicity. A rejected transition or stock reservation produces HTTP 409 and the transaction rolls back. The low-stock threshold is a configurable operational rule: the default is five and an alert uses strict less-than comparison. In-app notification persistence participates in the same transaction as the business event; reading the notification is a separate user action. See `lib/order-api.ts:248–292`, `lib/notify.ts:14–36` and `prisma/schema.prisma:54–61`.
 
-The [ER source](../logistics/docs/er.puml) and [rendering](../logistics/docs/er.svg) derive multiplicities from `prisma/schema.prisma`. An Order has zero or more OrderItems at schema level; the order-creation API requires at least one item (`lib/create-order.ts:14–17`). Each OrderItem references exactly one Order and one Product; a Product may occur in zero or more OrderItems. An Order has zero or one Shipment, each Shipment has exactly one Order, and a Product has zero or more InventoryLogs. The assigned driver is optional on a Shipment; each User may have zero or more assigned Shipments.
+The [ER source](../logistics/docs/diagrams/er.puml) and [rendering](../logistics/docs/diagrams/er.svg) derive multiplicities from `prisma/schema.prisma`. An Order has zero or more OrderItems at schema level; the order-creation API requires at least one item (`lib/create-order.ts:14–17`). Each OrderItem references exactly one Order and one Product; a Product may occur in zero or more OrderItems. An Order has zero or one Shipment, each Shipment has exactly one Order, and a Product has zero or more InventoryLogs. The assigned driver is optional on a Shipment; each User may have zero or more assigned Shipments.
 
-![Entity relationships](../logistics/docs/er.svg)
+![Entity relationships](../logistics/docs/diagrams/er.svg)
 
 The [confirmation sequence source](../logistics/docs/diagrams/sequence-diagram.puml) and [rendering](../logistics/docs/diagrams/sequence-diagram.svg) show `PATCH(req, context)` → `updateStatus(req, id)` → `confirmOrder(id, actorId)` → a transaction, with commit/HTTP 200 and rollback/HTTP 409 alternatives.
 
