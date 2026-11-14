@@ -1,6 +1,6 @@
 # User validation — per-increment records
 
-Original textual record from the team handover, recorded per increment as text rather than CSV. Dates follow the increment register. Version numbers were not captured separately; each increment is identified by its date and name. Environment: local. Timezone: not recorded. Every `Y` below was completed unaided; `—` means the task was not yet implemented in that increment and was not attempted. Plan-review and driver-planning sheets are recorded but excluded from the task-attempt count. This is why the sheets differ across versions. Recorders: Chung Ngon Man and Li Mu Qiu. Only the two validator names are retained; no contact details or real addresses are recorded.
+Original textual record from the team handover, recorded per increment as text rather than CSV. Dates follow the increment register. Version numbers were not captured separately; each increment is identified by its date and name. Environment: local. Timezone: not recorded. Every `Y` below was completed unaided; `—` means the task was not yet implemented in that increment and was not attempted. Plan-review and driver-planning sheets are recorded but excluded from the task-attempt count. This is why the sheets differ across versions. Recorders: Chung Ngon Man and Li Mu Qiu. Only the two tester names are retained; no contact details or real addresses are recorded.
 
 ## Task key
 
@@ -13,7 +13,7 @@ Original textual record from the team handover, recorded per increment as text r
 
 ## Records
 
-| # | Sheet | Increment and date | Validator | Recorder | T1 | T2 | T3 | T4 | T5 | T6 | Environment | Time |
+| # | Sheet | Increment and date | Tester | Recorder | T1 | T2 | T3 | T4 | T5 | T6 | Environment | Time |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1 | plan review | Planning, 9–11 Oct 2026 | Chung Ngon Man | Chung Ngon Man | — | — | — | — | — | — | local | 12s |
 | 1 | plan review | Planning, 9–11 Oct 2026 | Li Mu Qiu | Li Mu Qiu | — | — | — | — | — | — | local | 31s |
@@ -37,7 +37,7 @@ Original textual record from the team handover, recorded per increment as text r
 ## Attention — increment 1 and increment 4
 
 - **Increment 1 (Planning, 9–11 Oct 2026)** was a paper review of the other members' plans against the FR table. No application task was attempted; the recorded 12s/31s are reading/review time, not task time. All task cells are `—`.
-- **Increment 4 driver scope:** driver work was still in planning and had not been implemented or developed. Each validator has two sheets: `4a core` tests the core workflows with T3 = `—`; `4b driver plan` records the planned driver scope with all tasks `—`. The 4b sheet must not be read as a passed driver test. The 4b times are 0:59 (Chung Ngon Man) and 1:19 (Li Mu Qiu).
+- **Increment 4 driver scope:** driver work was still in planning and had not been implemented or developed. Each tester has two sheets: `4a core` tests the core workflows with T3 = `—`; `4b driver plan` records the planned driver scope with all tasks `—`. The 4b sheet must not be read as a passed driver test. The 4b times are 0:59 (Chung Ngon Man) and 1:19 (Li Mu Qiu).
 
 ## Per-increment notes
 
@@ -55,14 +55,14 @@ Original textual record from the team handover, recorded per increment as text r
 - Increments: 8
 - Sheets: 18 (16 increment sheets + 2 driver-planning sheets at increment 4)
 - Timed sheets: 18
-- Task-running sessions: 14 (increments 2–8, one core sheet per validator; increment 4 uses the 4a sheet)
-- Validators and recorders: 2 (Chung Ngon Man, Li Mu Qiu)
-- Per-validator applicable attempts: 32 each (Chung Ngon Man 32 + Li Mu Qiu 32 = 64)
+- Task-running sessions: 14 (increments 2–8, one core sheet per tester; increment 4 uses the 4a sheet)
+- Testers and recorders: 2 (Chung Ngon Man, Li Mu Qiu)
+- Per-tester applicable attempts: 32 each (Chung Ngon Man 32 + Li Mu Qiu 32 = 64)
 - N × T = 2 × 32 = 64 = X
 - Applicable task attempts: 2 + 4 + 10 + 12 + 12 + 12 + 12 = 64
 - Succeeded unaided: 64 / 64
 - Cells marked `—` (not implemented, plan review, or driver planning): 44
-- Median task-session time: **2:04.5** across the 14 task-running sessions (= 2.1 min)
+- Median session time: **2.1 min** (2:04.5 across the 14 task-running sessions)
 - All-sheet median (including the 2 plan-review and 2 driver-planning sheets): 1:46, not used as the task median
 - Durations recorded per increment/sheet, not per task
 - Environment: local
