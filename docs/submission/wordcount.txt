@@ -1,4 +1,6 @@
-Command: sed image lines | pandoc --to=plain | sed URL lines | wc -w
-Words (headings, captions and tables included; figures and first URL excluded): 1087
-Limit: 1350
+Method: body prose, headings and tables counted; figures and their captions excluded per the course rule "Diagram or chart is not part of the word count".
+Words (figures and captions excluded): 998
+Words (captions included, reference only): 1047
+Figure captions found: 5 of 5 (frozen)
+Limit: 1000
 Result: PASS

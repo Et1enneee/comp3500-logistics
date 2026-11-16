@@ -80,8 +80,6 @@ Four layers: pages → routes → handlers → Prisma/SQLite persistence. **Orde
 
 Stock is reserved at CONFIRMED, released on cancellation; lifecycle CREATED→CONFIRMED→PICKING→SHIPPED→IN_TRANSIT→DELIVERED.
 
-Cancellation permissions:
-
 | Role | Transition and effect |
 |---|---|
 | Customer | CREATED: cancel, no restock |
@@ -90,13 +88,11 @@ Cancellation permissions:
 | Staff | CONFIRMED: cancel, restock |
 | Customer, staff | PICKING onwards: rejected |
 
-A CREATED order leaves CREATED only by customer cancel or staff confirmation.
-
 Atomic confirmation (HTTP 409 on repeats; rollback on short stock); driverId set at SHIPPED by the Assign driver step (Figure 1), immutable after; FR-03/04 verified ([order-api](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/order-api.ts#L245), [driver-api](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/driver-api.ts#L44), [inventory-api](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/inventory-api.ts#L142)).
 
 ## 6. Verification
 
-Verification checks the implementation against §3; validation exercises the delivered workflows (§8). [CI](https://github.com/Et1enneee/comp3500-logistics/actions/runs/43175733067) records 38 unit, 140 integration, 2 integrity: the demo-data reset requires RESET_DEMO_DATA=YES (so evidence runs cannot wipe seeded state), and CI compares the packaged submission's SHA-256 manifest with the source ([integrity checks](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/integrity.check.mjs)). Browser acceptance runs on every commit — the recorded browser baseline is 11 Nov, 26 checks ([browser log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/test-logs/2026-11-11-browser/browser.log)). Logs: [integration](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/test-logs/2026-11-12-regression/integration.log) "tests 140", "pass 140"; [unit](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/test-logs/2026-11-12-regression/unit.log) "Tests 38 passed (38)".
+Verification checks the implementation against §3; validation exercises the delivered workflows (§8). [CI](https://github.com/Et1enneee/comp3500-logistics/actions/runs/43175733067) records 38 unit, 140 integration, 2 integrity: the reset requires RESET_DEMO_DATA=YES (so evidence runs cannot wipe seeded state), and CI compares the packaged submission's SHA-256 manifest with the source ([integrity checks](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/integrity.check.mjs)). Browser acceptance runs on every commit — the recorded browser baseline is 11 Nov, 26 checks ([browser log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/test-logs/2026-11-11-browser/browser.log)). Logs: [integration](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/test-logs/2026-11-12-regression/integration.log) "tests 140", "pass 140"; [unit](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/test-logs/2026-11-12-regression/unit.log) "Tests 38 passed (38)".
 
 Loopback [measurement](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/performance.json): p95 3.2–13.6 ms, first contentful paint p95 64–96 ms (30 samples per endpoint) vs the 2 s / 3 s budgets — not representative of public networks.
 
@@ -104,11 +100,11 @@ Reviews verified requirements and models statically; the export fix was validate
 
 ## 7. Evolution
 
-Reviews: 17 Oct found two defects fixed by confirmation (§5); 10–11 Nov aligned diagrams; NFR-01 hosted → local; NFR-02 window → per-commit CI green (§3). Feedback that CI outcomes were untested led to two regression tests (row 8; unit suite 36→38, 36 = count before).
+Changes: NFR-01 hosted → local; NFR-02 window → per-commit CI green (§3). Feedback that CI outcomes were untested led to two regression tests (row 8; unit suite 36→38, 36 = count before).
 
 ## 8. Validation
 
-[Walkthrough](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/walkthrough/automated-walkthrough.md) covers eleven operations: create order; open details; confirm; start picking; ship; assign driver; record pickup; record delivery; filter report; export current; export selected dates — ≤3 interactions each; the 26 checks reach Figure 1's thirteen use cases ([coverage map](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/walkthrough/coverage-map.md)), e.g. Cancel order → check 19. "Browser acceptance passed: 26 checks" ([browser log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/test-logs/2026-11-11-browser/browser.log)): 20 checks (five operations once, three twice, three thrice) plus 6 cross-cutting checks — two each for validation errors, expired sessions, interface failures. During report preparation, both testers (Chung Ngon Man, Li Mu Qiu) made 64 unaided attempts (32 each, repeated across the six core tasks); median 2.1 min per session ([user-validation](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/user-validation.md)). The six tasks: create order; confirm + pick + ship; assign driver + pickup + deliver; cancel a CONFIRMED order (observe restock); administrator reports; selected-date CSV export.
+[Walkthrough](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/walkthrough/automated-walkthrough.md) covers eleven operations: create order; open details; confirm; start picking; ship; assign driver; record pickup; record delivery; filter report; export current; export selected dates — ≤3 interactions each; the 26 checks reach Figure 1's thirteen use cases ([coverage map](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/walkthrough/coverage-map.md)). "Browser acceptance passed: 26 checks" ([browser log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/test-logs/2026-11-11-browser/browser.log)): 20 checks (five operations once, three twice, three thrice) plus 6 cross-cutting checks — two each for validation errors, expired sessions, interface failures. Both testers (Chung Ngon Man, Li Mu Qiu) made 64 unaided attempts (32 each, repeated across the six core tasks); median 2.1 min per session ([user-validation](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/user-validation.md)). The six tasks: create order; confirm + pick + ship; assign driver + pickup + deliver; cancel a CONFIRMED order (observe restock); administrator reports; selected-date CSV export.
 
 ## 9. Feedback and reconciliation
 
@@ -126,4 +122,4 @@ Reviews: 17 Oct found two defects fixed by confirmation (§5); 10–11 Nov align
 
 ## 10. Evidence
 
-38 unit (row 8's two included), 140 integration, 2 integrity (12 Nov); 26 browser checks (11 Nov) ([history](https://github.com/Et1enneee/comp3500-logistics/commits/main)) — [BASELINE](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/BASELINE-final-report.json) (final CI snapshot). [Traceability](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/traceability.md). Limits: local-only, seed data, in-team validation (§1, §8).
+38 unit (row 8's two included), 140 integration, 2 integrity (12 Nov); 26 browser checks (11 Nov) — [BASELINE](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/BASELINE-final-report.json) (final CI snapshot). [Traceability](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/traceability.md). Limits: local-only, seed data, in-team validation.
