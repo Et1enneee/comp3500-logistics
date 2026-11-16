@@ -6,7 +6,7 @@
 
 ## 1. Scope
 
-Goals: traceable decisions, role-separated workflows. Roles: customer, staff, driver, administrator. Local-only: one app; seed data only (RK-05/10, Table B).
+Goals: traceable decisions, role-separated workflows. Roles: customer, staff, driver, administrator. Local-only (course constraint): one app; seed data only (team decision, 9 Oct; RK-05/10, Table B).
 
 ## 2. Development process
 
@@ -14,12 +14,12 @@ Goals: traceable decisions, role-separated workflows. Roles: customer, staff, dr
 
 | Increment and date | Trigger / activity | Outcome |
 |---|---|---|
-| Planning, 9–11 Oct 2026 | Coursework kickoff | Scope, roles, API contracts ([register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/process/increments.md)); the entry is the closing record |
+| Planning, 9–11 Oct 2026 | Coursework kickoff | Scope, roles, API contracts ([register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/process/increments.md)) |
 | 17 Oct review | Requirements review | Two defects found (repeat submits, no ledger); fixed in row 3 |
 | Confirmation, 26–28 Oct 2026 | Row-2 defects: repeat submits, no stock ledger | Both fixed — transaction verified ([orders tests](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/orders.integration.ts)) |
 | Integrated application, 1 Nov 2026 | Role functions integrated | Customer, staff, admin workflows end-to-end (driver follows, row 5) |
 | Driver and privacy, 2 Nov 2026 | Driver, privacy tests missing | Both pass ([driver](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/driver.integration.ts), [privacy](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/tests/privacy.integration.ts)) |
-| Diagram review, 10–11 Nov 2026 | Diagrams diverged from code | Aligned ([review record](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/diagrams/compliance.md)) |
+| Diagram review, 10–11 Nov 2026 | Teacher diagram critique | Fixed ([review record](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/diagrams/compliance.md)) |
 | Export simplification, 11 Nov 2026 | Export took four interactions ([issue #15](https://github.com/Et1enneee/comp3500-logistics/issues/15)) | Selected-date export in three interactions — two fills, one click |
 | CI health tests, 11–12 Nov 2026 | No test covered CI-run outcomes | Two regression tests; unit suite 38 ([unit.log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/test-logs/2026-11-12-regression/unit.log)) |
 
@@ -88,7 +88,7 @@ Stock is reserved at CONFIRMED, released on cancellation; lifecycle CREATED→CO
 | Staff | CONFIRMED: cancel, restock |
 | Customer, staff | PICKING onwards: rejected |
 
-Atomic confirmation (HTTP 409 on repeats; rollback on short stock); driverId set at SHIPPED by the Assign driver step (Figure 1), immutable after; FR-03/04 verified ([order-api](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/order-api.ts#L245), [driver-api](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/driver-api.ts#L44), [inventory-api](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/inventory-api.ts#L142)).
+Atomic confirmation (HTTP 409 on repeats; rollback on short stock); driverId set at SHIPPED by the Assign driver step, immutable after; FR-03/04 implemented ([order-api](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/order-api.ts#L245), [driver-api](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/driver-api.ts#L44), [inventory-api](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/lib/inventory-api.ts#L142)).
 
 ## 6. Verification
 
@@ -100,7 +100,7 @@ Reviews verified requirements and models statically; the export fix was validate
 
 ## 7. Evolution
 
-Changes: NFR-01 hosted → local; NFR-02 window → per-commit CI green (§3). Feedback that CI outcomes were untested led to two regression tests (row 8; unit suite 36→38, 36 = count before).
+Changes: NFR-01 hosted → local; NFR-02 window → per-commit CI green (§3). Feedback that CI outcomes were untested led to two regression tests (row 8; unit suite 36→38).
 
 ## 8. Validation
 
@@ -117,9 +117,9 @@ Changes: NFR-01 hosted → local; NFR-02 window → per-commit CI green (§3). F
 | Stock effects under FR-04 (17 Oct, [traceability](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/traceability.md)) | Moved to FR-02 |
 | Thin trigger descriptions (10–11 Nov, [register](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/process/increments.md)) | Rewritten (Table A) |
 | Filter-then-export took four interactions (11 Nov, [issue #15](https://github.com/Et1enneee/comp3500-logistics/issues/15)) | A combined filter+export path was proposed but still took four interactions — rejected; the adopted direct path (two date fills, one click) meets NFR-04 (row 7); tracked in issue #15 |
-| No CI-health test (11 Nov, [unit.log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/test-logs/2026-11-12-regression/unit.log)) | Two regression tests (row 8); suite 38 |
+| No CI-health test (11 Nov feedback; tests 12 Nov, [unit.log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/evidence/test-logs/2026-11-12-regression/unit.log)) | Two regression tests (row 8); suite 38 |
 | NFR-01/02 assumed hosted measurement, daily window (10–11 Nov, [revision log](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/requirements/srs.md#7-document-control)) | NFR-01 "hosted, daily window" → "on the local host"; NFR-02 "daily window" → "per-commit CI green" |
 
 ## 10. Evidence
 
-38 unit (row 8's two included), 140 integration, 2 integrity (12 Nov); 26 browser checks (11 Nov) — [BASELINE](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/BASELINE-final-report.json) (final CI snapshot). [Traceability](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/traceability.md). Limits: local-only, seed data, in-team validation.
+38 unit (row 8's two included), 140 integration, 2 integrity (12 Nov); 26 browser checks (11 Nov) — [BASELINE](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/BASELINE-final-report.json). [Traceability](https://github.com/Et1enneee/comp3500-logistics/blob/main/logistics/docs/traceability.md). Limits: local-only, seed data, in-team validation.

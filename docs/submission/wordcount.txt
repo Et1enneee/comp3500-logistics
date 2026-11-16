@@ -1,6 +1,6 @@
 Method: body prose, headings and tables counted; figures and their captions excluded per the course rule "Diagram or chart is not part of the word count".
-Words (figures and captions excluded): 998
-Words (captions included, reference only): 1047
+Words (figures and captions excluded): 992
+Words (captions included, reference only): 1041
 Figure captions found: 5 of 5 (frozen)
 Limit: 1000
 Result: PASS
